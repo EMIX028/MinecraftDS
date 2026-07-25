@@ -1,3 +1,7 @@
+*.nds
+*.lst
+.vscode/
+
 # Prerequisites
 *.d
 
