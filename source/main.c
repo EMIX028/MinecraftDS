@@ -5,27 +5,29 @@
 #include <stdio.h>
 #include "nds/arm9/videoGL.h"
 #include "../include/Untitled.h"
+#include "../include/main.h"
+//define this because i have some library issues
+#define KEY_X        (1U<<10)
+#define KEY_Y        (1U<<11)
 
-
-static float posX = 0.0f;
-static float posY = 1.5f;      // hauteur des yeux
-static float posZ = 2.0f;
-
-static float angle = 0.0f;     // rotation autour de Y
+camera_t Camera = {
+                    .position.x = 0.0, .position.y = 1.5, .position.z = 2.0,
+                    .yaw = 0.0,
+                    .pitch = 0.0
+};
 
 const float vitesse = 0.08f;
-const float vitesseRotation = 0.04f;
+const float vitesseRotation = 0.06f;
 
 int main() {
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
   videoSetMode(MODE_0_3D);
   glInit();
   consoleDemoInit();
-  BG_PALETTE_SUB[0] = RGB15(4,8,25);
+  BG_PALETTE_SUB[0] = RGB15(10,20,10);
   glEnable(GL_ANTIALIAS);
   glViewport(0, 0, 255, 191);
   glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
   gluPerspective(70, 256.0 / 192.0, 0.1, 40);
 
   glLight(
@@ -47,59 +49,70 @@ int main() {
     RGB15(31,31,31)
   );
 
+  printf("\n\t\tMinecraft DS Edition\n");
 
   while (pmMainLoop()) {
-    float dirX = sinf(angle);
-    float dirZ = -cosf(angle);
-    float rightX = cosf(angle);
-    float rightZ = sinf(angle);
+    position_t Direction = getDir(Camera);
     scanKeys();
     u16 k = keysHeld();
     if (k & KEY_LEFT) {
-      posX -= rightX * vitesse;
-      posZ -= rightZ * vitesse;
+      Camera.position.x -= cosf(Camera.yaw) * vitesse;
+      Camera.position.z -= sinf(Camera.yaw) * vitesse;
     }
     if (k & KEY_RIGHT) {
-      posX += rightX * vitesse;
-      posZ += rightZ * vitesse;
+      Camera.position.x += cosf(Camera.yaw) * vitesse;
+      Camera.position.z += sinf(Camera.yaw) * vitesse;
     }
     if (k & KEY_UP) {
-      posX += dirX * vitesse;
-      posZ += dirZ * vitesse;
+      Camera.position.x += Direction.x * vitesse;
+      Camera.position.z += Direction.z * vitesse;
     }
     if (k & KEY_DOWN) {
-      posX -= dirX * vitesse;
-      posZ -= dirZ * vitesse;
+      Camera.position.x -= Direction.x * vitesse;
+      Camera.position.z -= Direction.z * vitesse;
     }
     if(k & KEY_Y){
-      angle -= vitesseRotation;
+      Camera.yaw -= vitesseRotation;
     }
     if(k & KEY_A){
-      angle += vitesseRotation;
+      Camera.yaw += vitesseRotation;
     }
-    if(keysUp()){
-      consoleClear();
+    if(k & KEY_B){
+      //printf("pitch : %f\n",sinf(Camera.pitch));
+      if(sinf(Camera.pitch) > -0.98){
+        Camera.pitch -= vitesseRotation;
+      }
+    }
+    if(k & KEY_X){
+      // printf("pitch : %f\n",sinf(Camera.pitch));
+      if(sinf(Camera.pitch) < 0.98){
+        Camera.pitch += vitesseRotation;
+      }
     }
     //touches
-    glMatrixMode(GL_MODELVIEW);
-    // CRUCIAL : reset complet chaque frame
+    glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
 
     gluLookAt(
-      posX,
-      posY,
-      posZ,
+      Camera.position.x, Camera.position.y, Camera.position.z,
+      
+      Camera.position.x + Direction.x, Camera.position.y +Direction.y, Camera.position.z + Direction.z,
 
-      posX + dirX,
-      posY,
-      posZ + dirZ,
-
-      0.0f,
-      1.0f,
-      0.0f
+      0.0f, 1.0f, 0.0f
     );
 
-    drawCube(false);
+    glPushMatrix();
+      glScalef32(floattof32(0.5),floattof32(0.5),floattof32(0.5));
+      drawCube(false);
+    glPopMatrix(1);
+
+    glPushMatrix();
+      glScalef32(floattof32(0.5),floattof32(0.5),floattof32(0.5));
+      glTranslatef32(0.0,floattof32(-2.0),floattof32(2.0));
+      drawCube(false);
+    glPopMatrix(1);
+
+
 
     glFlush(0);
     swiWaitForVBlank();
@@ -108,3 +121,10 @@ int main() {
 }
 
 
+position_t getDir(camera_t cam){
+  position_t dir;
+  dir.x = sinf(cam.yaw)*cosf(cam.pitch);
+  dir.y = sinf(cam.pitch);
+  dir.z = -cosf(cam.yaw)*cosf(cam.pitch);
+  return dir;
+}
