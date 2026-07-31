@@ -13,8 +13,20 @@
 #define SCREEN_H 192
 #define MAX_ANGLE 0.995
 
-typedef struct{
+typedef struct fvec3{
   float x;
   float y;
   float z;
 } vec3_t;
+
+typedef struct ivec3{
+  float x;
+  float y;
+  float z;
+} ivec3_t;
+
+typedef struct rgb{
+  char r;
+  char g;
+  char b;
+} rgb_t;

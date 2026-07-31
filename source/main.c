@@ -18,8 +18,8 @@ camera_t Camera = {
 const float vitesse = 0.08f;
 const float vitesseRotation = 0.06f;
 
-chunk_t test = {
-  .position.x = 0.0,.position.y = 0.0,.position.z = 0.0
+chunk_t test_chunk = {
+  .position.x = 1.0,.position.y = 0.0,.position.z = 0.0
 };
 
 int main() {
@@ -54,9 +54,10 @@ int main() {
   );
 
   printf("\n\t\tMinecraft DS Edition\n");
-  initChunk(&test);
-
+  initChunk(&test_chunk,&pierre);
+  rgb_t colorTest = {.r = 0,.g = 20, .b=0};
   while (pmMainLoop()) {
+    keyboardUpdate();
     vec3_t Direction = getDir(Camera);
     scanKeys();
     loadKeyAssignation(&Camera,&Direction,vitesse,vitesseRotation);
@@ -71,15 +72,17 @@ int main() {
       0.0f, 1.0f, 0.0f
     );
 
-    drawCube(true);
+    drawSpecialCube(false);
 
     glPushMatrix();
       glTranslatef32(0.0,floattof32(-1.0),floattof32(1.0));
-      drawPierre(true);
+      drawCube(true,colorTest);
     glPopMatrix(1);
 
-    setBlock(&pierre,true);
+    //setBlock(&pierre,true);
+    setBlockFaces(&pierre,false,'L');
 
+    drawChunk(&test_chunk,true);
 
     glFlush(0);
     swiWaitForVBlank();

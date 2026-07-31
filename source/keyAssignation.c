@@ -47,4 +47,7 @@ void loadKeyAssignation(camera_t *Camera,vec3_t *Direction, const float vitesse,
     if(keysUp() & KEY_L){
       consoleClear();
     }
+    if(keysDown() & KEY_R){
+      keyboardShow();
+    }
 }
