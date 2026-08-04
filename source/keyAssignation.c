@@ -4,50 +4,75 @@
 #include "mctypes.h"
 #include "keyAssignation.h"
 
-void loadKeyAssignation(camera_t *Camera,vec3_t *Direction, const float vitesse, const float sensitivity){
+void loadKeyAssignation(player_t *player,vec3_t *Direction, const float vitesse, const float sensitivity){
+    bool specialmode = false;
+    if(keysHeld() & KEY_L){
+      specialmode = true;
+    }
+    if(keysUp() & KEY_L){
+      //consoleClear();
+      //printf("\n\t\tMinecraft DS Edition\n");
+      specialmode = false;
+    }
     if (keysHeld() & KEY_LEFT) {
-      Camera->position.x -= cosf(Camera->yaw) * vitesse;
-      Camera->position.z -= sinf(Camera->yaw) * vitesse;
+      movePlayer(player, (vec3_t){
+        .x = -(cosf(player->Camera.yaw) * vitesse),
+        .y = 0.0f,
+        .z = -(sinf(player->Camera.yaw) * vitesse)
+      });
     }
     if (keysHeld() & KEY_RIGHT) {
-      Camera->position.x += cosf(Camera->yaw) * vitesse;
-      Camera->position.z += sinf(Camera->yaw) * vitesse;
+      movePlayer(player, (vec3_t){
+        .x = cosf(player->Camera.yaw) * vitesse,
+        .y = 0.0f,
+        .z = sinf(player->Camera.yaw) * vitesse
+      });
     }
     if (keysHeld() & KEY_UP) {
-      Camera->position.x += sinf(Camera->yaw) * vitesse;
-      Camera->position.z += -cosf(Camera->yaw) * vitesse;
+      movePlayer(player, (vec3_t){
+        .x = sinf(player->Camera.yaw) * vitesse,
+        .y = 0.0f,
+        .z = -cosf(player->Camera.yaw) * vitesse
+      });
     }
     if (keysHeld() & KEY_DOWN) {
-      Camera->position.x -= sinf(Camera->yaw) * vitesse;
-      Camera->position.z -= -cosf(Camera->yaw) * vitesse;
+      movePlayer(player, (vec3_t){
+        .x = -(sinf(player->Camera.yaw) * vitesse),
+        .y = 0.0f,
+        .z = cosf(player->Camera.yaw) * vitesse
+      });
     }
     if(keysHeld() & KEY_Y){
-      Camera->yaw -= sensitivity;
+      player->Camera.yaw -= sensitivity;
     }
     if(keysHeld() & KEY_A){
-      Camera->yaw += sensitivity;
+      player->Camera.yaw += sensitivity;
     }
     if(keysHeld() & KEY_B){
-      //printf("pitch : %f\n",sinf(Camera->pitch));
-      if(sinf(Camera->pitch) > -MAX_ANGLE){
-        Camera->pitch -= sensitivity;
+      if( specialmode != true && sinf(player->Camera.pitch) > -MAX_ANGLE){
+        player->Camera.pitch -= sensitivity;
       }
     }
     if(keysHeld() & KEY_X){
-      // printf("pitch : %f\n",sinf(Camera->pitch));
-      if(sinf(Camera->pitch) < MAX_ANGLE){
-        Camera->pitch += sensitivity;
+      if(sinf(player->Camera.pitch) < MAX_ANGLE){
+        player->Camera.pitch += sensitivity;
       }
     }
-    if(keysDown() & KEY_L){
-      printf("point x: %d, y: %d, z: %d\n",(int)round(Camera->position.x + Direction->x),
-                        (int)round(Camera->position.y + Direction->y),
-                        (int)round(Camera->position.z + Direction->z));
+    // if(keysDown() & KEY_L){
+    //   printf("point x: %d, y: %d, z: %d\n",(int)(player->Position.x),
+    //                     (int)(player->Position.y),
+    //                     -(int)(player->Position.z));
+    // }
+    if(keysUp() & KEY_R){
+      lcdMainOnBottom();
     }
-    if(keysUp() & KEY_L){
-      consoleClear();
+    if(keysUp() & KEY_START){
+      systemShutDown();
     }
-    if(keysDown() & KEY_R){
-      keyboardShow();
+    if((keysHeld() & KEY_L) && ( keysHeld() & KEY_B)){
+      movePlayer(player,(vec3_t){.x=0,.y=0.5,.z=0});
+    }
+    if((keysHeld() & KEY_L) && ( keysHeld() & KEY_SELECT)){
+      movePlayer(player,(vec3_t){.x=0,.y=-0.5,.z=0});
     }
 }

@@ -8,21 +8,16 @@
 #include "ChunkStruct.h"
 #include "keyAssignation.h"
 #include "Blocks.h"
+#include "stone.h"
 
-camera_t Camera = {
-                    .position.x = 0.5, .position.y = 1.5, .position.z = 0.0,
-                    .yaw = 0.0,
-                    .pitch = 0.0
-};
+player_t Joueur;
 
 const float vitesse = 0.08f;
 const float vitesseRotation = 0.06f;
 
-chunk_t test_chunk = {
-  .position.x = 1.0,.position.y = 0.0,.position.z = 0.0
-};
-
 int main() {
+  setPlayer(&Joueur);
+  InitBlocks();
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
   videoSetMode(MODE_0_3D);
   glInit();
@@ -34,56 +29,61 @@ int main() {
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, 40);
 
-  glLight(
-    0,
-    RGB15(20,20,20),
-    floattov10(-0.5f),
-    floattov10(-0.8f),
-    floattov10(-1.0f)
-  );
-  
 
-  glMaterialf(
-    GL_AMBIENT,
-    RGB15(5,5,5)
-  );
+  chunk_t chunkTest = {
+    .position.x = 1, .position.z = 0
+  };
 
-  glMaterialf(
-    GL_DIFFUSE,
-    RGB15(31,31,31)
-  );
+  chunk_t chunkTest2 = {
+    .position.x = 0, .position.z = 0
+  };
 
+  initChunk(&chunkTest,DIRT);
+  initChunk(&chunkTest2,GRASS);
+
+  //movePlayer(&Joueur, (vec3_t){.x=0,.y=1,.z=0});
   printf("\n\t\tMinecraft DS Edition\n");
-  initChunk(&test_chunk,&pierre);
-  rgb_t colorTest = {.r = 0,.g = 20, .b=0};
   while (pmMainLoop()) {
-    keyboardUpdate();
-    vec3_t Direction = getDir(Camera);
+    vec3_t Direction = getDir(Joueur.Camera);
     scanKeys();
-    loadKeyAssignation(&Camera,&Direction,vitesse,vitesseRotation);
+    loadKeyAssignation(&Joueur,&Direction,vitesse,vitesseRotation);
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
 
+    glLight(
+      0,
+      RGB15(31,31,31),      // Soleil bien blanc
+      floattov10(-0.5f),
+      floattov10(-1.0f),
+      floattov10(-0.3f)
+    );
+
+    glMaterialf(GL_AMBIENT, RGB15(15,15,15));
+    glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
+
     gluLookAt(
-      Camera.position.x, Camera.position.y, Camera.position.z,
+      Joueur.Camera.position.x, Joueur.Camera.position.y, Joueur.Camera.position.z,
       
-      Camera.position.x + Direction.x, Camera.position.y +Direction.y, Camera.position.z + Direction.z,
+      Joueur.Camera.position.x + Direction.x, Joueur.Camera.position.y +Direction.y, Joueur.Camera.position.z + Direction.z,
 
       0.0f, 1.0f, 0.0f
     );
 
-    drawSpecialCube(false);
+    //drawSpecialCube(false);
+    hitbox_t cubetest = {.x = 0, .y = 0, .z = 0, .w = 1, .h = 1};
+    drawCube(false,(rgb_t){.r=31,.g=31,.b=31});
 
-    glPushMatrix();
-      glTranslatef32(0.0,floattof32(-1.0),floattof32(1.0));
-      drawCube(true,colorTest);
-    glPopMatrix(1);
+    if(checkCollision(Joueur.hitbox,cubetest)){
+      printf("en collision\n");
+    }
 
-    //setBlock(&pierre,true);
-    setBlockFaces(&pierre,false,'L');
+    RenderChunk(&chunkTest,gBlocks);
 
-    drawChunk(&test_chunk,true);
-
+    // if(chunkTest2.position.x*L_CHUNK <= Joueur.Position.x && Joueur.Position.x <= chunkTest2.position.x*L_CHUNK + L_CHUNK &&
+    //     chunkTest2.position.z*L_CHUNK <= Joueur.Position.z && Joueur.Position.z <= chunkTest2.position.z*L_CHUNK + L_CHUNK){
+    //       RenderChunk(&chunkTest2,gBlocks);
+    //     }
+    //consoleClear();
     glFlush(0);
     swiWaitForVBlank();
   }

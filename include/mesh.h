@@ -1,5 +1,7 @@
 #include "mctypes.h"
 
+#define AMBIENT_RATIO 0.5
+
 void drawCube(bool cullback,rgb_t color);
 
 void drawSpecialCube(bool cullback);

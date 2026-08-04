@@ -25,6 +25,11 @@ typedef struct ivec3{
   float z;
 } ivec3_t;
 
+typedef struct vec2{
+  int x;
+  int z;
+} vec2_t;
+
 typedef struct rgb{
   char r;
   char g;

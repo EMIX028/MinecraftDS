@@ -2,33 +2,32 @@
 #define CHUNKSTRUCT_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "mctypes.h"
 #define L_CHUNK 5
+#define H_CHUNK 5
 
-typedef struct{
-  int id;
-  vec3_t position;
-  rgb_t color;
-  void (*drawFront)(bool,rgb_t);
-  void (*drawBack)(bool,rgb_t);
-  void (*drawTop)(bool,rgb_t);
-  void (*drawBottom)(bool,rgb_t);
-  void (*drawLeft)(bool,rgb_t);
-  void (*drawRight)(bool,rgb_t);
-  void (*drawAll)(bool,rgb_t);
+typedef struct block_s {
+    int id;
+
+    bool solid; //si on traverse ou non le block
+    bool transparent; //transparence du block
+
+    int hardness; //temps de destruction
+    rgb_t color;
+    void (*draw)(const struct block_s *block);
+    void (*onBreak)(int x, int y, int z);
+    void (*onTick)(int x, int y, int z);
+
 } block_t;
 
-void setBlockAll(block_t *block, bool cullback);
-
-void setBlockFaces(block_t *block, bool cullback, char face);
-
 typedef struct chunk{
-    ivec3_t position;
-    block_t chunk[L_CHUNK][L_CHUNK][L_CHUNK];
+    vec2_t position;
+    uint8_t blocks[L_CHUNK][H_CHUNK][L_CHUNK];
 } chunk_t;
 
-void initChunk(chunk_t *chunk, block_t *block);
+void initChunk(chunk_t *chunk, int id);
 
-void drawChunk(chunk_t *chunk, bool cullback);
+void RenderChunk(chunk_t *chunk, block_t *list);
 
 #endif
