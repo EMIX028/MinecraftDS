@@ -8,6 +8,7 @@
 #include "ChunkStruct.h"
 #include "keyAssignation.h"
 #include "Blocks.h"
+#include "stone.h"
 
 player_t Joueur;
 
@@ -20,14 +21,34 @@ int main() {
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
   videoSetMode(MODE_0_3D);
   glInit();
+  vramSetBankA(VRAM_A_TEXTURE);
   glClearColor(10, 20, 31, 31); // fond bleu ciel
   consoleDemoInit();
   BG_PALETTE_SUB[0] = RGB15(10,20,10);
+  glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, 40);
 
+  int stoneTextureID;
+
+  glGenTextures(1, &stoneTextureID);
+
+  glBindTexture(0, stoneTextureID);
+
+  if (glTexImage2D(
+    0,                  // texture slot
+    0,                  // niveau mipmap
+    GL_RGB,             // format couleur
+    TEXTURE_SIZE_16,
+    TEXTURE_SIZE_16,
+    0,
+    TEXGEN_TEXCOORD,
+    stoneBitmap
+  ) == 0){
+    printf("erreur init texture\n");
+  }
 
   chunk_t chunkTest = {
     .position.x = 1, .position.z = 0
@@ -68,9 +89,11 @@ int main() {
       0.0f, 1.0f, 0.0f
     );
 
-    //drawSpecialCube(false);
+    glBindTexture(0, stoneTextureID);
+
     hitbox_t cubetest = {.x = 0, .y = 0, .z = 0, .w = 1, .h = 1};
     drawCube(false,(rgb_t){.r=31,.g=31,.b=31});
+    drawCubeLeft(false,(rgb_t){.r=31,.g=31,.b=31});
 
     if(checkCollision(Joueur.hitbox,cubetest)){
       printf("en collision\n");
@@ -82,7 +105,6 @@ int main() {
     //     chunkTest2.position.z*L_CHUNK <= Joueur.Position.z && Joueur.Position.z <= chunkTest2.position.z*L_CHUNK + L_CHUNK){
     //       RenderChunk(&chunkTest2,gBlocks);
     //     }
-    //consoleClear();
     glFlush(0);
     swiWaitForVBlank();
   }

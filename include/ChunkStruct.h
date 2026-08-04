@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mctypes.h"
-#define L_CHUNK 5
-#define H_CHUNK 5
+#define L_CHUNK 10 //chunk minecraft 15
+#define H_CHUNK 20 // hauteur max 256
 
 typedef struct block_s {
     int id;
