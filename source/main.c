@@ -8,7 +8,6 @@
 #include "ChunkStruct.h"
 #include "keyAssignation.h"
 #include "Blocks.h"
-#include "stone.h"
 
 player_t Joueur;
 
