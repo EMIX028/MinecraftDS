@@ -8,7 +8,7 @@
 #endif
 
 #pragma once
-
+#include <stdint.h>
 #define SCREEN_W 256
 #define SCREEN_H 192
 #define MAX_ANGLE 0.995
@@ -31,7 +31,7 @@ typedef struct vec2{
 } vec2_t;
 
 typedef struct rgb{
-  char r;
-  char g;
-  char b;
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
 } rgb_t;

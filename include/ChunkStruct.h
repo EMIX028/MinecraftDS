@@ -8,13 +8,14 @@
 #define H_CHUNK 20 // hauteur max 256
 
 typedef struct block_s {
-    int id;
+    uint8_t id;
 
     bool solid; //si on traverse ou non le block
     bool transparent; //transparence du block
 
     int hardness; //temps de destruction
     rgb_t color;
+    uint8_t texture;
     void (*draw)(const struct block_s *block);
     void (*onBreak)(int x, int y, int z);
     void (*onTick)(int x, int y, int z);

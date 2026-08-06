@@ -146,7 +146,7 @@ void drawSpecialCube(bool cullback){
 	glEnd();
 }
 
-void drawCubeTop(bool cullback,rgb_t color){
+void drawCubeTop(bool cullback){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0);//POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
 
@@ -168,7 +168,7 @@ void drawCubeTop(bool cullback,rgb_t color){
 	glEnd();
 }
 
-void drawCubeBottom(bool cullback,rgb_t color){
+void drawCubeBottom(bool cullback){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //| POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
 
@@ -189,7 +189,7 @@ void drawCubeBottom(bool cullback,rgb_t color){
 	glEnd();
 }
 
-void drawCubeFront(bool cullback,rgb_t color){
+void drawCubeFront(bool cullback){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
     
@@ -211,7 +211,7 @@ void drawCubeFront(bool cullback,rgb_t color){
 	glEnd();
 }
 
-void drawCubeRight(bool cullback,rgb_t color){
+void drawCubeRight(bool cullback){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
 	//face droite
@@ -232,7 +232,7 @@ void drawCubeRight(bool cullback,rgb_t color){
 	glEnd();
 }
 
-void drawCubeBack(bool cullback,rgb_t color){
+void drawCubeBack(bool cullback){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
 	//face arrière
@@ -253,7 +253,7 @@ void drawCubeBack(bool cullback,rgb_t color){
 	glEnd();
 }
 
-void drawCubeLeft(bool cullback,rgb_t color){
+void drawCubeLeft(bool cullback){
     glPolyFmt(
         POLY_ALPHA(31) |
         (cullback ? POLY_CULL_BACK : POLY_CULL_NONE) |
@@ -282,13 +282,13 @@ glVertex3v16(0,0,inttov16(-1));
 glEnd();
 }
 
-void drawCube(bool cullback,rgb_t color){
-	drawCubeLeft(cullback, color);
-    drawCubeFront(cullback, color);
-	drawCubeBack(cullback, color);
-	drawCubeRight(cullback, color);
-	drawCubeTop(cullback, color);
-	drawCubeBottom(cullback, color);
+void drawCube(bool cullback){
+	drawCubeLeft(cullback);
+    drawCubeFront(cullback);
+	drawCubeBack(cullback);
+	drawCubeRight(cullback);
+	drawCubeTop(cullback);
+	drawCubeBottom(cullback);
 }
 
 // glMaterialf(

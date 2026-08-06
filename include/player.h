@@ -2,6 +2,10 @@
 #include <math.h>
 #include <stdbool.h>
 
+#define P_SPEED 0.08
+#define P_SENSI 0.06
+#define P_FLYSPEED 0.25
+
 typedef struct{
   vec3_t position;
   float yaw;
