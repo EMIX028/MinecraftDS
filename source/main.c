@@ -8,7 +8,7 @@
 #include "ChunkStruct.h"
 #include "keyAssignation.h"
 #include "Blocks.h"
-#include "stone.h"
+#include "TextureAtlas.h"
 
 player_t Joueur;
 vec3_t Direction;
@@ -29,41 +29,51 @@ int main() {
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, 40);
 
-  int stoneTextureID;
+  int TextureID;
 
-  glGenTextures(1, &stoneTextureID);
-  glBindTexture(0, stoneTextureID);
+  glGenTextures(1, &TextureID);
+  glBindTexture(0, TextureID);
 
   if (glTexImage2D(
     0,
     0,
     GL_RGB,
-    TEXTURE_SIZE_16,
-    TEXTURE_SIZE_16,
+    TEXTURE_SIZE_32,
+    TEXTURE_SIZE_32,
     0,
     TEXGEN_TEXCOORD,
-    stoneBitmap
+    TextureAtlasBitmap
   ) == 0){
     printf("\nerreur init texture\n");
   }
+
+  chunk_t chunk00 = {
+    .position.x = 0, .position.z = 0,
+    .blocks[0][0][0] = DIRT
+  };
 
   chunk_t chunkTest = {
     .position.x = 1, .position.z = 0
   };
 
-  initChunk(&chunkTest,DIRT);
+  initChunk(&chunkTest,STONE);
   uint8_t compteur = 0;
 
   while (pmMainLoop()) {
+    glBindTexture(0, TextureID);
     subscreenAff();
     vec3_t Direction = getDir(Joueur.Camera);
     scanKeys();
+    loadPlayerMovement(&Joueur,&Direction);
     loadKeyAssignation(&Joueur,&Direction);
 
     if(keysDown() & KEY_R){
       chunkTest.blocks[compteur][1][5] = AIR;
       ++compteur;
-      printf("\n%d id block : %d",compteur,chunkTest.blocks[compteur][1][5]);
+    }
+    if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
+      chunkTest.blocks[compteur][1][5] = COBBLESTONE;
+      --compteur;
     }
 
 
@@ -90,21 +100,14 @@ int main() {
       0.0f, 1.0f, 0.0f
     );
 
-    glBindTexture(0, stoneTextureID);
-
     hitbox_t cubetest = {.x = 0, .y = 0, .z = 0, .w = 1, .h = 1};
-    drawCube(false);
 
     if(checkCollision(Joueur.hitbox,cubetest)){
       printf("\nen collision\n");
     }
-
+    RenderChunk(&chunk00,gBlocks);
     RenderChunk(&chunkTest,gBlocks);
 
-    // if(chunkTest2.position.x*L_CHUNK <= Joueur.Position.x && Joueur.Position.x <= chunkTest2.position.x*L_CHUNK + L_CHUNK &&
-    //     chunkTest2.position.z*L_CHUNK <= Joueur.Position.z && Joueur.Position.z <= chunkTest2.position.z*L_CHUNK + L_CHUNK){
-    //       RenderChunk(&chunkTest,gBlocks);
-    //     }
     glFlush(0);
     swiWaitForVBlank();
   }
@@ -112,7 +115,7 @@ int main() {
 }
 
 void subscreenAff(){
-  //consoleClear();
+  consoleClear();
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;5H|Minecraft DS Edition|");
   iprintf("\x1b[2;5H----------------------");
@@ -120,8 +123,4 @@ void subscreenAff(){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           -(int)Joueur.Position.z);
-  iprintf("\x1b[5;1HDir x:%4d y:%4d z:%4d",
-          (int)(Joueur.Camera.position.x + Direction.x),
-          (int)(Joueur.Camera.position.y +Direction.y),
-          -(int)(Joueur.Camera.position.z + Direction.z));
 }

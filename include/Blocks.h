@@ -6,7 +6,8 @@
 typedef enum {
     AIR,
     DIRT,
-    GRASS,
+    STONE,
+    COBBLESTONE,
     BLOCK_COUNT
 } Blocks;
 

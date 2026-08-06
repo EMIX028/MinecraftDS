@@ -1,4 +1,5 @@
 #include "player.h"
+#include <nds.h>
 
 void setPlayer(player_t *player){
   player->Position.x = 0.5f;
@@ -41,13 +42,71 @@ vec3_t getDir(camera_t cam){
 
 bool checkCollision(hitbox_t a, hitbox_t b){
     return (
-        a.x < b.x + b.w &&
-        a.x + a.w > b.x &&
+      a.x < b.x + b.w &&
+      a.x + a.w > b.x &&
 
-        a.y < b.y + b.h &&
-        a.y + a.h > b.y &&
+      a.y < b.y + b.h &&
+      a.y + a.h > b.y &&
 
-        a.z < b.z + b.d &&
-        a.z + a.d > b.z
+      a.z < b.z + b.d &&
+      a.z + a.d > b.z
     );
+}
+
+void loadPlayerMovement(player_t *player,vec3_t *Direction){
+  bool specialmode = false;
+  if(keysHeld() & KEY_L){
+    specialmode = true;
+  }
+  if(keysUp() & KEY_L){
+    specialmode = false;
+  }
+  if (keysHeld() & KEY_LEFT) {
+    movePlayer(player, (vec3_t){
+      .x = -(cosf(player->Camera.yaw) * P_SPEED),
+      .y = 0.0f,
+      .z = -(sinf(player->Camera.yaw) * P_SPEED)
+    });
+  }
+  if (keysHeld() & KEY_RIGHT) {
+    movePlayer(player, (vec3_t){
+      .x = cosf(player->Camera.yaw) * P_SPEED,
+      .y = 0.0f,
+      .z = sinf(player->Camera.yaw) * P_SPEED
+    });
+  }
+  if (keysHeld() & KEY_UP) {
+    movePlayer(player, (vec3_t){
+      .x = sinf(player->Camera.yaw) * P_SPEED,
+      .y = 0.0f,
+      .z = -cosf(player->Camera.yaw) * P_SPEED
+    });
+  }
+  if (keysHeld() & KEY_DOWN) {
+    movePlayer(player, (vec3_t){
+      .x = -(sinf(player->Camera.yaw) * P_SPEED),
+      .y = 0.0f,
+      .z = cosf(player->Camera.yaw) * P_SPEED
+    });
+  }
+  if(keysHeld() & KEY_Y){
+    if(specialmode != true){
+      player->Camera.yaw -= P_SENSI;
+    }
+  }
+  if(keysHeld() & KEY_A){
+    if(specialmode != true){
+      player->Camera.yaw += P_SENSI;
+    }
+  }
+  if(keysHeld() & KEY_B){
+    if( specialmode != true && sinf(player->Camera.pitch) > -MAX_ANGLE){
+      player->Camera.pitch -= P_SENSI;
+    }
+  }
+  if(keysHeld() & KEY_X){
+    if(sinf(player->Camera.pitch) < MAX_ANGLE){
+      player->Camera.pitch += P_SENSI;
+    }
+  }
 }

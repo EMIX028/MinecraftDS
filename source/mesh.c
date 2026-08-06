@@ -146,149 +146,140 @@ void drawSpecialCube(bool cullback){
 	glEnd();
 }
 
-void drawCubeTop(bool cullback){
+void drawCubeTop(bool cullback, vec2_8_t t){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0);//POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
 
-	//face dessus
 	glBegin(GL_QUADS);
 	glNormal(NORMAL_PACK(0,floattov10(1.0),0));
 
-    glTexCoord2t16(inttot16(16), inttot16(16));
-	glVertex3v16(floattov16(1.0), floattov16(1.0), floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y), inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), floattov16(1.0), floattov16(-1.0));
 
-    glTexCoord2t16(inttot16(16),0);
-	glVertex3v16(0, floattov16(1.0), floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(0, floattov16(1.0), floattov16(-1.0));
 
-    glTexCoord2t16(0,0);
-	glVertex3v16(0, floattov16(1.0), 0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(0, floattov16(1.0), 0);
 
-    glTexCoord2t16(0,inttot16(16));
-	glVertex3v16(floattov16(1.0), floattov16(1.0),0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), floattov16(1.0),0);
 	glEnd();
 }
 
-void drawCubeBottom(bool cullback){
+void drawCubeBottom(bool cullback, vec2_8_t t){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //| POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
 
 	glBegin(GL_QUADS);
 	glNormal(NORMAL_PACK(0,floattov10(-1.0),0));
 
-    glTexCoord2t16(inttot16(16), inttot16(16));
-	glVertex3v16(0, 0, floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y), inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(0, 0, floattov16(-1.0));
 
-    glTexCoord2t16(inttot16(16),0);
-	glVertex3v16(floattov16(1.0), 0, floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), 0, floattov16(-1.0));
 
-    glTexCoord2t16(0,0);
-	glVertex3v16(floattov16(1.0),0, 0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0),0, 0);
 
-    glTexCoord2t16(0,inttot16(16));
-	glVertex3v16(0,0, 0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(0,0, 0);
 	glEnd();
 }
 
-void drawCubeFront(bool cullback){
+void drawCubeFront(bool cullback, vec2_8_t t){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
     
-	//face avant
 	glBegin(GL_QUADS);
 	glNormal(NORMAL_PACK(0,0,floattov10(1.0)));
 
-    glTexCoord2t16(inttot16(16), inttot16(16));
-	glVertex3v16(floattov16(1.0),0, 0);
+    glTexCoord2t16(inttot16(16 + 16*t.y), inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0),0, 0);
 
-    glTexCoord2t16(inttot16(16),0);
-	glVertex3v16(floattov16(1.0), floattov16(1.0), 0);
+    glTexCoord2t16(inttot16(16 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), floattov16(1.0), 0);
 
-    glTexCoord2t16(0,0);
-	glVertex3v16(0, floattov16(1.0), 0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(0, floattov16(1.0), 0);
 
-    glTexCoord2t16(0,inttot16(16));
-	glVertex3v16(0,0,0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(0,0,0);
 	glEnd();
 }
 
-void drawCubeRight(bool cullback){
+void drawCubeRight(bool cullback, vec2_8_t t){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
-	//face droite
+
 	glBegin(GL_QUADS);
 	glNormal(NORMAL_PACK(floattov10(1.0),0,0));
 
-    glTexCoord2t16(inttot16(16), inttot16(16));
-	glVertex3v16(floattov16(1.0), 0, floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y), inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), 0, floattov16(-1.0));
 
-    glTexCoord2t16(inttot16(16),0);
-	glVertex3v16(floattov16(1.0), floattov16(1.0), floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), floattov16(1.0), floattov16(-1.0));
 
-    glTexCoord2t16(0,0);
-	glVertex3v16(floattov16(1.0), floattov16(1.0), 0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), floattov16(1.0), 0);
 
-    glTexCoord2t16(0,inttot16(16));
-	glVertex3v16(floattov16(1.0), 0,0);
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), 0,0);
 	glEnd();
 }
 
-void drawCubeBack(bool cullback){
+void drawCubeBack(bool cullback, vec2_8_t t){
 	glPolyFmt(POLY_ALPHA(31) |(cullback ? POLY_CULL_BACK : POLY_CULL_NONE)| POLY_FORMAT_LIGHT0); //POLY_FORMAT_LIGHT0
 	glColor3b(255,255,255);
-	//face arrière
+
 	glBegin(GL_QUADS);
 	glNormal(NORMAL_PACK(0,0,floattov10(-1.0)));
 
-    glTexCoord2t16(inttot16(16), inttot16(16));
-	glVertex3v16(0,0, floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y), inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(0,0, floattov16(-1.0));
 
-    glTexCoord2t16(inttot16(16),0);
-	glVertex3v16(0, floattov16(1.0), floattov16(-1.0));
+    glTexCoord2t16(inttot16(16 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(0, floattov16(1.0), floattov16(-1.0));
 
-    glTexCoord2t16(0,0);
-	glVertex3v16(floattov16(1.0), floattov16(1.0), floattov16(-1.0));
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), floattov16(1.0), floattov16(-1.0));
 
-    glTexCoord2t16(0,inttot16(16));
-	glVertex3v16(floattov16(1.0), 0, floattov16(-1.0));
+    glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(floattov16(1.0), 0, floattov16(-1.0));
 	glEnd();
 }
 
-void drawCubeLeft(bool cullback){
-    glPolyFmt(
-        POLY_ALPHA(31) |
-        (cullback ? POLY_CULL_BACK : POLY_CULL_NONE) |
-        POLY_FORMAT_LIGHT0
-    );
+void drawCubeLeft(bool cullback, vec2_8_t t){
+  glPolyFmt(POLY_ALPHA(31) | (cullback ? POLY_CULL_BACK : POLY_CULL_NONE) | POLY_FORMAT_LIGHT0 );
+  glColor3b(255,255,255);
 
-    glColor3b(255,255,255);
+	glBegin(GL_QUADS);
+		glNormal(NORMAL_PACK(floattov10(-1.0),0,0));
 
-    glBegin(GL_QUADS);
+		glTexCoord2t16(inttot16(16 + 16*t.y), inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(0,0,0);
 
-glBegin(GL_QUADS);
-glNormal(NORMAL_PACK(floattov10(-1.0),0,0));
+		glTexCoord2t16(inttot16(16 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(0,inttov16(1),0);
 
-glTexCoord2t16(inttot16(16), inttot16(16));
-glVertex3v16(0,0,0);
+		glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(0 + 16*t.x)); //Texture
+		glVertex3v16(0,inttov16(1),inttov16(-1));
 
-glTexCoord2t16(inttot16(16),0);
-glVertex3v16(0,inttov16(1),0);
+		glTexCoord2t16(inttot16(0 + 16*t.y),inttot16(16 + 16*t.x)); //Texture
+		glVertex3v16(0,0,inttov16(-1));
 
-glTexCoord2t16(0,0);
-glVertex3v16(0,inttov16(1),inttov16(-1));
-
-glTexCoord2t16(0,inttot16(16));
-glVertex3v16(0,0,inttov16(-1));
-
-glEnd();
+	glEnd();
 }
 
-void drawCube(bool cullback){
-	drawCubeLeft(cullback);
-    drawCubeFront(cullback);
-	drawCubeBack(cullback);
-	drawCubeRight(cullback);
-	drawCubeTop(cullback);
-	drawCubeBottom(cullback);
+void drawCube(bool cullback, vec2_8_t t){
+	drawCubeLeft(cullback, t);
+  drawCubeFront(cullback, t);
+	drawCubeBack(cullback, t);
+	drawCubeRight(cullback, t);
+	drawCubeTop(cullback, t);
+	drawCubeBottom(cullback, t);
 }
 
 // glMaterialf(

@@ -1,3 +1,12 @@
+//define this because i have some library issues
+// #ifndef KEY_X
+//     #define KEY_X (1U << 10)
+// #endif
+
+// #ifndef KEY_Y
+//     #define KEY_Y (1U << 11)
+// #endif
+
 #include "mctypes.h"
 #include <math.h>
 #include <stdbool.h>
@@ -34,3 +43,5 @@ void setPlayer(player_t *player);
 void movePlayer(player_t *player, vec3_t d);
 
 bool checkCollision(hitbox_t a, hitbox_t b);
+
+void loadPlayerMovement(player_t *player,vec3_t *Direction);

@@ -12,12 +12,18 @@ void InitBlocks(void){
     gBlocks[DIRT] = (block_t){
         .id = DIRT,
         .transparent = false,
-        .color.r = 10, .color.g = 10, .color.b = 10
+        .texture.x = 0, .texture.y = 1
     };
 
-    gBlocks[GRASS] = (block_t){
-        .id = GRASS,
+    gBlocks[STONE] = (block_t){
+        .id = STONE,
         .transparent = false,
-        .color.r = 0, .color.g = 27, .color.b = 0
+        .texture.x = 1, .texture.y = 0
+    };
+
+    gBlocks[COBBLESTONE] = (block_t){
+        .id = COBBLESTONE,
+        .transparent = false,
+        .texture.x = 1, .texture.y = 1
     };
 }

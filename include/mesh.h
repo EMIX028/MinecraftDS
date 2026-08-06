@@ -2,13 +2,13 @@
 
 #define AMBIENT_RATIO 0.5
 
-void drawCube(bool cullback);
+void drawCube(bool cullback,vec2_8_t t);
 
 void drawSpecialCube(bool cullback);
 
-void drawCubeTop(bool cullback);
-void drawCubeBottom(bool cullback);
-void drawCubeLeft(bool cullback);
-void drawCubeRight(bool cullback);
-void drawCubeFront(bool cullback);
-void drawCubeBack(bool cullback);
+void drawCubeTop(bool cullback, vec2_8_t t);
+void drawCubeBottom(bool cullback, vec2_8_t t);
+void drawCubeLeft(bool cullback, vec2_8_t t);
+void drawCubeRight(bool cullback, vec2_8_t t);
+void drawCubeFront(bool cullback, vec2_8_t t);
+void drawCubeBack(bool cullback, vec2_8_t t);
