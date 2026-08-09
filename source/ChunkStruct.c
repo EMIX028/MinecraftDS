@@ -23,64 +23,64 @@ void RenderChunk(chunk_t *chunk, block_t *list){
                             inttof32(z + chunk->position.z*L_CHUNK));
           if(x != L_CHUNK - 1 && x != 0){
             if(list[chunk->blocks[x+1][y][z]].transparent == true){
-              drawCubeRight(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeRight(true,list[chunk->blocks[x][y][z]].texture);
             }
             if(list[chunk->blocks[x-1][y][z]].transparent == true){
-              drawCubeLeft(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeLeft(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
           else if(x == 0){
-            drawCubeLeft(false,list[chunk->blocks[x][y][z]].texture);
+            drawCubeLeft(true,list[chunk->blocks[x][y][z]].texture);
             if(list[chunk->blocks[x+1][y][z]].transparent == true){
-              drawCubeRight(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeRight(true,list[chunk->blocks[x][y][z]].texture);
             }
           } else{
-            drawCubeRight(false,list[chunk->blocks[x][y][z]].texture);
+            drawCubeRight(true,list[chunk->blocks[x][y][z]].texture);
             if(list[chunk->blocks[x-1][y][z]].transparent == true){
-              drawCubeLeft(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeLeft(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
 
           //Front & Back faces
           if(z != L_CHUNK - 1 && z != 0){
             if(list[chunk->blocks[x][y][z+1]].transparent == true){
-              drawCubeFront(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeFront(true,list[chunk->blocks[x][y][z]].texture);
             }
             if(list[chunk->blocks[x][y][z-1]].transparent == true){
-              drawCubeBack(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeBack(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
           else if(z==0){
-            drawCubeBack(false,list[chunk->blocks[x][y][z]].texture);
+            drawCubeBack(true,list[chunk->blocks[x][y][z]].texture);
             if(list[chunk->blocks[x][y][z+1]].transparent == true){
-              drawCubeFront(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeFront(true,list[chunk->blocks[x][y][z]].texture);
             }
           } else{
-            drawCubeFront(false,list[chunk->blocks[x][y][z]].texture);
+            drawCubeFront(true,list[chunk->blocks[x][y][z]].texture);
             if(list[chunk->blocks[x][y][z-1]].transparent == true){
-              drawCubeBack(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeBack(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
 
           //Top & Bottom faces
           if(y != H_CHUNK - 1 && y != 0){
             if(list[chunk->blocks[x][y+1][z]].transparent == true){
-              drawCubeTop(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeTop(true,list[chunk->blocks[x][y][z]].texture);
             }
             if(list[chunk->blocks[x][y-1][z]].transparent == true){
-              drawCubeBottom(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeBottom(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
           else if(y==0){
-            drawCubeBottom(false,list[chunk->blocks[x][y][z]].texture);
+            drawCubeBottom(true,list[chunk->blocks[x][y][z]].texture);
             if(list[chunk->blocks[x][y+1][z]].transparent == true){
-              drawCubeTop(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeTop(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
           else{
-            drawCubeTop(false,list[chunk->blocks[x][y][z]].texture);
+            drawCubeTop(true,list[chunk->blocks[x][y][z]].texture);
             if(list[chunk->blocks[x][y-1][z]].transparent == true){
-              drawCubeBottom(false,list[chunk->blocks[x][y][z]].texture);
+              drawCubeBottom(true,list[chunk->blocks[x][y][z]].texture);
             }
           }
           glPopMatrix(1);

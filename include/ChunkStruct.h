@@ -12,7 +12,7 @@ typedef struct block_s {
 
     bool solid; //si on traverse ou non le block
     bool transparent; //transparence du block
-
+    hitbox_t box;
     int hardness; //temps de destruction
     vec2_8_t texture;
     void (*draw)(const struct block_s *block);

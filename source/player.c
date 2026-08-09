@@ -5,31 +5,29 @@ void setPlayer(player_t *player){
   player->Position.x = 0.5f;
   player->Position.y = 0.0f;
   player->Position.z = 0.5f;
-  player->Camera.position.x = 0.5;
-  player->Camera.position.y = 1.5;
-  player->Camera.position.z = 0.0;
-  player->Camera.yaw = 0.0;
-  player->Camera.pitch = 0.0;
-  player->hitbox.x = 0.0f;
-  player->hitbox.y = 0.0f;
-  player->hitbox.z = 0.0f;
-  player->hitbox.w = 1.0f;
-  player->hitbox.h = 2.0f;
-  player->hitbox.d = 1.0f;
+
+  player->Camera.position.x = player->Position.x;
+  player->Camera.position.y = player->Position.y +1.5f;
+  player->Camera.position.z = player->Position.z;
+
+  player->Camera.yaw = 0.0f;
+  player->Camera.pitch = 0.0f;
+
+  player->hitbox.w = 0.8f;
+  player->hitbox.d = 0.8f;
+  player->hitbox.h = 1.8f;
+
+  player->isfalling = false;
+  player->velocityY = 0.0f;
 }
 
 void movePlayer(player_t *player, vec3_t d){
   player->Position.x += d.x;
   player->Position.y += d.y;
   player->Position.z += d.z;
-  player->Camera.position.x += d.x;
-  player->Camera.position.y += d.y;
-  player->Camera.position.z += d.z;
-  player->hitbox.x += d.x;
-  player->hitbox.w += d.x;
-  player->hitbox.y += d.y;
-  player->hitbox.h += d.y;
-  player->hitbox.z += d.z;
+  player->Camera.position.x = player->Position.x;
+  player->Camera.position.y = player->Position.y +1.5f;
+  player->Camera.position.z = player->Position.z;
 }
 
 vec3_t getDir(camera_t cam){
@@ -40,20 +38,52 @@ vec3_t getDir(camera_t cam){
   return dir;
 }
 
-bool checkCollision(hitbox_t a, hitbox_t b){
+// bool checkCollision(hitbox_t a, hitbox_t b){
+//     return (
+//       a.x < b.x + b.w &&
+//       a.x + a.w > b.x &&
+
+//       a.y < b.y + b.h &&
+//       a.y + a.h > b.y &&
+
+//       a.z < b.z + b.d &&
+//       a.z + a.d > b.z
+//     );
+// }
+
+bool checkCollisionTest(vec3_t apos,hitbox_t a,ivec3_t bpos,hitbox_t b){
+    float playerMinX = apos.x - a.w / 2.0f;
+    float playerMaxX = apos.x + a.w / 2.0f;
+
+    float playerMinY = apos.y;
+    float playerMaxY = apos.y + a.h;
+
+    float playerMinZ = apos.z - a.d / 2.0f;
+    float playerMaxZ = apos.z + a.d / 2.0f;
+
+    float blockMinX = bpos.x;
+    float blockMaxX = bpos.x + b.w;
+
+    float blockMinY = bpos.y;
+    float blockMaxY = bpos.y + b.h;
+
+    float blockMinZ = bpos.z;
+    float blockMaxZ = bpos.z + b.d;
+
     return (
-      a.x < b.x + b.w &&
-      a.x + a.w > b.x &&
+        playerMinX < blockMaxX &&
+        playerMaxX > blockMinX &&
 
-      a.y < b.y + b.h &&
-      a.y + a.h > b.y &&
+        playerMinY < blockMaxY &&
+        playerMaxY > blockMinY &&
 
-      a.z < b.z + b.d &&
-      a.z + a.d > b.z
+        playerMinZ < blockMaxZ &&
+        playerMaxZ > blockMinZ
     );
 }
 
-void loadPlayerMovement(player_t *player,vec3_t *Direction){
+void loadPlayerMovement(player_t *player,bool test){
+  player->Direction = getDir(player->Camera);
   bool specialmode = false;
   if(keysHeld() & KEY_L){
     specialmode = true;
@@ -75,7 +105,7 @@ void loadPlayerMovement(player_t *player,vec3_t *Direction){
       .z = sinf(player->Camera.yaw) * P_SPEED
     });
   }
-  if (keysHeld() & KEY_UP) {
+  if ((keysHeld() & KEY_UP) && !test) {
     movePlayer(player, (vec3_t){
       .x = sinf(player->Camera.yaw) * P_SPEED,
       .y = 0.0f,

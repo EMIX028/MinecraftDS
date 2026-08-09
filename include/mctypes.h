@@ -11,9 +11,9 @@ typedef struct fvec3{
 } vec3_t;
 
 typedef struct ivec3{
-  float x;
-  float y;
-  float z;
+  int x;
+  int y;
+  int z;
 } ivec3_t;
 
 typedef struct vec2{
@@ -31,3 +31,12 @@ typedef struct rgb{
   uint8_t g;
   uint8_t b;
 } rgb_t;
+
+typedef struct hitbox{
+  // float x;
+  // float y;
+  // float z;
+  float w;
+  float h;
+  float d;
+}hitbox_t;

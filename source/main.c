@@ -10,8 +10,9 @@
 #include "Blocks.h"
 #include "TextureAtlas.h"
 
+
+#define GRAVITY 0.05f
 player_t Joueur;
-vec3_t Direction;
 
 int main() {
   setPlayer(&Joueur);
@@ -22,7 +23,7 @@ int main() {
   vramSetBankA(VRAM_A_TEXTURE);
   glClearColor(10, 20, 31, 31); // fond bleu ciel
   consoleDemoInit();
-  BG_PALETTE_SUB[0] = RGB15(10,17,10);
+  BG_PALETTE_SUB[0] = RGB15(10,17,10); //fond écran sub
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
@@ -48,24 +49,31 @@ int main() {
   }
 
   chunk_t chunk00 = {
-    .position.x = 0, .position.z = 0,
-    .blocks[0][0][0] = DIRT
+    .position.x = 0, .position.z = 0
   };
 
   chunk_t chunkTest = {
     .position.x = 1, .position.z = 0
   };
-
   initChunk(&chunkTest,STONE);
+  initChunk(&chunk00,AIR);
+
+  chunk00.blocks[5][1][5] = DIRT;
+  chunk_t *chunk_list[] = {&chunk00,&chunkTest};
+  bool contour[9] = {false};
+
   uint8_t compteur = 0;
+  movePlayer(&Joueur,(vec3_t){.x = 0,.y = 1,.z=0});
 
   while (pmMainLoop()) {
     glBindTexture(0, TextureID);
     subscreenAff();
-    vec3_t Direction = getDir(Joueur.Camera);
     scanKeys();
-    loadPlayerMovement(&Joueur,&Direction);
-    loadKeyAssignation(&Joueur,&Direction);
+    loadPlayerMovement(&Joueur,contour[0]);
+    loadKeyAssignation(&Joueur);
+
+    // Joueur.velocityY -= GRAVITY;
+    // movePlayer(&Joueur,(vec3_t){.x=0,.y=Joueur.velocityY,.z=0});
 
     if(keysDown() & KEY_R){
       chunkTest.blocks[compteur][1][5] = AIR;
@@ -95,16 +103,41 @@ int main() {
     gluLookAt(
       Joueur.Camera.position.x, Joueur.Camera.position.y, Joueur.Camera.position.z,
       
-      Joueur.Camera.position.x + Direction.x, Joueur.Camera.position.y +Direction.y, Joueur.Camera.position.z + Direction.z,
+      Joueur.Camera.position.x + Joueur.Direction.x, Joueur.Camera.position.y +Joueur.Direction.y, Joueur.Camera.position.z + Joueur.Direction.z,
 
       0.0f, 1.0f, 0.0f
     );
 
-    hitbox_t cubetest = {.x = 0, .y = 0, .z = 0, .w = 1, .h = 1};
+    hitbox_t cube = {.d=1,.h=1,.w=1};
 
-    if(checkCollision(Joueur.hitbox,cubetest)){
-      printf("\nen collision\n");
+    bool cubeTest = checkCollisionTest(Joueur.Position,Joueur.hitbox,
+                                                (ivec3_t){.x=5,.y=1,.z=5},
+                                              cube);
+
+
+    //printf("\nposition local x : %d chunk x: %d\n",(int)(Joueur.Position.x)%L_CHUNK,(int)(Joueur.Position.x)/L_CHUNK);
+
+    // for(int i =0; i<2;++i){
+    //   if((int)(Joueur.Position.x)/L_CHUNK == chunk_list[i]->position.x &&
+    //       (int)(Joueur.Position.z)/L_CHUNK == chunk_list[i]->position.z){
+    //         if((int)(Joueur.Position.x)%L_CHUNK != 0 &&
+    //             (int)(Joueur.Position.x)%L_CHUNK != L_CHUNK-1 &&
+    //             (int)(Joueur.Position.z)%L_CHUNK != 0 &&
+    //             (int)(Joueur.Position.z)%L_CHUNK != L_CHUNK-1){
+    //               contour[0] = checkCollisionPlayerToBlock(Joueur.Position,
+    //                                                         Joueur.hitbox,
+    //                                                       (ivec3_t){.x = (int)Joueur.Position.x,
+    //                                                               .y=(int)Joueur.Position.y,
+    //                                                               .z=(int)(Joueur.Position.z+1)},
+    //                                                       (hitbox_t){.d=1,.h=1,.w=1}) && 
+    //                                                       gBlocks[chunk_list[i]->blocks[(int)(Joueur.Position.x)%L_CHUNK][(int)(Joueur.Position.y)%H_CHUNK][(int)(Joueur.Position.z)%L_CHUNK+1]].solid;
+    //       }
+    //   }
+    // }
+    if(cubeTest==true){
+      printf("\n\tCollision\n");
     }
+
     RenderChunk(&chunk00,gBlocks);
     RenderChunk(&chunkTest,gBlocks);
 
@@ -119,8 +152,8 @@ void subscreenAff(){
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;5H|Minecraft DS Edition|");
   iprintf("\x1b[2;5H----------------------");
-  iprintf("\x1b[3;1Hx:%4d y:%4d z:%4d",
-          (int)Joueur.Position.x,
-          (int)Joueur.Position.y,
-          -(int)Joueur.Position.z);
+  printf("\nx:%4f y:%4f z:%4f",
+          Joueur.Position.x,
+          Joueur.Position.y,
+          Joueur.Position.z);
 }
