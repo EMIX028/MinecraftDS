@@ -28,6 +28,8 @@ typedef struct chunk{
 
 void initChunk(chunk_t *chunk, int id);
 
-void RenderChunk(chunk_t *chunk, block_t *list);
+void RenderChunk(chunk_t *chunk, block_t *list, bool cull);
+
+uint8_t getBlock(chunk_t *chunk[],int x,int y, int z);
 
 #endif

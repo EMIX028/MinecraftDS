@@ -3,11 +3,11 @@
 
 //======================================================================
 //
-//	TextureAtlas, 32x32@16, 
+//	TextureAtlas, 64x64@16, 
 //	+ bitmap not compressed
-//	Total size: 2048 = 2048
+//	Total size: 8192 = 8192
 //
-//	Time-stamp: 2026-08-06, 11:45:46
+//	Time-stamp: 2026-08-11, 21:21:41
 //	Exported by Cearn's GBA Image Transmogrifier, v0.9.2
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -16,8 +16,8 @@
 #ifndef GRIT_TEXTUREATLAS_H
 #define GRIT_TEXTUREATLAS_H
 
-#define TextureAtlasBitmapLen 2048
-extern const unsigned int TextureAtlasBitmap[512];
+#define TextureAtlasBitmapLen 8192
+extern const unsigned int TextureAtlasBitmap[2048];
 
 #endif // GRIT_TEXTUREATLAS_H
 

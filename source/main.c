@@ -12,6 +12,7 @@
 
 
 #define GRAVITY 0.05f
+#define DISPLAY_DISTANCE 30
 player_t Joueur;
 
 int main() {
@@ -28,7 +29,12 @@ int main() {
   glEnable(GL_ANTIALIAS);
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
   glMatrixMode(GL_PROJECTION);
-  gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, 40);
+  gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, DISPLAY_DISTANCE);
+
+  char pseudo[PersonalData->nameLen];
+  for(int i=0;i<PersonalData->nameLen;++i){
+    pseudo[i] = PersonalData->name[i];
+  }
 
   int TextureID;
 
@@ -39,8 +45,8 @@ int main() {
     0,
     0,
     GL_RGB,
-    TEXTURE_SIZE_32,
-    TEXTURE_SIZE_32,
+    TEXTURE_SIZE_64,
+    TEXTURE_SIZE_64,
     0,
     TEXGEN_TEXCOORD,
     TextureAtlasBitmap
@@ -60,29 +66,75 @@ int main() {
 
   chunk00.blocks[5][1][5] = DIRT;
   chunk_t *chunk_list[] = {&chunk00,&chunkTest};
-  bool contour[9] = {false};
-
-  uint8_t compteur = 0;
+  
   movePlayer(&Joueur,(vec3_t){.x = 0,.y = 1,.z=0});
 
   while (pmMainLoop()) {
     glBindTexture(0, TextureID);
     subscreenAff();
     scanKeys();
-    loadPlayerMovement(&Joueur,contour[0]);
+    //loadPlayerMovement(&Joueur);
     loadKeyAssignation(&Joueur);
+
+    Joueur.Direction = getDir(Joueur.Camera);
+    bool specialmode = false;
+    if(keysHeld() & KEY_L){
+      specialmode = true;
+    }
+    if(keysUp() & KEY_L){
+      specialmode = false;
+    }
+    if (keysHeld() & KEY_LEFT) {
+      movePlayer(&Joueur, (vec3_t){
+        .x = -(cosf(Joueur.Camera.yaw) * P_SPEED),
+        .y = 0.0f,
+        .z = -(sinf(Joueur.Camera.yaw) * P_SPEED)
+      });
+    }
+    if (keysHeld() & KEY_RIGHT) {
+      movePlayer(&Joueur, (vec3_t){
+        .x = cosf(Joueur.Camera.yaw) * P_SPEED,
+        .y = 0.0f,
+        .z = sinf(Joueur.Camera.yaw) * P_SPEED
+      });
+    }
+    if (keysHeld() & KEY_UP) {
+      movePlayer(&Joueur, (vec3_t){
+        .x = sinf(Joueur.Camera.yaw) * P_SPEED,
+        .y = 0.0f,
+        .z = -cosf(Joueur.Camera.yaw) * P_SPEED
+      });
+    }
+    if (keysHeld() & KEY_DOWN) {
+      movePlayer(&Joueur, (vec3_t){
+        .x = -(sinf(Joueur.Camera.yaw) * P_SPEED),
+        .y = 0.0f,
+        .z = cosf(Joueur.Camera.yaw) * P_SPEED
+      });
+    }
+    if(keysHeld() & KEY_Y){
+      if(specialmode != true){
+        Joueur.Camera.yaw -= P_SENSI;
+      }
+    }
+    if(keysHeld() & KEY_A){
+      if(specialmode != true){
+        Joueur.Camera.yaw += P_SENSI;
+      }
+    }
+    if(keysHeld() & KEY_B){
+      if( specialmode != true && sinf(Joueur.Camera.pitch) > -MAX_ANGLE){
+        Joueur.Camera.pitch -= P_SENSI;
+      }
+    }
+    if(keysHeld() & KEY_X){
+      if(sinf(Joueur.Camera.pitch) < MAX_ANGLE){
+        Joueur.Camera.pitch += P_SENSI;
+      }
+    }
 
     // Joueur.velocityY -= GRAVITY;
     // movePlayer(&Joueur,(vec3_t){.x=0,.y=Joueur.velocityY,.z=0});
-
-    if(keysDown() & KEY_R){
-      chunkTest.blocks[compteur][1][5] = AIR;
-      ++compteur;
-    }
-    if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
-      chunkTest.blocks[compteur][1][5] = COBBLESTONE;
-      --compteur;
-    }
 
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
@@ -108,38 +160,14 @@ int main() {
       0.0f, 1.0f, 0.0f
     );
 
-    hitbox_t cube = {.d=1,.h=1,.w=1};
-
-    bool cubeTest = checkCollisionTest(Joueur.Position,Joueur.hitbox,
-                                                (ivec3_t){.x=5,.y=1,.z=5},
-                                              cube);
-
 
     //printf("\nposition local x : %d chunk x: %d\n",(int)(Joueur.Position.x)%L_CHUNK,(int)(Joueur.Position.x)/L_CHUNK);
 
-    // for(int i =0; i<2;++i){
-    //   if((int)(Joueur.Position.x)/L_CHUNK == chunk_list[i]->position.x &&
-    //       (int)(Joueur.Position.z)/L_CHUNK == chunk_list[i]->position.z){
-    //         if((int)(Joueur.Position.x)%L_CHUNK != 0 &&
-    //             (int)(Joueur.Position.x)%L_CHUNK != L_CHUNK-1 &&
-    //             (int)(Joueur.Position.z)%L_CHUNK != 0 &&
-    //             (int)(Joueur.Position.z)%L_CHUNK != L_CHUNK-1){
-    //               contour[0] = checkCollisionPlayerToBlock(Joueur.Position,
-    //                                                         Joueur.hitbox,
-    //                                                       (ivec3_t){.x = (int)Joueur.Position.x,
-    //                                                               .y=(int)Joueur.Position.y,
-    //                                                               .z=(int)(Joueur.Position.z+1)},
-    //                                                       (hitbox_t){.d=1,.h=1,.w=1}) && 
-    //                                                       gBlocks[chunk_list[i]->blocks[(int)(Joueur.Position.x)%L_CHUNK][(int)(Joueur.Position.y)%H_CHUNK][(int)(Joueur.Position.z)%L_CHUNK+1]].solid;
-    //       }
-    //   }
-    // }
-    if(cubeTest==true){
-      printf("\n\tCollision\n");
-    }
+    printf("\n pseudo : %s\n",pseudo);
 
-    RenderChunk(&chunk00,gBlocks);
-    RenderChunk(&chunkTest,gBlocks);
+    for(uint8_t i=0;i<2;i++){
+      RenderChunk(chunk_list[i],gBlocks,false);
+    }
 
     glFlush(0);
     swiWaitForVBlank();
@@ -157,3 +185,4 @@ void subscreenAff(){
           Joueur.Position.y,
           Joueur.Position.z);
 }
+

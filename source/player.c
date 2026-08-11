@@ -82,7 +82,38 @@ bool checkCollisionTest(vec3_t apos,hitbox_t a,ivec3_t bpos,hitbox_t b){
     );
 }
 
-void loadPlayerMovement(player_t *player,bool test){
+bool checkCollisionPlayerBlock(player_t player,ivec3_t bpos,hitbox_t b){
+    float playerMinX = player.Position.x - player.hitbox.w / 2.0f;
+    float playerMaxX = player.Position.x + player.hitbox.w / 2.0f;
+
+    float playerMinY = player.Position.y;
+    float playerMaxY = player.Position.y + player.hitbox.h;
+
+    float playerMinZ = player.Position.z - player.hitbox.d / 2.0f;
+    float playerMaxZ = player.Position.z + player.hitbox.d / 2.0f;
+
+    float blockMinX = bpos.x;
+    float blockMaxX = bpos.x + b.w;
+
+    float blockMinY = bpos.y;
+    float blockMaxY = bpos.y + b.h;
+
+    float blockMinZ = bpos.z;
+    float blockMaxZ = bpos.z + b.d;
+
+    return (
+        playerMinX < blockMaxX &&
+        playerMaxX > blockMinX &&
+
+        playerMinY < blockMaxY &&
+        playerMaxY > blockMinY &&
+
+        playerMinZ < blockMaxZ &&
+        playerMaxZ > blockMinZ
+    );
+}
+
+void loadPlayerMovement(player_t *player){
   player->Direction = getDir(player->Camera);
   bool specialmode = false;
   if(keysHeld() & KEY_L){
@@ -105,7 +136,7 @@ void loadPlayerMovement(player_t *player,bool test){
       .z = sinf(player->Camera.yaw) * P_SPEED
     });
   }
-  if ((keysHeld() & KEY_UP) && !test) {
+  if (keysHeld() & KEY_UP) {
     movePlayer(player, (vec3_t){
       .x = sinf(player->Camera.yaw) * P_SPEED,
       .y = 0.0f,

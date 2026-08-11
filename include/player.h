@@ -39,4 +39,6 @@ void movePlayer(player_t *player, vec3_t d);
 // bool checkCollision(hitbox_t a, hitbox_t b);
 bool checkCollisionTest(vec3_t apos,hitbox_t a,ivec3_t bpos, hitbox_t b);
 
-void loadPlayerMovement(player_t *player, bool test);
+bool checkCollisionPlayerBlock(player_t player,ivec3_t bpos,hitbox_t b);
+
+void loadPlayerMovement(player_t *player);
