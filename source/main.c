@@ -70,7 +70,7 @@ int main() {
   chunk00.blocks[5][1][5] = DIRT;
   chunk00.blocks[5][1][6] = DIRT;
   chunk00.blocks[5][1][7] = DIRT;
-  chunk00.blocks[5][2][7] = DIRT;
+  chunk00.blocks[5][2][7] = STONE;
   for(int x = 0 ; x < L_CHUNK ; ++x){
     for(int z = 0; z < L_CHUNK ; ++z){
       chunk00.blocks[x][0][z] = DIRT;
