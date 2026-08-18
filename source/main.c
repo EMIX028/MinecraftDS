@@ -1,7 +1,9 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <nds.h>
 #include <stdio.h>
+#include "mctypes.h"
 #include "mesh.h"
 #include "main.h"
 #include "player.h"
@@ -11,9 +13,10 @@
 #include "TextureAtlas.h"
 
 
-#define GRAVITY 0.05f
+#define GRAVITY 0.008f
 #define DISPLAY_DISTANCE 30
 player_t Joueur;
+int timer = 0;
 
 int main() {
   setPlayer(&Joueur);
@@ -65,76 +68,42 @@ int main() {
   initChunk(&chunk00,AIR);
 
   chunk00.blocks[5][1][5] = DIRT;
+  chunk00.blocks[5][1][6] = DIRT;
+  chunk00.blocks[5][1][7] = DIRT;
+  chunk00.blocks[5][2][7] = DIRT;
+  for(int x = 0 ; x < L_CHUNK ; ++x){
+    for(int z = 0; z < L_CHUNK ; ++z){
+      chunk00.blocks[x][0][z] = DIRT;
+    }
+  }
   chunk_t *chunk_list[] = {&chunk00,&chunkTest};
+  int size = 2;
   
-  movePlayer(&Joueur,(vec3_t){.x = 0,.y = 1,.z=0});
+  movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 1.0f,.z=0.0f});
 
   while (pmMainLoop()) {
     glBindTexture(0, TextureID);
-    subscreenAff();
+    subscreenAff(pseudo);
     scanKeys();
-    //loadPlayerMovement(&Joueur);
+    loadPlayerMovement(&Joueur,chunk_list,size,gBlocks,blocks);
     loadKeyAssignation(&Joueur);
 
-    Joueur.Direction = getDir(Joueur.Camera);
-    bool specialmode = false;
-    if(keysHeld() & KEY_L){
-      specialmode = true;
+    vec3_t gravityMove = {
+      .x = 0.0f,
+      .y = Joueur.velocityY,
+      .z = 0.0f
+    };
+
+    if (canMovePlayer(&Joueur , gravityMove, chunk_list, size,gBlocks,blocks)) {
+      movePlayer(&Joueur, gravityMove);
     }
-    if(keysUp() & KEY_L){
-      specialmode = false;
-    }
-    if (keysHeld() & KEY_LEFT) {
-      movePlayer(&Joueur, (vec3_t){
-        .x = -(cosf(Joueur.Camera.yaw) * P_SPEED),
-        .y = 0.0f,
-        .z = -(sinf(Joueur.Camera.yaw) * P_SPEED)
-      });
-    }
-    if (keysHeld() & KEY_RIGHT) {
-      movePlayer(&Joueur, (vec3_t){
-        .x = cosf(Joueur.Camera.yaw) * P_SPEED,
-        .y = 0.0f,
-        .z = sinf(Joueur.Camera.yaw) * P_SPEED
-      });
-    }
-    if (keysHeld() & KEY_UP) {
-      movePlayer(&Joueur, (vec3_t){
-        .x = sinf(Joueur.Camera.yaw) * P_SPEED,
-        .y = 0.0f,
-        .z = -cosf(Joueur.Camera.yaw) * P_SPEED
-      });
-    }
-    if (keysHeld() & KEY_DOWN) {
-      movePlayer(&Joueur, (vec3_t){
-        .x = -(sinf(Joueur.Camera.yaw) * P_SPEED),
-        .y = 0.0f,
-        .z = cosf(Joueur.Camera.yaw) * P_SPEED
-      });
-    }
-    if(keysHeld() & KEY_Y){
-      if(specialmode != true){
-        Joueur.Camera.yaw -= P_SENSI;
-      }
-    }
-    if(keysHeld() & KEY_A){
-      if(specialmode != true){
-        Joueur.Camera.yaw += P_SENSI;
-      }
-    }
-    if(keysHeld() & KEY_B){
-      if( specialmode != true && sinf(Joueur.Camera.pitch) > -MAX_ANGLE){
-        Joueur.Camera.pitch -= P_SENSI;
-      }
-    }
-    if(keysHeld() & KEY_X){
-      if(sinf(Joueur.Camera.pitch) < MAX_ANGLE){
-        Joueur.Camera.pitch += P_SENSI;
-      }
+    else {
+      Joueur.velocityY = 0;
+      Joueur.isfalling = false;
+      Joueur.Position.y = (float)floor(Joueur.Position.y);
     }
 
-    // Joueur.velocityY -= GRAVITY;
-    // movePlayer(&Joueur,(vec3_t){.x=0,.y=Joueur.velocityY,.z=0});
+    Joueur.velocityY -= GRAVITY;
 
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
@@ -163,26 +132,26 @@ int main() {
 
     //printf("\nposition local x : %d chunk x: %d\n",(int)(Joueur.Position.x)%L_CHUNK,(int)(Joueur.Position.x)/L_CHUNK);
 
-    printf("\n pseudo : %s\n",pseudo);
-
     for(uint8_t i=0;i<2;i++){
       RenderChunk(chunk_list[i],gBlocks,false);
     }
 
     glFlush(0);
     swiWaitForVBlank();
+    timer++;
   }
   return EXIT_SUCCESS;
 }
 
-void subscreenAff(){
+void subscreenAff(char *pseudo){
   consoleClear();
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;5H|Minecraft DS Edition|");
   iprintf("\x1b[2;5H----------------------");
-  printf("\nx:%4f y:%4f z:%4f",
-          Joueur.Position.x,
-          Joueur.Position.y,
-          Joueur.Position.z);
+  iprintf("\x1b[4;1Hpseudo : %s",pseudo);
+  iprintf("\x1b[6;1Hx:%3d y:%3d z:%3d",
+          (int)Joueur.Position.x,
+          (int)Joueur.Position.y,
+          (int)Joueur.Position.z);
+  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %lf",timer/60.0);
 }
-

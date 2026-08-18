@@ -1,3 +1,4 @@
 #include <stdint.h>
+#include <stdbool.h>
 
-void subscreenAff();
+void subscreenAff(char *pseudo);

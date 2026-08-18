@@ -1,5 +1,8 @@
 #include "player.h"
+#include "ChunkStruct.h"
+#include "mctypes.h"
 #include <nds.h>
+#include <math.h>
 
 void setPlayer(player_t *player){
   player->Position.x = 0.5f;
@@ -8,13 +11,13 @@ void setPlayer(player_t *player){
 
   player->Camera.position.x = player->Position.x;
   player->Camera.position.y = player->Position.y +1.5f;
-  player->Camera.position.z = player->Position.z;
+  player->Camera.position.z = player->Position.z+0.1f;
 
   player->Camera.yaw = 0.0f;
   player->Camera.pitch = 0.0f;
 
-  player->hitbox.w = 0.8f;
-  player->hitbox.d = 0.8f;
+  player->hitbox.w = P_hitbox;
+  player->hitbox.d = P_hitbox;
   player->hitbox.h = 1.8f;
 
   player->isfalling = false;
@@ -38,20 +41,7 @@ vec3_t getDir(camera_t cam){
   return dir;
 }
 
-// bool checkCollision(hitbox_t a, hitbox_t b){
-//     return (
-//       a.x < b.x + b.w &&
-//       a.x + a.w > b.x &&
-
-//       a.y < b.y + b.h &&
-//       a.y + a.h > b.y &&
-
-//       a.z < b.z + b.d &&
-//       a.z + a.d > b.z
-//     );
-// }
-
-bool checkCollisionTest(vec3_t apos,hitbox_t a,ivec3_t bpos,hitbox_t b){
+bool checkCollision(vec3_t apos , hitbox_t a , ivec3_t bpos , hitbox_t b){
     float playerMinX = apos.x - a.w / 2.0f;
     float playerMaxX = apos.x + a.w / 2.0f;
 
@@ -82,38 +72,66 @@ bool checkCollisionTest(vec3_t apos,hitbox_t a,ivec3_t bpos,hitbox_t b){
     );
 }
 
-bool checkCollisionPlayerBlock(player_t player,ivec3_t bpos,hitbox_t b){
-    float playerMinX = player.Position.x - player.hitbox.w / 2.0f;
-    float playerMaxX = player.Position.x + player.hitbox.w / 2.0f;
+bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks){
+  vec3_t futurePosition = {
+    .x = player->Position.x + movement.x,
+    .y = player->Position.y + movement.y,
+    .z = player->Position.z + movement.z
+  };
 
-    float playerMinY = player.Position.y;
-    float playerMaxY = player.Position.y + player.hitbox.h;
+  for (int i = 0; i < n; i++){
+    int chunkX = chunk[i]->position.x;
+    int chunkZ = chunk[i]->position.z;
 
-    float playerMinZ = player.Position.z - player.hitbox.d / 2.0f;
-    float playerMaxZ = player.Position.z + player.hitbox.d / 2.0f;
+    for (int x = (int)floor(futurePosition.x) - 1;
+          x <= (int)floor(futurePosition.x) + 1;
+          x++){
+            
+      for (int y = (int)floor(futurePosition.y) - 1;
+            y <= (int)floor(futurePosition.y) + 2;
+            y++){
+                
+        for (int z = (int)floor(futurePosition.z) - 1;
+              z <= (int)floor(futurePosition.z) + 1;
+              z++){
+                    
+          if (y < 0 || y >= H_CHUNK)
+            continue;
 
-    float blockMinX = bpos.x;
-    float blockMaxX = bpos.x + b.w;
+          // Coordonnées monde -> coordonnées locales du chunk
+          int localX = x - chunkX * L_CHUNK;
+          int localZ = z - chunkZ * L_CHUNK;
 
-    float blockMinY = bpos.y;
-    float blockMaxY = bpos.y + b.h;
+          // Le bloc n'appartient pas à ce chunk
+          if (localX < 0 || localX >= L_CHUNK ||
+              localZ < 0 || localZ >= L_CHUNK)
+            continue;
 
-    float blockMinZ = bpos.z;
-    float blockMaxZ = bpos.z + b.d;
+          int blockID = chunk[i]->blocks[localX][y][localZ];
 
-    return (
-        playerMinX < blockMaxX &&
-        playerMaxX > blockMinX &&
-
-        playerMinY < blockMaxY &&
-        playerMaxY > blockMinY &&
-
-        playerMinZ < blockMaxZ &&
-        playerMaxZ > blockMinZ
-    );
+          if (list[blockID].solid){
+                        
+            if (checkCollision(
+              futurePosition,
+              player->hitbox,
+              (ivec3_t){
+                .x = x,
+                .y = y,
+                .z = z
+              },
+              blocks)){
+                return false;
+            }
+          }
+        }
+      }
+    }
+  }
+  return true;
 }
 
-void loadPlayerMovement(player_t *player){
+void loadPlayerMovement(player_t *player, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks){
+  vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
   player->Direction = getDir(player->Camera);
   bool specialmode = false;
   if(keysHeld() & KEY_L){
@@ -123,32 +141,44 @@ void loadPlayerMovement(player_t *player){
     specialmode = false;
   }
   if (keysHeld() & KEY_LEFT) {
-    movePlayer(player, (vec3_t){
-      .x = -(cosf(player->Camera.yaw) * P_SPEED),
-      .y = 0.0f,
-      .z = -(sinf(player->Camera.yaw) * P_SPEED)
-    });
+    m.x = -(cosf(player->Camera.yaw) * P_SPEED);
+    m.z = -(sinf(player->Camera.yaw) * P_SPEED);
+    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
+    }
+    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
+    }
   }
   if (keysHeld() & KEY_RIGHT) {
-    movePlayer(player, (vec3_t){
-      .x = cosf(player->Camera.yaw) * P_SPEED,
-      .y = 0.0f,
-      .z = sinf(player->Camera.yaw) * P_SPEED
-    });
+    m.x = cosf(player->Camera.yaw) * P_SPEED;
+    m.z = sinf(player->Camera.yaw) * P_SPEED;
+    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
+    }
+    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
+    }
   }
   if (keysHeld() & KEY_UP) {
-    movePlayer(player, (vec3_t){
-      .x = sinf(player->Camera.yaw) * P_SPEED,
-      .y = 0.0f,
-      .z = -cosf(player->Camera.yaw) * P_SPEED
-    });
+    m.x = sinf(player->Camera.yaw) * P_SPEED;
+    m.z = -cosf(player->Camera.yaw) * P_SPEED;
+    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
+    }
+    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
+    }
   }
   if (keysHeld() & KEY_DOWN) {
-    movePlayer(player, (vec3_t){
-      .x = -(sinf(player->Camera.yaw) * P_SPEED),
-      .y = 0.0f,
-      .z = cosf(player->Camera.yaw) * P_SPEED
-    });
+    m.x = -(sinf(player->Camera.yaw) * P_SPEED);
+    m.z = cosf(player->Camera.yaw) * P_SPEED;
+    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
+    }
+    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
+      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
+    }
   }
   if(keysHeld() & KEY_Y){
     if(specialmode != true){

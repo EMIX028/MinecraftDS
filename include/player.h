@@ -1,19 +1,11 @@
-//define this because i have some library issues
-// #ifndef KEY_X
-//     #define KEY_X (1U << 10)
-// #endif
-
-// #ifndef KEY_Y
-//     #define KEY_Y (1U << 11)
-// #endif
-
 #include "mctypes.h"
-#include <math.h>
 #include <stdbool.h>
+#include "ChunkStruct.h"
 
 #define P_SPEED 0.08
 #define P_SENSI 0.06
 #define P_FLYSPEED 0.25
+#define P_hitbox 0.6f
 
 typedef struct{
   vec3_t position;
@@ -36,9 +28,8 @@ void setPlayer(player_t *player);
 
 void movePlayer(player_t *player, vec3_t d);
 
-// bool checkCollision(hitbox_t a, hitbox_t b);
-bool checkCollisionTest(vec3_t apos,hitbox_t a,ivec3_t bpos, hitbox_t b);
+bool checkCollision(vec3_t apos , hitbox_t a , ivec3_t bpos , hitbox_t b);
 
-bool checkCollisionPlayerBlock(player_t player,ivec3_t bpos,hitbox_t b);
+bool canMovePlayer(player_t *player ,vec3_t movement, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks);
 
-void loadPlayerMovement(player_t *player);
+void loadPlayerMovement(player_t *player , chunk_t *chunk[], int n, block_t list[], hitbox_t blocks);

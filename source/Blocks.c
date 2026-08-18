@@ -4,6 +4,7 @@ block_t gBlocks[BLOCK_COUNT];
 
 const hitbox_t blocks = {.w = 1, .h = 1,.d = 1};
 
+
 void InitBlocks(void){
     
     gBlocks[AIR] = (block_t){

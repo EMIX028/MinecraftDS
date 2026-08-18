@@ -13,6 +13,8 @@ typedef enum {
 
 extern block_t gBlocks[BLOCK_COUNT];
 
+extern const hitbox_t blocks;
+
 void InitBlocks(void);
 
 #endif

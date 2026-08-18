@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <nds.h>
+#include "nds/arm9/input.h"
 #include "player.h"
 #include "mctypes.h"
 #include "keyAssignation.h"
@@ -11,8 +11,8 @@ void loadKeyAssignation(player_t *player){
   if(keysDown() & KEY_START){
     systemShutDown();
   }
-  if((keysHeld() & KEY_L) && ( keysHeld() & KEY_B)){
-    player->velocityY = 0.25f;
+  if((keysHeld() & KEY_L) && ( keysDown() & KEY_B) && !player->isfalling){
+    player->velocityY = 0.13749f;
     player->isfalling = true;
   }
   if((keysHeld() & KEY_L) && ( keysHeld() & KEY_SELECT)){
