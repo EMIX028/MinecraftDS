@@ -2,3 +2,5 @@
 #include <stdbool.h>
 
 void subscreenAff(char *pseudo);
+
+void setCam();

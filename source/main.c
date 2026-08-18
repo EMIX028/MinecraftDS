@@ -105,32 +105,10 @@ int main() {
 
     Joueur.velocityY -= GRAVITY;
 
-
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
+    setCam();
 
-
-    glLight(
-      0,
-      RGB15(31,31,31),
-      floattov10(-0.5f),
-      floattov10(-1.0f),
-      floattov10(-0.3f)
-    );
-
-    glMaterialf(GL_AMBIENT, RGB15(15,15,15));
-    glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
-
-    gluLookAt(
-      Joueur.Camera.position.x, Joueur.Camera.position.y, Joueur.Camera.position.z,
-      
-      Joueur.Camera.position.x + Joueur.Direction.x, Joueur.Camera.position.y +Joueur.Direction.y, Joueur.Camera.position.z + Joueur.Direction.z,
-
-      0.0f, 1.0f, 0.0f
-    );
-
-
-    //printf("\nposition local x : %d chunk x: %d\n",(int)(Joueur.Position.x)%L_CHUNK,(int)(Joueur.Position.x)/L_CHUNK);
 
     for(uint8_t i=0;i<2;i++){
       RenderChunk(chunk_list[i],gBlocks,false);
@@ -148,10 +126,31 @@ void subscreenAff(char *pseudo){
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;5H|Minecraft DS Edition|");
   iprintf("\x1b[2;5H----------------------");
-  iprintf("\x1b[4;1Hpseudo : %s",pseudo);
+  iprintf("\x1b[4;1HBienvenue %s !",pseudo);
   iprintf("\x1b[6;1Hx:%3d y:%3d z:%3d",
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %lf",timer/60.0);
+  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %lfs",timer/60.0);
+}
+
+void setCam(){
+  glLight(
+      0,
+      RGB15(31,31,31),
+      floattov10(-0.5f),
+      floattov10(-1.0f),
+      floattov10(-0.3f)
+    );
+
+    glMaterialf(GL_AMBIENT, RGB15(15,15,15));
+    glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
+
+    gluLookAt(
+      Joueur.Camera.position.x, Joueur.Camera.position.y, Joueur.Camera.position.z,
+      
+      Joueur.Camera.position.x + Joueur.Direction.x, Joueur.Camera.position.y +Joueur.Direction.y, Joueur.Camera.position.z + Joueur.Direction.z,
+
+      0.0f, 1.0f, 0.0f
+    );
 }
