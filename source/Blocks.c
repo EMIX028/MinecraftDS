@@ -1,4 +1,5 @@
 #include "Blocks.h"
+#include <stdbool.h>
 
 block_t gBlocks[BLOCK_COUNT];
 
@@ -32,5 +33,11 @@ void InitBlocks(void){
         .transparent = false,
         .solid = true,
         .texture.x = 1, .texture.y = 1
+    };
+    gBlocks[LEAVES] = (block_t){
+        .id = LEAVES,
+        .transparent = true,
+        .solid = true,
+        .texture.x = 0, .texture.y = 2
     };
 }

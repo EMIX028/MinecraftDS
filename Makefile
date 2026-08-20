@@ -7,9 +7,9 @@ $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>dev
 endif
 
 # These set the information text in the nds file
-GAME_TITLE     := Minecraft
-GAME_SUBTITLE1 := Minecraft DS Edition
-GAME_SUBTITLE2 := By EMIX
+GAME_TITLE     := Minecraft DS Edition
+GAME_SUBTITLE1 := Made by EMIX
+GAME_SUBTITLE2 := https://github.com/EMIX028
 
 include $(DEVKITARM)/ds_rules
 

@@ -1,5 +1,6 @@
 #include <nds.h>
 #include "mesh.h"
+#include "nds/arm9/videoGL.h"
 #define TNBR0 16
 #define TNBR1 16
 
@@ -182,12 +183,73 @@ void drawCubeLeft(vec2_8_t t){
 void drawCube(bool cullback, vec2_8_t t){
 	startingDraw(cullback);
 	drawCubeLeft( t);
-  drawCubeFront( t);
+  	drawCubeFront( t);
 	drawCubeBack( t);
 	drawCubeRight( t);
 	drawCubeTop( t);
 	drawCubeBottom(t);
 	glEnd();
+}
+
+void drawBlockOutline(int x, int y, int z)
+{
+    glPushMatrix();
+
+    glTranslatef32(
+        inttof32(x),
+        inttof32(y),
+        inttof32(z)
+    );
+
+    glPolyFmt(
+        POLY_ALPHA(31) |
+        POLY_CULL_NONE |
+        POLY_ID(0)
+    );
+
+    glColor(RGB15(0, 0, 0));
+
+    glBegin(GL_QUADS);
+
+        // Face avant
+        glVertex3v16(inttov16(1), 0, inttov16(1));
+        glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+        glVertex3v16(0, inttov16(1), inttov16(1));
+        glVertex3v16(0, 0, inttov16(1));
+
+        // Face arrière
+        glVertex3v16(0, 0, 0);
+        glVertex3v16(0, inttov16(1), 0);
+        glVertex3v16(inttov16(1), inttov16(1), 0);
+        glVertex3v16(inttov16(1), 0, 0);
+
+        // Face gauche
+        glVertex3v16(0, 0, inttov16(1));
+        glVertex3v16(0, inttov16(1), inttov16(1));
+        glVertex3v16(0, inttov16(1), 0);
+        glVertex3v16(0, 0, 0);
+
+        // Face droite
+        glVertex3v16(inttov16(1), 0, 0);
+        glVertex3v16(inttov16(1), inttov16(1), 0);
+        glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+        glVertex3v16(inttov16(1), 0, inttov16(1));
+
+        // Haut
+        glVertex3v16(0, inttov16(1), 0);
+        glVertex3v16(inttov16(1), inttov16(1), 0);
+        glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+        glVertex3v16(0, inttov16(1), inttov16(1));
+
+        // Bas
+        glVertex3v16(0, 0, 0);
+        glVertex3v16(0, 0, inttov16(1));
+        glVertex3v16(inttov16(1), 0, inttov16(1));
+        glVertex3v16(inttov16(1), 0, 0);
+
+    glEnd();
+
+    glPopMatrix(1);
 }
 
 // glMaterialf(

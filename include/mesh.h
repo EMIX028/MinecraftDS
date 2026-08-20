@@ -13,3 +13,4 @@ void drawCubeLeft(vec2_8_t t);
 void drawCubeRight(vec2_8_t t);
 void drawCubeFront(vec2_8_t t);
 void drawCubeBack(vec2_8_t t);
+void drawBlockOutline(int x,int y,int z);

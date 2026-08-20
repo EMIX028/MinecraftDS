@@ -6,6 +6,7 @@
 #define P_SENSI 0.06
 #define P_FLYSPEED 0.25
 #define P_hitbox 0.6f
+#define P_REACH 4.5f
 
 typedef struct{
   vec3_t position;

@@ -92,11 +92,19 @@ void RenderChunk(chunk_t *chunk, block_t *list, bool cull){
   }
 }
 
-uint8_t getBlock(chunk_t *chunk[],int x,int y, int z){
-  for(int i=0;i<2;++i){
+uint8_t getBlock(chunk_t *chunk[],int size,int x,int y, int z){
+  for(int i=0;i<size;++i){
     if(chunk[i]->position.x == x/L_CHUNK && chunk[i]->position.z == z/L_CHUNK){
       return chunk[i]->blocks[x%L_CHUNK][y][z%L_CHUNK];
     }
     }
     return 0;
   }
+
+void setBlock(chunk_t *chunk[],int size,int x,int y, int z, uint8_t block){
+  for(int i=0;i<size;++i){
+    if(chunk[i]->position.x == x/L_CHUNK && chunk[i]->position.z == z/L_CHUNK){
+      chunk[i]->blocks[x%L_CHUNK][y%H_CHUNK][z%L_CHUNK] = block;
+    }
+  }
+}

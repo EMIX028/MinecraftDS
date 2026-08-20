@@ -6,16 +6,15 @@
 
 void loadKeyAssignation(player_t *player){
   if((keysHeld() & KEY_L) && (keysUp() & KEY_R)){
-    lcdMainOnBottom();
-  }
-  if(keysDown() & KEY_START){
-    systemShutDown();
+    //lcdMainOnBottom();
   }
   if((keysHeld() & KEY_L) && ( keysDown() & KEY_B) && !player->isfalling){
     player->velocityY = 0.13749f;
     player->isfalling = true;
   }
-  if((keysHeld() & KEY_L) && ( keysHeld() & KEY_SELECT)){
-    movePlayer(player,(vec3_t){.x=0,.y=-P_FLYSPEED,.z=0});
+  if(keysDown() & KEY_SELECT){
+    player->Position.x = 0;
+    player->Position.y = 1;
+    player->Position.z = 0;
   }
 }

@@ -3,9 +3,12 @@
 #include <stdlib.h>
 #include <nds.h>
 #include <stdio.h>
+#include "calico/gba/keypad.h"
 #include "mctypes.h"
 #include "mesh.h"
 #include "main.h"
+#include "nds/arm9/input.h"
+#include "nds/arm9/videoGL.h"
 #include "player.h"
 #include "ChunkStruct.h"
 #include "keyAssignation.h"
@@ -33,6 +36,9 @@ int main() {
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, DISPLAY_DISTANCE);
+
+  //glEnable(GL_OUTLINE);
+  //glSetOutlineColor(0, RGB15(31, 31, 31));
 
   char pseudo[PersonalData->nameLen];
   for(int i=0;i<PersonalData->nameLen;++i){
@@ -64,16 +70,22 @@ int main() {
   chunk_t chunkTest = {
     .position.x = 1, .position.z = 0
   };
-  initChunk(&chunkTest,STONE);
+  initChunk(&chunkTest,AIR);
   initChunk(&chunk00,AIR);
 
   chunk00.blocks[5][1][5] = DIRT;
   chunk00.blocks[5][1][6] = DIRT;
   chunk00.blocks[5][1][7] = DIRT;
   chunk00.blocks[5][2][7] = STONE;
+  chunk00.blocks[5][3][7] = LEAVES;
   for(int x = 0 ; x < L_CHUNK ; ++x){
     for(int z = 0; z < L_CHUNK ; ++z){
       chunk00.blocks[x][0][z] = DIRT;
+    }
+  }
+  for(int x = 0 ; x < L_CHUNK ; ++x){
+    for(int z = 0; z < L_CHUNK ; ++z){
+      chunkTest.blocks[x][0][z] = STONE;
     }
   }
   chunk_t *chunk_list[] = {&chunk00,&chunkTest};
@@ -87,31 +99,73 @@ int main() {
     scanKeys();
     loadPlayerMovement(&Joueur,chunk_list,size,gBlocks,blocks);
     loadKeyAssignation(&Joueur);
-
-    vec3_t gravityMove = {
-      .x = 0.0f,
-      .y = Joueur.velocityY,
-      .z = 0.0f
-    };
-
-    if (canMovePlayer(&Joueur , gravityMove, chunk_list, size,gBlocks,blocks)) {
-      movePlayer(&Joueur, gravityMove);
-    }
-    else {
-      Joueur.velocityY = 0;
-      Joueur.isfalling = false;
-      Joueur.Position.y = (float)floor(Joueur.Position.y);
+    
+    if(keysDown() & KEY_START){
+      break;
     }
 
-    Joueur.velocityY -= GRAVITY;
+    ApplyGravity(chunk_list,size);
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
     setCam();
 
+      int targetX;
+      int targetY;
+      int targetZ;
+      bool blockTargeted;
+      vec3_t Raydir;
+
+      Raydir.x = cosf(Joueur.Camera.pitch) * sinf(Joueur.Camera.yaw);
+      Raydir.y = sinf(Joueur.Camera.pitch);
+      Raydir.z = -cosf(Joueur.Camera.pitch) * cosf(Joueur.Camera.yaw);
+
+      vec3_t rayPos = Joueur.Camera.position;
+
+      int previousX = 0;
+      int previousY = 0;
+      int previousZ = 0;
+
+      int previousValid = 0;
+
+      for (float distance = 0.0f; distance < P_REACH; distance += 0.05f){
+        rayPos.x = Joueur.Camera.position.x + Raydir.x * distance;
+        rayPos.y = Joueur.Camera.position.y + Raydir.y * distance;
+        rayPos.z = Joueur.Camera.position.z + Raydir.z * distance;
+
+        int bx = (int)floorf(rayPos.x);
+        int by = (int)floorf(rayPos.y);
+        int bz = (int)floorf(rayPos.z);
+
+        if (getBlock(chunk_list,size,bx, by, bz) != AIR){
+          targetX = bx;
+          targetY = by;
+          targetZ = bz;
+          blockTargeted = true;
+          if ((keysDown() & KEY_R) && previousValid && !checkCollision(Joueur.Position, Joueur.hitbox,
+                                                (ivec3_t){.x=previousX,
+                                                  .y=previousY,
+                                                  .z=previousZ}, blocks)){
+            setBlock(chunk_list, size, previousX, previousY, previousZ, COBBLESTONE);
+          }
+          break;
+        }
+        else{
+          blockTargeted = false;
+        }
+        previousX = bx;
+        previousY = by;
+        previousZ = bz;
+        previousValid = 1;
+      }
+
 
     for(uint8_t i=0;i<2;i++){
       RenderChunk(chunk_list[i],gBlocks,false);
+    }
+
+    if (blockTargeted) {
+      drawBlockOutline(targetX, targetY, targetZ);
     }
 
     glFlush(0);
@@ -120,6 +174,10 @@ int main() {
   }
   return EXIT_SUCCESS;
 }
+
+
+
+
 
 void subscreenAff(char *pseudo){
   consoleClear();
@@ -153,4 +211,22 @@ void setCam(){
 
       0.0f, 1.0f, 0.0f
     );
+}
+
+void ApplyGravity(chunk_t *chunk_list[],int size){
+  vec3_t gravityMove = {
+    .x = 0.0f,
+    .y = Joueur.velocityY,
+    .z = 0.0f
+  };
+
+  if (canMovePlayer(&Joueur , gravityMove, chunk_list, size,gBlocks,blocks)) {
+    movePlayer(&Joueur, gravityMove);
+  }
+  else {
+    Joueur.velocityY = 0;
+    Joueur.isfalling = false;
+    Joueur.Position.y = (float)floor(Joueur.Position.y);
+  }
+  Joueur.velocityY -= GRAVITY;
 }
