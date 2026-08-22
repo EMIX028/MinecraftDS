@@ -23,6 +23,8 @@ typedef struct player{
   float velocityY;
 }player_t;
 
+extern bool specialmode;
+
 vec3_t getDir(camera_t cam);
 
 void setPlayer(player_t *player);

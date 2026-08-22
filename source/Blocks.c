@@ -36,7 +36,7 @@ void InitBlocks(void){
     };
     gBlocks[LEAVES] = (block_t){
         .id = LEAVES,
-        .transparent = true,
+        .transparent = false,
         .solid = true,
         .texture.x = 0, .texture.y = 2
     };

@@ -130,10 +130,11 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
   return true;
 }
 
+bool specialmode = false;
 void loadPlayerMovement(player_t *player, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks){
   vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
   player->Direction = getDir(player->Camera);
-  bool specialmode = false;
+  
   if(keysHeld() & KEY_L){
     specialmode = true;
   }

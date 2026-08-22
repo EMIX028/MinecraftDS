@@ -20,6 +20,7 @@
 #define DISPLAY_DISTANCE 30
 player_t Joueur;
 int timer = 0;
+uint8_t indexB = 1;
 
 int main() {
   setPlayer(&Joueur);
@@ -33,10 +34,11 @@ int main() {
   BG_PALETTE_SUB[0] = RGB15(10,17,10); //fond écran sub
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
+  glEnable(GL_BLEND);
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, DISPLAY_DISTANCE);
-
+  
   //glEnable(GL_OUTLINE);
   //glSetOutlineColor(0, RGB15(31, 31, 31));
 
@@ -93,6 +95,7 @@ int main() {
   
   movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 1.0f,.z=0.0f});
 
+
   while (pmMainLoop()) {
     glBindTexture(0, TextureID);
     subscreenAff(pseudo);
@@ -102,6 +105,14 @@ int main() {
     
     if(keysDown() & KEY_START){
       break;
+    }
+    if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
+      if(indexB < 4){
+        ++indexB;
+      }
+      else{
+        indexB = 1;
+      }
     }
 
     ApplyGravity(chunk_list,size);
@@ -142,11 +153,19 @@ int main() {
           targetY = by;
           targetZ = bz;
           blockTargeted = true;
-          if ((keysDown() & KEY_R) && previousValid && !checkCollision(Joueur.Position, Joueur.hitbox,
+          if (previousValid && !checkCollision(Joueur.Position, Joueur.hitbox,
                                                 (ivec3_t){.x=previousX,
                                                   .y=previousY,
                                                   .z=previousZ}, blocks)){
-            setBlock(chunk_list, size, previousX, previousY, previousZ, COBBLESTONE);
+            
+            if(keysDown() & KEY_R){
+              if(specialmode != true){
+                setBlock(chunk_list, size, previousX, previousY, previousZ, indexB);
+              }
+            }
+          }
+          if((keysHeld() & KEY_L) && (keysDown() & KEY_R)){
+              setBlock(chunk_list, size, targetX, targetY, targetZ, AIR);
           }
           break;
         }
@@ -184,12 +203,13 @@ void subscreenAff(char *pseudo){
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;5H|Minecraft DS Edition|");
   iprintf("\x1b[2;5H----------------------");
-  iprintf("\x1b[4;1HBienvenue %s !",pseudo);
+  iprintf("\x1b[4;1HHey %s !",pseudo);
   iprintf("\x1b[6;1Hx:%3d y:%3d z:%3d",
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %lfs",timer/60.0);
+  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %0.2lfs",timer/60.0);
+  iprintf("\x1b[6;16H Bloc : %d",indexB);
 }
 
 void setCam(){
