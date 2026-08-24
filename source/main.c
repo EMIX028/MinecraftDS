@@ -39,8 +39,6 @@ int main() {
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, DISPLAY_DISTANCE);
   
-  //glEnable(GL_OUTLINE);
-  //glSetOutlineColor(0, RGB15(31, 31, 31));
 
   char pseudo[PersonalData->nameLen];
   for(int i=0;i<PersonalData->nameLen;++i){
@@ -70,28 +68,31 @@ int main() {
   };
 
   chunk_t chunkTest = {
-    .position.x = 1, .position.z = 0
+    .position.x = 0, .position.z = -1
   };
+  // chunk_t chunk01 = {
+  //   .position.x = 2, .position.z = 0
+  // };
+  // chunk_t chunk02 = {
+  //   .position.x = 1, .position.z = 1
+  // };
   initChunk(&chunkTest,AIR);
   initChunk(&chunk00,AIR);
+  // initChunk(&chunk01,AIR);
+  // initChunk(&chunk02,AIR);
 
-  chunk00.blocks[5][1][5] = DIRT;
-  chunk00.blocks[5][1][6] = DIRT;
-  chunk00.blocks[5][1][7] = DIRT;
-  chunk00.blocks[5][2][7] = STONE;
-  chunk00.blocks[5][3][7] = LEAVES;
   for(int x = 0 ; x < L_CHUNK ; ++x){
     for(int z = 0; z < L_CHUNK ; ++z){
       chunk00.blocks[x][0][z] = DIRT;
+      chunkTest.blocks[x][0][z] = DIRT;
+      // chunk01.blocks[x][0][z] = DIRT;
+      // chunk02.blocks[x][0][z] = DIRT;
     }
   }
-  for(int x = 0 ; x < L_CHUNK ; ++x){
-    for(int z = 0; z < L_CHUNK ; ++z){
-      chunkTest.blocks[x][0][z] = STONE;
-    }
-  }
+  
+  const int size = 2;
   chunk_t *chunk_list[] = {&chunk00,&chunkTest};
-  int size = 2;
+  
   
   movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 1.0f,.z=0.0f});
 
@@ -179,7 +180,7 @@ int main() {
       }
 
 
-    for(uint8_t i=0;i<2;i++){
+    for(uint8_t i=0;i<size;i++){
       RenderChunk(chunk_list[i],gBlocks,false);
     }
 
@@ -209,7 +210,7 @@ void subscreenAff(char *pseudo){
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
   printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %0.2lfs",timer/60.0);
-  iprintf("\x1b[6;16H Bloc : %d",indexB);
+  iprintf("\x1b[6;18H Bloc : %d",indexB);
 }
 
 void setCam(){
