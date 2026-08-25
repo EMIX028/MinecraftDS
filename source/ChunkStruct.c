@@ -1,5 +1,6 @@
 #include <nds.h>
 #include "ChunkStruct.h"
+#include "mctypes.h"
 #include "mesh.h"
 
 void initChunk(chunk_t *chunk, int id){
@@ -92,19 +93,50 @@ void RenderChunk(chunk_t *chunk, block_t *list, bool cull){
   }
 }
 
-uint8_t getBlock(chunk_t *chunk[],int size,int x,int y, int z){
-  for(int i=0;i<size;++i){
-    if(chunk[i]->position.x == x/L_CHUNK && chunk[i]->position.z == z/L_CHUNK){
-      return chunk[i]->blocks[x%L_CHUNK][y][z%L_CHUNK];
-    }
-    }
-    return 0;
+int floorDiv(int a, int b){
+  int q = a / b;
+  int r = a % b;
+  if (r != 0 && a < 0) {
+    q--;
   }
+  return q;
+}
 
-void setBlock(chunk_t *chunk[],int size,int x,int y, int z, uint8_t block){
-  for(int i=0;i<size;++i){
-    if(chunk[i]->position.x == x/L_CHUNK && chunk[i]->position.z == z/L_CHUNK){
-      chunk[i]->blocks[x%L_CHUNK][y%H_CHUNK][z%L_CHUNK] = block;
+int floorMod(int a, int b){
+  int r = a % b;
+  if (r < 0) {
+    r += b;
+  }
+  return r;
+}
+
+uint8_t getBlock(chunk_t *chunk[], int size, int x, int y, int z){
+  int chunkX = floorDiv(x, L_CHUNK);
+  int chunkZ = floorDiv(z, L_CHUNK);
+
+  int localX = floorMod(x, L_CHUNK);
+  int localZ = floorMod(z, L_CHUNK);
+
+  for (int i = 0; i < size; ++i) {
+    if (chunk[i]->position.x == chunkX && chunk[i]->position.z == chunkZ) {
+      return chunk[i]->blocks[localX][y][localZ];
+    }
+  }
+  return AIR;
+}
+
+void setBlock(chunk_t *chunk[], int size,int x, int y, int z,uint8_t block){
+  int chunkX = floorDiv(x, L_CHUNK);
+  int chunkZ = floorDiv(z, L_CHUNK);
+
+  int localX = floorMod(x, L_CHUNK);
+  int localZ = floorMod(z, L_CHUNK);
+
+  for (int i = 0; i < size; ++i) {
+    if (chunk[i]->position.x == chunkX &&
+      chunk[i]->position.z == chunkZ) {
+      chunk[i]->blocks[localX][y][localZ] = block;
+      return;
     }
   }
 }

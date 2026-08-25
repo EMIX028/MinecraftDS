@@ -40,3 +40,12 @@ typedef struct hitbox{
   float h;
   float d;
 }hitbox_t;
+
+typedef enum {
+    AIR,
+    DIRT,
+    STONE,
+    COBBLESTONE,
+    LEAVES,
+    BLOCK_COUNT
+} Blocks;

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mctypes.h"
-#define L_CHUNK 15 //chunk minecraft 15
+#define L_CHUNK 10 //chunk minecraft 15
 #define H_CHUNK 20 // hauteur max 256
 
 typedef struct block_s {
@@ -29,6 +29,10 @@ typedef struct chunk{
 void initChunk(chunk_t *chunk, int id);
 
 void RenderChunk(chunk_t *chunk, block_t *list, bool cull);
+
+int floorDiv(int a, int b);
+
+int floorMod(int a, int b);
 
 uint8_t getBlock(chunk_t *chunk[],int size,int x,int y, int z);
 

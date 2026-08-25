@@ -68,30 +68,30 @@ int main() {
   };
 
   chunk_t chunkTest = {
+    .position.x = 1, .position.z = 0
+  };
+  chunk_t chunk01 = {
     .position.x = 0, .position.z = -1
   };
-  // chunk_t chunk01 = {
-  //   .position.x = 2, .position.z = 0
-  // };
-  // chunk_t chunk02 = {
-  //   .position.x = 1, .position.z = 1
-  // };
+  chunk_t chunk02 = {
+    .position.x = 1, .position.z = -1
+  };
   initChunk(&chunkTest,AIR);
   initChunk(&chunk00,AIR);
-  // initChunk(&chunk01,AIR);
-  // initChunk(&chunk02,AIR);
+  initChunk(&chunk01,AIR);
+  initChunk(&chunk02,AIR);
 
   for(int x = 0 ; x < L_CHUNK ; ++x){
     for(int z = 0; z < L_CHUNK ; ++z){
       chunk00.blocks[x][0][z] = DIRT;
-      chunkTest.blocks[x][0][z] = DIRT;
-      // chunk01.blocks[x][0][z] = DIRT;
-      // chunk02.blocks[x][0][z] = DIRT;
+      chunkTest.blocks[x][0][z] = STONE;
+      chunk01.blocks[x][0][z] = COBBLESTONE;
+      chunk02.blocks[x][0][z] = DIRT;
     }
   }
   
-  const int size = 2;
-  chunk_t *chunk_list[] = {&chunk00,&chunkTest};
+  const int size = 4;
+  chunk_t *chunk_list[] = {&chunk00,&chunkTest,&chunk01,&chunk02};
   
   
   movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 1.0f,.z=0.0f});
@@ -128,9 +128,7 @@ int main() {
       bool blockTargeted;
       vec3_t Raydir;
 
-      Raydir.x = cosf(Joueur.Camera.pitch) * sinf(Joueur.Camera.yaw);
-      Raydir.y = sinf(Joueur.Camera.pitch);
-      Raydir.z = -cosf(Joueur.Camera.pitch) * cosf(Joueur.Camera.yaw);
+      Raydir = getDir(Joueur.Camera);
 
       vec3_t rayPos = Joueur.Camera.position;
 
@@ -209,7 +207,7 @@ void subscreenAff(char *pseudo){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %0.2lfs",timer/60.0);
+  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %0.1lfs",timer/60.0);
   iprintf("\x1b[6;18H Bloc : %d",indexB);
 }
 
@@ -234,20 +232,26 @@ void setCam(){
     );
 }
 
-void ApplyGravity(chunk_t *chunk_list[],int size){
-  vec3_t gravityMove = {
-    .x = 0.0f,
-    .y = Joueur.velocityY,
-    .z = 0.0f
-  };
+void ApplyGravity(chunk_t *chunk_list[], int size){
+    vec3_t gravityMove = {
+        .x = 0.0f,
+        .y = Joueur.velocityY,
+        .z = 0.0f
+    };
 
-  if (canMovePlayer(&Joueur , gravityMove, chunk_list, size,gBlocks,blocks)) {
-    movePlayer(&Joueur, gravityMove);
-  }
-  else {
-    Joueur.velocityY = 0;
-    Joueur.isfalling = false;
-    Joueur.Position.y = (float)floor(Joueur.Position.y);
-  }
-  Joueur.velocityY -= GRAVITY;
+    if (canMovePlayer(&Joueur, gravityMove,
+                      chunk_list, size, gBlocks, blocks)){
+        movePlayer(&Joueur, gravityMove);
+    }
+    else{
+        if (Joueur.velocityY < 0.0f){
+            Joueur.velocityY = 0.0f;
+            Joueur.isfalling = false;
+            Joueur.Position.y = floor(Joueur.Position.y);
+        }
+        else if (Joueur.velocityY > 0.0f){
+            Joueur.velocityY = 0.0f;
+        }
+    }
+    Joueur.velocityY -= GRAVITY;
 }

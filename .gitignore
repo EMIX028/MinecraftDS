@@ -3,6 +3,9 @@
 .vscode/
 *.DS_Store
 compile_commands.json
+*.png
+*.ase
+*.ogg
 
 # Prerequisites
 *.d
