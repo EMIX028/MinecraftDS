@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <sys/_intsup.h>
 #define SCREEN_W 256
 #define SCREEN_H 192
 #define MAX_ANGLE 0.995
@@ -47,5 +48,7 @@ typedef enum {
     STONE,
     COBBLESTONE,
     LEAVES,
+    MOSS,
+    GLASS,
     BLOCK_COUNT
 } Blocks;

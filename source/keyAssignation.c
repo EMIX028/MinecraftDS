@@ -13,8 +13,8 @@ void loadKeyAssignation(player_t *player){
     player->isfalling = true;
   }
   if(keysDown() & KEY_SELECT){
-    player->Position.x = 0;
-    player->Position.y = 1;
-    player->Position.z = 0;
+    movePlayer(player, (vec3_t){.x=-player->Position.x+5.0f,
+                                .y=-player->Position.y+10.0f,
+                                .z = -player->Position.z+5.0f});
   }
 }

@@ -1,1 +1,5 @@
 grit TextureAtlas.png -gb -gB16 -ftc -fh
+
+test pour transparence : 
+
+grit TextureAtlas.png -gx -gb -gB16 -gTFFFFFF -ftc -fh

@@ -1,9 +1,11 @@
 #include <math.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <nds.h>
 #include <stdio.h>
 #include "calico/gba/keypad.h"
+#include "calico/types.h"
 #include "mctypes.h"
 #include "mesh.h"
 #include "main.h"
@@ -14,15 +16,34 @@
 #include "keyAssignation.h"
 #include "Blocks.h"
 #include "TextureAtlas.h"
+#include <malloc.h>
 
 
-#define GRAVITY 0.008f
-#define DISPLAY_DISTANCE 30
 player_t Joueur;
-int timer = 0;
 uint8_t indexB = 1;
+int delay = 0; //delay entre chaque bloc posé ou cassé
+
+bool majChunk = false;
+
+
+#define TIMER_TICKS_PER_SECOND (BUS_CLOCK / 1024)
+
+static u32 totalTicks = 0;
+
+static u16 previousTimer = 0;
+static u16 lastFpsTimer = 0;
+
+static int frames = 0;
+static int fps = 0;
+
 
 int main() {
+  TIMER0_DATA = 0;
+  TIMER0_CR = TIMER_ENABLE | TIMER_DIV_1024;
+  previousTimer = TIMER0_DATA;
+  lastFpsTimer = TIMER0_DATA;
+  
+  
   setPlayer(&Joueur);
   InitBlocks();
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
@@ -31,7 +52,7 @@ int main() {
   vramSetBankA(VRAM_A_TEXTURE);
   glClearColor(10, 20, 31, 31); // fond bleu ciel
   consoleDemoInit();
-  BG_PALETTE_SUB[0] = RGB15(10,17,10); //fond écran sub
+  BG_PALETTE_SUB[0] = RGB15(24,24,24); //fond écran sub
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
   glEnable(GL_BLEND);
@@ -53,7 +74,7 @@ int main() {
   if (glTexImage2D(
     0,
     0,
-    GL_RGB,
+    GL_RGBA,
     TEXTURE_SIZE_64,
     TEXTURE_SIZE_64,
     0,
@@ -63,6 +84,7 @@ int main() {
     printf("\nerreur init texture\n");
   }
 
+  
   chunk_t chunk00 = {
     .position.x = 0, .position.z = 0
   };
@@ -76,6 +98,7 @@ int main() {
   chunk_t chunk02 = {
     .position.x = 1, .position.z = -1
   };
+
   initChunk(&chunkTest,AIR);
   initChunk(&chunk00,AIR);
   initChunk(&chunk01,AIR);
@@ -83,32 +106,51 @@ int main() {
 
   for(int x = 0 ; x < L_CHUNK ; ++x){
     for(int z = 0; z < L_CHUNK ; ++z){
-      chunk00.blocks[x][0][z] = DIRT;
-      chunkTest.blocks[x][0][z] = STONE;
-      chunk01.blocks[x][0][z] = COBBLESTONE;
-      chunk02.blocks[x][0][z] = DIRT;
+      chunk00.blocks[x][0][z].id = DIRT;
+      chunkTest.blocks[x][0][z].id = DIRT;
+      chunk01.blocks[x][0][z].id = DIRT;
+      chunk02.blocks[x][0][z].id = DIRT;
+      chunk00.blocks[x][1][z].id = MOSS;
+      chunkTest.blocks[x][1][z].id = MOSS;
+      chunk01.blocks[x][1][z].id = MOSS;
+      chunk02.blocks[x][1][z].id = MOSS;
     }
   }
+
   
-  const int size = 4;
-  chunk_t *chunk_list[] = {&chunk00,&chunkTest,&chunk01,&chunk02};
+  #define SIZE 4
+  chunk_t *chunk_list[SIZE] = {&chunk00,&chunk01,&chunk02,&chunkTest};
   
-  
-  movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 1.0f,.z=0.0f});
+  /*
+  for(int i = 0; i < SIZE ; ++i){
+    initChunk(chunk_list[i], AIR);
+    for(int x = 0 ; x < L_CHUNK ; ++x){
+      for(int z = 0; z < L_CHUNK ; ++z){
+        chunk_list[i]->blocks[x][0][z].id = MOSS;
+      }
+    }
+  }
+  */
+
+
+  blockVisibility(chunk_list, SIZE, gBlocks);
+
+  movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 3.0f,.z=5.0f});
 
 
   while (pmMainLoop()) {
+    struct mallinfo info = mallinfo();
     glBindTexture(0, TextureID);
-    subscreenAff(pseudo);
+    subscreenAff(pseudo,info);
     scanKeys();
-    loadPlayerMovement(&Joueur,chunk_list,size,gBlocks,blocks);
+    loadPlayerMovement(&Joueur,chunk_list,SIZE,gBlocks,blocks);
     loadKeyAssignation(&Joueur);
     
     if(keysDown() & KEY_START){
       break;
     }
     if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
-      if(indexB < 4){
+      if(indexB < 6){
         ++indexB;
       }
       else{
@@ -116,69 +158,78 @@ int main() {
       }
     }
 
-    ApplyGravity(chunk_list,size);
+    ApplyGravity(chunk_list,SIZE);
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
     setCam();
 
-      int targetX;
-      int targetY;
-      int targetZ;
-      bool blockTargeted;
-      vec3_t Raydir;
+    int targetX;
+    int targetY;
+    int targetZ;
+    bool blockTargeted;
+    vec3_t Raydir;
 
-      Raydir = getDir(Joueur.Camera);
+    Raydir = getDir(Joueur.Camera);
+    vec3_t rayPos = Joueur.Camera.position;
 
-      vec3_t rayPos = Joueur.Camera.position;
+    int previousX = 0;
+    int previousY = 0;
+    int previousZ = 0;
 
-      int previousX = 0;
-      int previousY = 0;
-      int previousZ = 0;
+    int previousValid = 0;
 
-      int previousValid = 0;
+    for (float distance = 0.0f; distance < P_REACH; distance += 0.05f){
+      rayPos.x = Joueur.Camera.position.x + Raydir.x * distance;
+      rayPos.y = Joueur.Camera.position.y + Raydir.y * distance;
+      rayPos.z = Joueur.Camera.position.z + Raydir.z * distance;
 
-      for (float distance = 0.0f; distance < P_REACH; distance += 0.05f){
-        rayPos.x = Joueur.Camera.position.x + Raydir.x * distance;
-        rayPos.y = Joueur.Camera.position.y + Raydir.y * distance;
-        rayPos.z = Joueur.Camera.position.z + Raydir.z * distance;
+      int bx = (int)floorf(rayPos.x);
+      int by = (int)floorf(rayPos.y);
+      int bz = (int)floorf(rayPos.z);
 
-        int bx = (int)floorf(rayPos.x);
-        int by = (int)floorf(rayPos.y);
-        int bz = (int)floorf(rayPos.z);
-
-        if (getBlock(chunk_list,size,bx, by, bz) != AIR){
-          targetX = bx;
-          targetY = by;
-          targetZ = bz;
-          blockTargeted = true;
-          if (previousValid && !checkCollision(Joueur.Position, Joueur.hitbox,
-                                                (ivec3_t){.x=previousX,
-                                                  .y=previousY,
-                                                  .z=previousZ}, blocks)){
+      if (getBlock(chunk_list,SIZE,bx, by, bz) != AIR){
+        targetX = bx;
+        targetY = by;
+        targetZ = bz;
+        blockTargeted = true;
+        if (previousValid && !checkCollision(Joueur.Position, Joueur.hitbox,
+                                              (ivec3_t){.x=previousX,
+                                                .y=previousY,
+                                                .z=previousZ}, blocks)){
             
-            if(keysDown() & KEY_R){
-              if(specialmode != true){
-                setBlock(chunk_list, size, previousX, previousY, previousZ, indexB);
-              }
+          if((keysDown() | keysHeld()) & KEY_R){
+            if(specialmode != true && delay <= 0){
+              setBlock(chunk_list, SIZE, previousX, previousY, previousZ, indexB);
+              majChunk = true;
+              delay = 10;
             }
           }
-          if((keysHeld() & KEY_L) && (keysDown() & KEY_R)){
-              setBlock(chunk_list, size, targetX, targetY, targetZ, AIR);
+        }
+        if((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)){
+          if(delay <= 0){
+            setBlock(chunk_list, SIZE, targetX, targetY, targetZ, AIR);
+            majChunk = true;
+            delay = 10;
           }
-          break;
         }
-        else{
-          blockTargeted = false;
-        }
-        previousX = bx;
-        previousY = by;
-        previousZ = bz;
-        previousValid = 1;
+        break;
       }
+      else{
+        blockTargeted = false;
+      }
+      previousX = bx;
+      previousY = by;
+      previousZ = bz;
+      previousValid = 1;
+    }
 
+    if(majChunk){
+      blockVisibility(chunk_list, SIZE, gBlocks);
+      majChunk = false;
+    }
 
-    for(uint8_t i=0;i<size;i++){
+    for(uint8_t i=0;i<SIZE;i++){
       RenderChunk(chunk_list[i],gBlocks,false);
     }
 
@@ -186,9 +237,13 @@ int main() {
       drawBlockOutline(targetX, targetY, targetZ);
     }
 
+    if(delay>0){
+      --delay;
+    }
+
     glFlush(0);
+    updatePerformance();
     swiWaitForVBlank();
-    timer++;
   }
   return EXIT_SUCCESS;
 }
@@ -197,7 +252,8 @@ int main() {
 
 
 
-void subscreenAff(char *pseudo){
+
+void subscreenAff(char *pseudo,struct mallinfo info){
   consoleClear();
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;5H|Minecraft DS Edition|");
@@ -207,8 +263,11 @@ void subscreenAff(char *pseudo){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %0.1lfs",timer/60.0);
-  iprintf("\x1b[6;18H Bloc : %d",indexB);
+  iprintf("\x1b[8;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
+  iprintf("\x1b[9;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
+  printf("\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %.1f s",(float)totalTicks / TIMER_TICKS_PER_SECOND);
+  printf("\t\t\tfps:%d", fps);
+  iprintf("\x1b[6;18H Bloc : %d/%d",indexB,BLOCK_COUNT-1);
 }
 
 void setCam(){
@@ -254,4 +313,23 @@ void ApplyGravity(chunk_t *chunk_list[], int size){
         }
     }
     Joueur.velocityY -= GRAVITY;
+}
+
+void updatePerformance(void){
+  u16 now = TIMER0_DATA;
+
+  // Temps écoulé depuis la dernière frame
+  totalTicks += (u16)(now - previousTimer);
+
+  previousTimer = now;
+
+  // Nombre de frames calculées
+  frames++;
+
+  // Une vraie seconde s'est écoulée
+  if ((u16)(now - lastFpsTimer) >= TIMER_TICKS_PER_SECOND){
+    fps = frames;
+    frames = 0;
+    lastFpsTimer = now;
+  }
 }

@@ -4,10 +4,11 @@
 //======================================================================
 //
 //	TextureAtlas, 64x64@16, 
+//	Transparent color : FF,FF,FF
 //	+ bitmap not compressed
 //	Total size: 8192 = 8192
 //
-//	Time-stamp: 2026-08-20, 15:48:13
+//	Time-stamp: 2026-08-25, 19:51:42
 //	Exported by Cearn's GBA Image Transmogrifier, v0.9.2
 //	( http://www.coranac.com/projects/#grit )
 //

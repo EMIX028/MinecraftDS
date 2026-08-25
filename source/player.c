@@ -3,6 +3,7 @@
 #include "mctypes.h"
 #include <nds.h>
 #include <math.h>
+#include "Blocks.h"
 
 void setPlayer(player_t *player){
   player->Position.x = 0.5f;
@@ -10,8 +11,8 @@ void setPlayer(player_t *player){
   player->Position.z = 0.5f;
 
   player->Camera.position.x = player->Position.x;
-  player->Camera.position.y = player->Position.y +1.5f;
-  player->Camera.position.z = player->Position.z+0.1f;
+  player->Camera.position.y = player->Position.y +1.62f;
+  player->Camera.position.z = player->Position.z;
 
   player->Camera.yaw = 0.0f;
   player->Camera.pitch = 0.0f;
@@ -107,7 +108,7 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
               localZ < 0 || localZ >= L_CHUNK)
             continue;
 
-          int blockID = chunk[i]->blocks[localX][y][localZ];
+          int blockID = chunk[i]->blocks[localX][y][localZ].id;
 
           if (list[blockID].solid){
                         
