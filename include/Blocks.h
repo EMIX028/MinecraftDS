@@ -3,10 +3,13 @@
 
 #include "ChunkStruct.h"
 
+//listes des blocs du jeu avec leur caractéristiques
 extern block_t gBlocks[BLOCK_COUNT];
 
+//hitbox d'un bloc classique 
 extern const hitbox_t blocks;
 
+//fonction d'initialisation de tous les blocs
 void InitBlocks(void);
 
 #endif

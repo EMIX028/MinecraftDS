@@ -19,38 +19,38 @@ void InitBlocks(void){
         .id = DIRT,
         .transparent = 0,
         .solid = true,
-        .texture.x = 0, .texture.y = 1
+        .texture.x = 0, .texture.z = 1
     };
 
     gBlocks[STONE] = (block_t){
         .id = STONE,
         .transparent = 0,
         .solid = true,
-        .texture.x = 1, .texture.y = 0
+        .texture.x = 1, .texture.z = 0
     };
 
     gBlocks[COBBLESTONE] = (block_t){
         .id = COBBLESTONE,
         .transparent = 0,
         .solid = true,
-        .texture.x = 1, .texture.y = 1
+        .texture.x = 1, .texture.z = 1
     };
     gBlocks[LEAVES] = (block_t){
         .id = LEAVES,
         .transparent = 1,
         .solid = true,
-        .texture.x = 0, .texture.y = 2
+        .texture.x = 0, .texture.z = 2
     };
     gBlocks[MOSS] = (block_t){
         .id = MOSS,
         .transparent = 0,
         .solid = true,
-        .texture.x = 1, .texture.y = 2
+        .texture.x = 1, .texture.z = 2
     };
     gBlocks[GLASS] = (block_t){
         .id = GLASS,
         .transparent = 1,
         .solid = true,
-        .texture.x = 2, .texture.y = 0
+        .texture.x = 2, .texture.z = 0
     };
 }

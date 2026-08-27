@@ -5,43 +5,34 @@
 #define SCREEN_H 192
 #define MAX_ANGLE 0.995
 
+//vecteur 3d en flottant
 typedef struct fvec3{
   float x;
   float y;
   float z;
 } vec3_t;
 
+//vecteur 3d en entier
 typedef struct ivec3{
-  int x;
-  int y;
-  int z;
+  int8_t x;
+  int8_t y;
+  int8_t z;
 } ivec3_t;
 
+//vecteur 2d en entier
 typedef struct vec2{
-  int x;
-  int z;
+  int8_t x;
+  int8_t z;
 } vec2_t;
 
-typedef struct vec2_8{
-  uint8_t x;
-  uint8_t y;
-} vec2_8_t;
-
-typedef struct rgb{
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-} rgb_t;
-
+//définir une hitbox avec largeur, hauteur, profondeur
 typedef struct hitbox{
-  // float x;
-  // float y;
-  // float z;
   float w;
   float h;
   float d;
 }hitbox_t;
 
+//Alias de plusieurs ID de bloc
 typedef enum {
     AIR,
     DIRT,

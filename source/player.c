@@ -96,32 +96,29 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
               z <= (int)floor(futurePosition.z) + 1;
               z++){
                     
-          if (y < 0 || y >= H_CHUNK)
+          if (y < 0 || y >= H_CHUNK){
             continue;
-
+          }
           // Coordonnées monde -> coordonnées locales du chunk
           int localX = x - chunkX * L_CHUNK;
           int localZ = z - chunkZ * L_CHUNK;
 
           // Le bloc n'appartient pas à ce chunk
           if (localX < 0 || localX >= L_CHUNK ||
-              localZ < 0 || localZ >= L_CHUNK)
+              localZ < 0 || localZ >= L_CHUNK){
             continue;
+          }
 
           int blockID = chunk[i]->blocks[localX][y][localZ].id;
 
           if (list[blockID].solid){
                         
-            if (checkCollision(
-              futurePosition,
-              player->hitbox,
-              (ivec3_t){
+            if (checkCollision(futurePosition,player->hitbox,(ivec3_t){
                 .x = x,
                 .y = y,
                 .z = z
-              },
-              blocks)){
-                return false;
+              },blocks)){
+              return false;
             }
           }
         }
@@ -132,6 +129,8 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
 }
 
 bool specialmode = false;
+
+
 void loadPlayerMovement(player_t *player, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks){
   vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
   player->Direction = getDir(player->Camera);

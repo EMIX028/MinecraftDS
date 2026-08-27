@@ -22,17 +22,14 @@
 player_t Joueur;
 uint8_t indexB = 1;
 int delay = 0; //delay entre chaque bloc posé ou cassé
-
 bool majChunk = false;
 
 
+//définition d'un TIMER et du compteur de fps
 #define TIMER_TICKS_PER_SECOND (BUS_CLOCK / 1024)
-
 static u32 totalTicks = 0;
-
 static u16 previousTimer = 0;
 static u16 lastFpsTimer = 0;
-
 static int frames = 0;
 static int fps = 0;
 
@@ -62,7 +59,7 @@ int main() {
   
 
   char pseudo[PersonalData->nameLen];
-  for(int i=0;i<PersonalData->nameLen;++i){
+  for(int i = 0 ; i < PersonalData->nameLen ; ++i){
     pseudo[i] = PersonalData->name[i];
   }
 
@@ -88,7 +85,6 @@ int main() {
   chunk_t chunk00 = {
     .position.x = 0, .position.z = 0
   };
-
   chunk_t chunkTest = {
     .position.x = 1, .position.z = 0
   };
@@ -99,44 +95,21 @@ int main() {
     .position.x = 1, .position.z = -1
   };
 
-  initChunk(&chunkTest,AIR);
-  initChunk(&chunk00,AIR);
-  initChunk(&chunk01,AIR);
-  initChunk(&chunk02,AIR);
-
-  for(int x = 0 ; x < L_CHUNK ; ++x){
-    for(int z = 0; z < L_CHUNK ; ++z){
-      chunk00.blocks[x][0][z].id = DIRT;
-      chunkTest.blocks[x][0][z].id = DIRT;
-      chunk01.blocks[x][0][z].id = DIRT;
-      chunk02.blocks[x][0][z].id = DIRT;
-      chunk00.blocks[x][1][z].id = MOSS;
-      chunkTest.blocks[x][1][z].id = MOSS;
-      chunk01.blocks[x][1][z].id = MOSS;
-      chunk02.blocks[x][1][z].id = MOSS;
-    }
-  }
-
-  
   #define SIZE 4
   chunk_t *chunk_list[SIZE] = {&chunk00,&chunk01,&chunk02,&chunkTest};
-  
-  /*
-  for(int i = 0; i < SIZE ; ++i){
-    initChunk(chunk_list[i], AIR);
+
+  for(int i = 0 ; i < SIZE ; ++i){
+    initChunk(chunk_list[i],AIR);
     for(int x = 0 ; x < L_CHUNK ; ++x){
       for(int z = 0; z < L_CHUNK ; ++z){
-        chunk_list[i]->blocks[x][0][z].id = MOSS;
+      chunk_list[i]->blocks[x][0][z].id = DIRT;
+      chunk_list[i]->blocks[x][1][z].id = MOSS;
       }
     }
   }
-  */
-
 
   blockVisibility(chunk_list, SIZE, gBlocks);
-
   movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 3.0f,.z=5.0f});
-
 
   while (pmMainLoop()) {
     struct mallinfo info = mallinfo();
@@ -147,7 +120,7 @@ int main() {
     loadKeyAssignation(&Joueur);
     
     if(keysDown() & KEY_START){
-      break;
+      break; //quitte le jeu
     }
     if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
       if(indexB < 6){
@@ -179,7 +152,7 @@ int main() {
 
     int previousValid = 0;
 
-    for (float distance = 0.0f; distance < P_REACH; distance += 0.05f){
+    for (float distance = 0.0f ; distance < P_REACH ; distance += 0.05f){
       rayPos.x = Joueur.Camera.position.x + Raydir.x * distance;
       rayPos.y = Joueur.Camera.position.y + Raydir.y * distance;
       rayPos.z = Joueur.Camera.position.z + Raydir.z * distance;
@@ -316,6 +289,7 @@ void ApplyGravity(chunk_t *chunk_list[], int size){
 }
 
 void updatePerformance(void){
+  //fonction bricoler rapidement avec l'IA
   u16 now = TIMER0_DATA;
 
   // Temps écoulé depuis la dernière frame

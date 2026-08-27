@@ -5,9 +5,6 @@
 #include "keyAssignation.h"
 
 void loadKeyAssignation(player_t *player){
-  if((keysHeld() & KEY_L) && (keysUp() & KEY_R)){
-    //lcdMainOnBottom();
-  }
   if((keysHeld() & KEY_L) && ( keysDown() & KEY_B) && !player->isfalling){
     player->velocityY = 0.13749f;
     player->isfalling = true;

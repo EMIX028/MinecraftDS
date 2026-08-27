@@ -23,185 +23,89 @@ chunk_t *getChunk(chunk_t *chunks[], int size, int chunkX, int chunkZ){
 }
 
 
-void blockVisibility(chunk_t *chunks[], int size, block_t *list)
-{
-    for (int i = 0; i < size; ++i)
-    {
-        chunk_t *chunk = chunks[i];
-
-        for (short x = 0; x < L_CHUNK; ++x)
-        {
-            for (short y = 0; y < H_CHUNK; ++y)
-            {
-                for (short z = 0; z < L_CHUNK; ++z)
-                {
-                    uint8_t id = chunk->blocks[x][y][z].id;
-
-                    chunk->blocks[x][y][z].faces = 0;
-
-                    // L'air n'a pas de faces à dessiner
-                    if (list[id].transparent == 2)
-                    {
-                        continue;
-                    }
-
-                    // =========================
-                    // LEFT
-                    // =========================
-
-                    if (x > 0)
-                    {
-                        uint8_t neighborId =
-                            chunk->blocks[x - 1][y][z].id;
-
-                        if (list[neighborId].transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_LEFT;
-                        }
-                    }
-                    else
-                    {
-                        chunk_t *neighbor =
-                            getChunk(chunks, size,
-                                     chunk->position.x - 1,
-                                     chunk->position.z);
-
-                        if (neighbor == NULL ||
-                            list[neighbor->blocks[L_CHUNK - 1][y][z].id]
-                                .transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_LEFT;
-                        }
-                    }
-
-                    // =========================
-                    // RIGHT
-                    // =========================
-
-                    if (x < L_CHUNK - 1)
-                    {
-                        uint8_t neighborId =
-                            chunk->blocks[x + 1][y][z].id;
-
-                        if (list[neighborId].transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_RIGHT;
-                        }
-                    }
-                    else
-                    {
-                        chunk_t *neighbor =
-                            getChunk(chunks, size,
-                                     chunk->position.x + 1,
-                                     chunk->position.z);
-
-                        if (neighbor == NULL ||
-                            list[neighbor->blocks[0][y][z].id]
-                                .transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_RIGHT;
-                        }
-                    }
-
-                    // =========================
-                    // BACK
-                    // =========================
-
-                    if (z > 0)
-                    {
-                        uint8_t neighborId =
-                            chunk->blocks[x][y][z - 1].id;
-
-                        if (list[neighborId].transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_BACK;
-                        }
-                    }
-                    else
-                    {
-                        chunk_t *neighbor =
-                            getChunk(chunks, size,
-                                     chunk->position.x,
-                                     chunk->position.z - 1);
-
-                        if (neighbor == NULL ||
-                            list[neighbor->blocks[x][y][L_CHUNK - 1].id]
-                                .transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_BACK;
-                        }
-                    }
-
-                    // =========================
-                    // FRONT
-                    // =========================
-
-                    if (z < L_CHUNK - 1)
-                    {
-                        uint8_t neighborId =
-                            chunk->blocks[x][y][z + 1].id;
-
-                        if (list[neighborId].transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_FRONT;
-                        }
-                    }
-                    else
-                    {
-                        chunk_t *neighbor =
-                            getChunk(chunks, size,
-                                     chunk->position.x,
-                                     chunk->position.z + 1);
-
-                        if (neighbor == NULL ||
-                            list[neighbor->blocks[x][y][0].id]
-                                .transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_FRONT;
-                        }
-                    }
-
-                    // =========================
-                    // BOTTOM
-                    // =========================
-
-                    if (y == 0)
-                    {
-                        chunk->blocks[x][y][z].faces |= FACE_BOTTOM;
-                    }
-                    else
-                    {
-                        uint8_t neighborId =
-                            chunk->blocks[x][y - 1][z].id;
-
-                        if (list[neighborId].transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_BOTTOM;
-                        }
-                    }
-
-                    // =========================
-                    // TOP
-                    // =========================
-
-                    if (y == H_CHUNK - 1)
-                    {
-                        chunk->blocks[x][y][z].faces |= FACE_TOP;
-                    }
-                    else
-                    {
-                        uint8_t neighborId =
-                            chunk->blocks[x][y + 1][z].id;
-
-                        if (list[neighborId].transparent != 0)
-                        {
-                            chunk->blocks[x][y][z].faces |= FACE_TOP;
-                        }
-                    }
-                }
+void blockVisibility(chunk_t *chunks[], int size, block_t *list){
+  for (int i = 0; i < size; ++i){
+    chunk_t *chunk = chunks[i];
+    for (short x = 0; x < L_CHUNK; ++x){
+      for (short y = 0; y < H_CHUNK; ++y){
+        for (short z = 0; z < L_CHUNK; ++z){
+          chunk->blocks[x][y][z].faces = 0;
+          // LEFT
+          if (x > 0){
+            uint8_t neighborId = chunk->blocks[x - 1][y][z].id;
+            if (list[neighborId].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_LEFT;
             }
+          }
+          else{
+            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x - 1, chunk->position.z);
+            if (neighbor == NULL || list[neighbor->blocks[L_CHUNK - 1][y][z].id].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_LEFT;
+            }
+          }
+          // RIGHT
+          if (x < L_CHUNK - 1){
+            uint8_t neighborId = chunk->blocks[x + 1][y][z].id;
+            if (list[neighborId].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_RIGHT;
+            }
+          }
+          else{
+            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x + 1, chunk->position.z);
+            if (neighbor == NULL || list[neighbor->blocks[0][y][z].id].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_RIGHT;
+            }
+          }
+          // BACK
+          if (z > 0){
+            uint8_t neighborId = chunk->blocks[x][y][z - 1].id;
+            if (list[neighborId].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_BACK;
+            }
+          }
+          else{
+            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x, chunk->position.z - 1);
+            if (neighbor == NULL || list[neighbor->blocks[x][y][L_CHUNK - 1].id].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_BACK;
+            }
+          }
+          // FRONT
+          if (z < L_CHUNK - 1){
+            uint8_t neighborId = chunk->blocks[x][y][z + 1].id;
+            if (list[neighborId].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_FRONT;
+            }
+          }
+          else{
+            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x, chunk->position.z + 1);
+            if (neighbor == NULL || list[neighbor->blocks[x][y][0].id].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_FRONT;
+            }
+          }
+          // BOTTOM
+          if (y == 0){
+            chunk->blocks[x][y][z].faces |= FACE_BOTTOM;
+          }
+          else{
+            uint8_t neighborId = chunk->blocks[x][y - 1][z].id;
+            if (list[neighborId].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_BOTTOM;
+            }
+          }
+          // TOP
+          if (y == H_CHUNK - 1){
+            chunk->blocks[x][y][z].faces |= FACE_TOP;
+          }
+          else{
+            uint8_t neighborId = chunk->blocks[x][y + 1][z].id;
+            if (list[neighborId].transparent != 0){
+              chunk->blocks[x][y][z].faces |= FACE_TOP;
+            }
+          }
         }
+      }
     }
+  }
 }
 
 void RenderChunk(chunk_t *chunk, block_t *list, bool cull){
