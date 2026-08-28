@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mctypes.h"
-#define L_CHUNK 14 //chunk minecraft 15
+#define L_CHUNK 11 //chunk minecraft 15
 #define H_CHUNK 15 // hauteur max 256
 
 //macro constante qui gère l'affichage d'un bloc sur un octet

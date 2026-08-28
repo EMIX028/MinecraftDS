@@ -20,3 +20,5 @@ void ApplyGravity(chunk_t *chunk_list[],int size);
 void updatePerformance(void);
 
 void calculRenderView(chunk_t *chunk_list[]);
+
+void setPlayground(chunk_t *chunk_list[]);

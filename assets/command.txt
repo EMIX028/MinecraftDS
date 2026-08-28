@@ -1,5 +1,12 @@
+texture sans transparence
+
 grit TextureAtlas.png -gb -gB16 -ftc -fh
 
-test pour transparence : 
+texture avec transparence : 
 
 grit TextureAtlas.png -gx -gb -gB16 -gTFFFFFF -ftc -fh
+
+pour les sons (temporaire) :
+
+ffmpeg -i wet_hands.ogg -ar 11025 -ac 1 -c:a pcm_s16le musique_ds2.wav
+mmutil -d sound/wet_hands_ds.wav -obuild/soundbank.bin -hbuild/soundbank.h

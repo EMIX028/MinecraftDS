@@ -6,6 +6,10 @@ compile_commands.json
 *.png
 *.ase
 *.ogg
+*.wav
+sound/
+build/
+
 
 # Prerequisites
 *.d

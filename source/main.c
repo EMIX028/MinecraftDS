@@ -17,12 +17,16 @@
 #include "Blocks.h"
 #include "TextureAtlas.h"
 #include <malloc.h>
+#include <maxmod9.h>
+
+#include "soundbank.h"
+#include "soundbank_bin.h"
 
 
 player_t Joueur;
 uint8_t indexB = 1;
 int delay = 0; //delay entre chaque bloc posé ou cassé
-#define DELAY 12
+#define DELAY 11
 bool majChunk = true;
 
 
@@ -100,18 +104,13 @@ int main() {
   #define SIZE 4
   chunk_t *chunk_list[SIZE] = {&chunk00,&chunk01,&chunk02,&chunkTest};
 
-  for(int i = 0 ; i < SIZE ; ++i){
-    initChunk(chunk_list[i],AIR);
-    for(int x = 0 ; x < L_CHUNK ; ++x){
-      for(int z = 0; z < L_CHUNK ; ++z){
-      chunk_list[i]->blocks[x][0][z].id = DIRT;
-      chunk_list[i]->blocks[x][1][z].id = MOSS;
-      }
-    }
-  }
+  setPlayground(chunk_list);
 
-  calculRenderView(chunk_list);
   movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 3.0f,.z=5.0f});
+
+  mmInitDefaultMem((mm_addr)soundbank_bin);
+  mm_sfxhand handle = mmEffect(SFX_WET_HANDS_DS);
+  mmEffectVolume(handle, 128);
 
   while (pmMainLoop()) {
     struct mallinfo info = mallinfo();
@@ -122,6 +121,12 @@ int main() {
     loadKeyAssignation(&Joueur);
     
     if(keysDown() & KEY_START){
+      setPlayground(chunk_list);
+      movePlayer(&Joueur, (vec3_t){.x=-Joueur.Position.x+5.0f,
+                                .y=-Joueur.Position.y+10.0f,
+                                .z = -Joueur.Position.z+5.0f});
+    }
+    if(keysDown() & KEY_SELECT){
       break; //quitte le jeu
     }
     if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
@@ -130,6 +135,14 @@ int main() {
       }
       else{
         indexB = 1;
+      }
+    }
+    if((keysHeld() & KEY_L) && (keysDown() & KEY_Y)){
+      if(indexB > 1){
+        --indexB;
+      }
+      else{
+        indexB = BLOCK_COUNT-1;
       }
     }
 
@@ -151,6 +164,7 @@ int main() {
     int previousX = 0;
     int previousY = 0;
     int previousZ = 0;
+    uint8_t b;
 
     int previousValid = 0;
 
@@ -163,7 +177,7 @@ int main() {
       int by = (int)floorf(rayPos.y);
       int bz = (int)floorf(rayPos.z);
 
-      if (getBlock(chunk_list,SIZE,bx, by, bz) != AIR){
+      if ((b = getBlock(chunk_list,SIZE,bx, by, bz)) != AIR){
         targetX = bx;
         targetY = by;
         targetZ = bz;
@@ -182,7 +196,7 @@ int main() {
           }
         }
         if((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)){
-          if(delay <= 0){
+          if(delay <= 0 && b != BEDROCK){
             setBlock(chunk_list, SIZE, targetX, targetY, targetZ, AIR);
             majChunk = true;
             delay = DELAY;
@@ -235,8 +249,8 @@ void subscreenAff(char *pseudo,struct mallinfo info){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  iprintf("\x1b[8;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
-  iprintf("\x1b[9;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
+  //iprintf("\x1b[8;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
+  //iprintf("\x1b[9;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
   printf("\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %.1f s",(float)totalTicks / TIMER_TICKS_PER_SECOND);
   printf("\t\t\tfps:%d", fps);
   iprintf("\x1b[6;18H Bloc : %d/%d",indexB,BLOCK_COUNT-1);
@@ -334,4 +348,18 @@ void calculRenderView(chunk_t *chunk_list[]){
       }
     }
   }
+}
+
+void setPlayground(chunk_t *chunk_list[]){
+  for(int i = 0 ; i < SIZE ; ++i){
+    initChunk(chunk_list[i],AIR);
+    for(int x = 0 ; x < L_CHUNK ; ++x){
+      for(int z = 0; z < L_CHUNK ; ++z){
+      chunk_list[i]->blocks[x][0][z].id = BEDROCK;
+      chunk_list[i]->blocks[x][1][z].id = MOSS;
+      }
+    }
+  }
+  majChunk = true;
+  calculRenderView(chunk_list);
 }

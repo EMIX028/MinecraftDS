@@ -3,7 +3,6 @@
 #include "mctypes.h"
 #include <nds.h>
 #include <math.h>
-#include "Blocks.h"
 
 void setPlayer(player_t *player){
   player->Position.x = 0.5f;
@@ -197,7 +196,7 @@ void loadPlayerMovement(player_t *player, chunk_t *chunk[], int n, block_t list[
     }
   }
   if(keysHeld() & KEY_X){
-    if(sinf(player->Camera.pitch) < MAX_ANGLE){
+    if(specialmode != true && sinf(player->Camera.pitch) < MAX_ANGLE){
       player->Camera.pitch += P_SENSI;
     }
   }
