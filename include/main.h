@@ -18,3 +18,5 @@ void ApplyGravity(chunk_t *chunk_list[],int size);
 
 //calcul le timer du jeu et les fps
 void updatePerformance(void);
+
+void calculRenderView(chunk_t *chunk_list[]);

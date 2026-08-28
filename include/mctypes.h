@@ -38,8 +38,10 @@ typedef enum {
     DIRT,
     STONE,
     COBBLESTONE,
-    LEAVES,
+    BEDROCK,
     MOSS,
     GLASS,
+    PLANK,
+    DIAMOND,
     BLOCK_COUNT
 } Blocks;

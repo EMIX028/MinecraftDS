@@ -22,7 +22,22 @@
 player_t Joueur;
 uint8_t indexB = 1;
 int delay = 0; //delay entre chaque bloc posé ou cassé
-bool majChunk = false;
+#define DELAY 12
+bool majChunk = true;
+
+
+chunk_t chunk00 = {
+  .position.x = 0, .position.z = 0
+};
+chunk_t chunkTest = {
+  .position.x = 1, .position.z = 0
+};
+chunk_t chunk01 = {
+  .position.x = 0, .position.z = -1
+};
+chunk_t chunk02 = {
+  .position.x = 1, .position.z = -1
+};
 
 
 //définition d'un TIMER et du compteur de fps
@@ -80,20 +95,7 @@ int main() {
   ) == 0){
     printf("\nerreur init texture\n");
   }
-
   
-  chunk_t chunk00 = {
-    .position.x = 0, .position.z = 0
-  };
-  chunk_t chunkTest = {
-    .position.x = 1, .position.z = 0
-  };
-  chunk_t chunk01 = {
-    .position.x = 0, .position.z = -1
-  };
-  chunk_t chunk02 = {
-    .position.x = 1, .position.z = -1
-  };
 
   #define SIZE 4
   chunk_t *chunk_list[SIZE] = {&chunk00,&chunk01,&chunk02,&chunkTest};
@@ -108,7 +110,7 @@ int main() {
     }
   }
 
-  blockVisibility(chunk_list, SIZE, gBlocks);
+  calculRenderView(chunk_list);
   movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 3.0f,.z=5.0f});
 
   while (pmMainLoop()) {
@@ -123,7 +125,7 @@ int main() {
       break; //quitte le jeu
     }
     if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
-      if(indexB < 6){
+      if(indexB < BLOCK_COUNT-1){
         ++indexB;
       }
       else{
@@ -175,7 +177,7 @@ int main() {
             if(specialmode != true && delay <= 0){
               setBlock(chunk_list, SIZE, previousX, previousY, previousZ, indexB);
               majChunk = true;
-              delay = 10;
+              delay = DELAY;
             }
           }
         }
@@ -183,7 +185,7 @@ int main() {
           if(delay <= 0){
             setBlock(chunk_list, SIZE, targetX, targetY, targetZ, AIR);
             majChunk = true;
-            delay = 10;
+            delay = DELAY;
           }
         }
         break;
@@ -197,13 +199,10 @@ int main() {
       previousValid = 1;
     }
 
-    if(majChunk){
-      blockVisibility(chunk_list, SIZE, gBlocks);
-      majChunk = false;
-    }
+    calculRenderView(chunk_list);
 
     for(uint8_t i=0;i<SIZE;i++){
-      RenderChunk(chunk_list[i],gBlocks,false);
+      RenderChunk(chunk_list[i],gBlocks,true);
     }
 
     if (blockTargeted) {
@@ -229,8 +228,8 @@ int main() {
 void subscreenAff(char *pseudo,struct mallinfo info){
   consoleClear();
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
-  iprintf("\x1b[1;5H|Minecraft DS Edition|");
-  iprintf("\x1b[2;5H----------------------");
+  iprintf("\x1b[1;3H|Minecraft DS Edition 1.0a|");
+  iprintf("\x1b[2;3H--------------------------");
   iprintf("\x1b[4;1HHey %s !",pseudo);
   iprintf("\x1b[6;1Hx:%3d y:%3d z:%3d",
           (int)Joueur.Position.x,
@@ -305,5 +304,34 @@ void updatePerformance(void){
     fps = frames;
     frames = 0;
     lastFpsTimer = now;
+  }
+}
+
+void calculRenderView(chunk_t *chunk_list[]){
+  if(majChunk){
+    blockVisibility(chunk_list, SIZE, gBlocks);
+    majChunk = false;
+  }
+  for(uint8_t i = 0 ; i < SIZE ; ++i){
+    for(uint8_t x = 0 ; x < L_CHUNK ; ++x){
+      for(uint8_t y = 0; y<H_CHUNK && y <= Joueur.Position.y ; ++y){
+        for(uint8_t z = 0; z < L_CHUNK ; ++z){
+          if(gBlocks[chunk_list[i]->blocks[x][0][z].id].transparent != 2){
+            chunk_list[i]->blocks[x][y][z].faces &= ~FACE_BOTTOM;
+          }
+          chunk_list[i]->blocks[x][0][0].faces &= ~FACE_BACK;
+          chunk_list[i]->blocks[x][1][0].faces &= ~FACE_BACK;
+
+          chunk_list[i]->blocks[x][0][L_CHUNK-1].faces &= ~FACE_FRONT;
+          chunk_list[i]->blocks[x][1][L_CHUNK-1].faces &= ~FACE_FRONT;
+
+          chunk_list[i]->blocks[0][0][z].faces &= ~FACE_LEFT;
+          chunk_list[i]->blocks[0][1][z].faces &= ~FACE_LEFT; 
+          
+          chunk_list[i]->blocks[L_CHUNK-1][0][z].faces &= ~FACE_RIGHT;
+          chunk_list[i]->blocks[L_CHUNK-1][1][z].faces &= ~FACE_RIGHT;          
+        }
+      }
+    }
   }
 }

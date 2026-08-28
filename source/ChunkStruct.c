@@ -30,6 +30,10 @@ void blockVisibility(chunk_t *chunks[], int size, block_t *list){
       for (short y = 0; y < H_CHUNK; ++y){
         for (short z = 0; z < L_CHUNK; ++z){
           chunk->blocks[x][y][z].faces = 0;
+          // L'air n'a pas de faces à dessiner
+          if (list[chunk->blocks[x][y][z].id].transparent == 2){
+             continue;
+          }
           // LEFT
           if (x > 0){
             uint8_t neighborId = chunk->blocks[x - 1][y][z].id;
@@ -109,39 +113,44 @@ void blockVisibility(chunk_t *chunks[], int size, block_t *list){
 }
 
 void RenderChunk(chunk_t *chunk, block_t *list, bool cull){
-  for(short x = 0 ; x < L_CHUNK ; ++x){
-    for(short y = 0 ; y < H_CHUNK ; ++y){
-      for(short z = 0 ; z < L_CHUNK ; ++z){
-        if(list[chunk->blocks[x][y][z].id].transparent < 2){
-          glPushMatrix();
-            glTranslatef32(inttof32(x + chunk->position.x*L_CHUNK),
-                            inttof32(y),
-                            inttof32(z + chunk->position.z*L_CHUNK));
-            startingDraw(cull);
-          if(chunk->blocks[x][y][z].faces & FACE_TOP){
-            drawCubeTop(list[chunk->blocks[x][y][z].id].texture);
-          }
-          if(chunk->blocks[x][y][z].faces & FACE_BOTTOM){
-            drawCubeBottom(list[chunk->blocks[x][y][z].id].texture);
-          }
-          if(chunk->blocks[x][y][z].faces & FACE_LEFT){
-            drawCubeLeft(list[chunk->blocks[x][y][z].id].texture);
-          }
-          if(chunk->blocks[x][y][z].faces & FACE_RIGHT){
-            drawCubeRight(list[chunk->blocks[x][y][z].id].texture);
-          }
-          if(chunk->blocks[x][y][z].faces & FACE_FRONT){
-            drawCubeFront(list[chunk->blocks[x][y][z].id].texture);
-          }
-          if(chunk->blocks[x][y][z].faces & FACE_BACK){
-            drawCubeBack(list[chunk->blocks[x][y][z].id].texture);
-          }
-          glEnd();
-          glPopMatrix(1);
+  glPushMatrix();
+  glTranslatef32(
+    inttof32(chunk->position.x * L_CHUNK),
+    0,
+    inttof32(chunk->position.z * L_CHUNK)
+  );
+  startingDraw(cull);
+  for (short x = 0; x < L_CHUNK; ++x) {
+    for (short y = 0; y < H_CHUNK; ++y) {
+      for (short z = 0; z < L_CHUNK; ++z) {
+        block_t *block = &list[chunk->blocks[x][y][z].id];
+        if (block->transparent >= 2){
+          continue;
         }
+        glPushMatrix();
+        glTranslatef32(
+          inttof32(x),
+          inttof32(y),
+          inttof32(z)
+        );
+        if (chunk->blocks[x][y][z].faces & FACE_TOP)
+          drawCubeTop(block->texture);
+        if (chunk->blocks[x][y][z].faces & FACE_BOTTOM)
+          drawCubeBottom(block->texture);
+        if (chunk->blocks[x][y][z].faces & FACE_LEFT)
+          drawCubeLeft(block->texture);
+        if (chunk->blocks[x][y][z].faces & FACE_RIGHT)
+          drawCubeRight(block->texture);
+        if (chunk->blocks[x][y][z].faces & FACE_FRONT)
+          drawCubeFront(block->texture);
+        if (chunk->blocks[x][y][z].faces & FACE_BACK)
+          drawCubeBack(block->texture);
+        glPopMatrix(1);
       }
     }
   }
+  glEnd();
+  glPopMatrix(1);
 }
 
 

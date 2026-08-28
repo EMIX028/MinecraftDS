@@ -35,9 +35,9 @@ void InitBlocks(void){
         .solid = true,
         .texture.x = 1, .texture.z = 1
     };
-    gBlocks[LEAVES] = (block_t){
-        .id = LEAVES,
-        .transparent = 1,
+    gBlocks[BEDROCK] = (block_t){
+        .id = BEDROCK,
+        .transparent = 0,
         .solid = true,
         .texture.x = 0, .texture.z = 2
     };
@@ -52,5 +52,17 @@ void InitBlocks(void){
         .transparent = 1,
         .solid = true,
         .texture.x = 2, .texture.z = 0
+    };
+    gBlocks[PLANK] = (block_t){
+        .id = PLANK,
+        .transparent = 0,
+        .solid = true,
+        .texture.x = 2, .texture.z = 1
+    };
+    gBlocks[DIAMOND] = (block_t){
+        .id = DIAMOND,
+        .transparent = 0,
+        .solid = true,
+        .texture.x = 2, .texture.z = 2
     };
 }
