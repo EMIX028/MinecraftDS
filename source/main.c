@@ -11,6 +11,7 @@
 #include "main.h"
 #include "nds/arm9/input.h"
 #include "nds/arm9/videoGL.h"
+#include "nds/system.h"
 #include "player.h"
 #include "ChunkStruct.h"
 #include "keyAssignation.h"
@@ -28,6 +29,7 @@ uint8_t indexB = 1;
 int delay = 0; //delay entre chaque bloc posé ou cassé
 #define DELAY 11
 bool majChunk = true;
+bool mainLCD = false;
 
 
 chunk_t chunk00 = {
@@ -78,7 +80,7 @@ int main() {
   
 
   char pseudo[PersonalData->nameLen];
-  for(int i = 0 ; i < PersonalData->nameLen ; ++i){
+  for(uint8_t i = 0 ; i < PersonalData->nameLen ; ++i){
     pseudo[i] = PersonalData->name[i];
   }
 
@@ -110,7 +112,7 @@ int main() {
 
   mmInitDefaultMem((mm_addr)soundbank_bin);
   mm_sfxhand handle = mmEffect(SFX_WET_HANDS_DS);
-  mmEffectVolume(handle, 128);
+  mmEffectVolume(handle, 255);
 
   while (pmMainLoop()) {
     struct mallinfo info = mallinfo();
@@ -143,6 +145,16 @@ int main() {
       }
       else{
         indexB = BLOCK_COUNT-1;
+      }
+    }
+    if((keysHeld() & KEY_L) && (keysDown() & KEY_X)){
+      if(!mainLCD){
+        lcdMainOnBottom();
+        mainLCD = true;
+      }
+      else{
+        lcdMainOnTop();
+        mainLCD = false;
       }
     }
 
@@ -212,16 +224,17 @@ int main() {
       previousZ = bz;
       previousValid = 1;
     }
+    
+    if (blockTargeted) {
+      drawBlockOutline(targetX, targetY, targetZ);
+    }
 
     calculRenderView(chunk_list);
 
     for(uint8_t i=0;i<SIZE;i++){
-      RenderChunk(chunk_list[i],gBlocks,true);
+      RenderChunk(chunk_list[i],gBlocks,true,&Joueur.Position);
     }
-
-    if (blockTargeted) {
-      drawBlockOutline(targetX, targetY, targetZ);
-    }
+    
 
     if(delay>0){
       --delay;
@@ -325,28 +338,6 @@ void calculRenderView(chunk_t *chunk_list[]){
   if(majChunk){
     blockVisibility(chunk_list, SIZE, gBlocks);
     majChunk = false;
-  }
-  for(uint8_t i = 0 ; i < SIZE ; ++i){
-    for(uint8_t x = 0 ; x < L_CHUNK ; ++x){
-      for(uint8_t y = 0; y<H_CHUNK && y <= Joueur.Position.y ; ++y){
-        for(uint8_t z = 0; z < L_CHUNK ; ++z){
-          if(gBlocks[chunk_list[i]->blocks[x][0][z].id].transparent != 2){
-            chunk_list[i]->blocks[x][y][z].faces &= ~FACE_BOTTOM;
-          }
-          chunk_list[i]->blocks[x][0][0].faces &= ~FACE_BACK;
-          chunk_list[i]->blocks[x][1][0].faces &= ~FACE_BACK;
-
-          chunk_list[i]->blocks[x][0][L_CHUNK-1].faces &= ~FACE_FRONT;
-          chunk_list[i]->blocks[x][1][L_CHUNK-1].faces &= ~FACE_FRONT;
-
-          chunk_list[i]->blocks[0][0][z].faces &= ~FACE_LEFT;
-          chunk_list[i]->blocks[0][1][z].faces &= ~FACE_LEFT; 
-          
-          chunk_list[i]->blocks[L_CHUNK-1][0][z].faces &= ~FACE_RIGHT;
-          chunk_list[i]->blocks[L_CHUNK-1][1][z].faces &= ~FACE_RIGHT;          
-        }
-      }
-    }
   }
 }
 

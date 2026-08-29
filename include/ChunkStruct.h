@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "mctypes.h"
-#define L_CHUNK 11 //chunk minecraft 15
-#define H_CHUNK 15 // hauteur max 256
+#define L_CHUNK 14 //chunk minecraft 15
+#define H_CHUNK 22 // hauteur max 256
 
 //macro constante qui gère l'affichage d'un bloc sur un octet
 // 1 bit par face, soit 6 bits d'utilisé sur 8
@@ -60,7 +60,7 @@ chunk_t *getChunk(chunk_t *chunks[], int size, int chunkX, int chunkZ);
 void blockVisibility(chunk_t *chunks[], int size, block_t *list);
 
 // dessine dans le rendu 3d un chunk
-void RenderChunk(chunk_t *chunk, block_t *list, bool cull);
+void RenderChunk(chunk_t *chunk, block_t *list, bool cull, vec3_t *playerpos);
 
 //renvoie le quotient d'une division pour un entier <0 ou >0
 int floorDiv(int a, int b);

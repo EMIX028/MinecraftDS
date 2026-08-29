@@ -112,7 +112,7 @@ void blockVisibility(chunk_t *chunks[], int size, block_t *list){
   }
 }
 
-void RenderChunk(chunk_t *chunk, block_t *list, bool cull){
+void RenderChunk(chunk_t *chunk, block_t *list, bool cull, vec3_t *playerpos){
   glPushMatrix();
   glTranslatef32(
     inttof32(chunk->position.x * L_CHUNK),
@@ -135,7 +135,7 @@ void RenderChunk(chunk_t *chunk, block_t *list, bool cull){
         );
         if (chunk->blocks[x][y][z].faces & FACE_TOP)
           drawCubeTop(block->texture);
-        if (chunk->blocks[x][y][z].faces & FACE_BOTTOM)
+        if ((chunk->blocks[x][y][z].faces & FACE_BOTTOM) && y >= playerpos->y)
           drawCubeBottom(block->texture);
         if (chunk->blocks[x][y][z].faces & FACE_LEFT)
           drawCubeLeft(block->texture);
