@@ -8,5 +8,12 @@ grit TextureAtlas.png -gx -gb -gB16 -gTFFFFFF -ftc -fh
 
 pour les sons (temporaire) :
 
-ffmpeg -i wet_hands.ogg -ar 11025 -ac 1 -c:a pcm_s16le musique_ds2.wav
-mmutil -d sound/wet_hands_ds.wav -obuild/soundbank.bin -hbuild/soundbank.h
+ffmpeg -i wet_hands.ogg -ar 11025 -ac 1 -c:a pcm_s16le wet_hands.wav
+
+ffmpeg -i wet_hands.ogg -ar 22050 -ac 1 -c:a pcm_s16le -af "loudnorm=I=-14:LRA=7:TP=-1.5" wet_hands_ds.wav // meilleur qualité  -t 79.7
+
+ffmpeg -i wet_hands.ogg -ar 11025 -ac 1 -c:a pcm_s16le -af "volume=16dB" wet_hands_ds.wav
+
+mmutil -d sound/wet_hands.wav -obuild/soundbank.bin -hbuild/soundbank.h
+
+

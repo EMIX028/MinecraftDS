@@ -111,7 +111,7 @@ int main() {
   movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 3.0f,.z=5.0f});
 
   mmInitDefaultMem((mm_addr)soundbank_bin);
-  mm_sfxhand handle = mmEffect(SFX_WET_HANDS_DS);
+  mm_sfxhand handle = mmEffect(SFX_WET_HANDS);
   mmEffectVolume(handle, 255);
 
   while (pmMainLoop()) {
