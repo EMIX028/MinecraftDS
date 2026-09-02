@@ -7,6 +7,7 @@
 #define P_FLYSPEED 0.25
 #define P_hitbox 0.6f
 #define P_REACH 4.5f
+#define DELAY 11
 
 //structure camera avec sa position en vecteur 3d
 //sa rotation horizontal yaw et vertical pitch
@@ -53,3 +54,6 @@ bool canMovePlayer(player_t *player ,vec3_t movement, chunk_t chunk[], int n, bl
 
 //gère les inputs de déplacement du joueur
 void loadPlayerMovement(player_t *player , chunk_t chunk[], int n, block_t list[], hitbox_t blocks);
+
+void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
+                      const bool specialmode, bool *majChunk, int *delay);

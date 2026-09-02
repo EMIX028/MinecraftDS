@@ -29,7 +29,6 @@
 player_t Joueur;
 uint8_t indexB = 1;
 int delay = 0; //delay entre chaque bloc posé ou cassé
-#define DELAY 11
 bool majChunk = true;
 uint8_t gameState = RUNNING;
 
@@ -159,71 +158,8 @@ int main() {
     glLoadIdentity();
     setCam();
 
-    
-    int targetX;
-    int targetY;
-    int targetZ;
-    bool blockTargeted;
-    vec3_t Raydir;
-
-    Raydir = getDir(Joueur.Camera);
-    vec3_t rayPos = Joueur.Camera.position;
-
-    int previousX = 0;
-    int previousY = 0;
-    int previousZ = 0;
-    uint8_t b;
-
-    int previousValid = 0;
-
-    for (float distance = 0.0f ; distance < P_REACH ; distance += 0.05f){
-      rayPos.x = Joueur.Camera.position.x + Raydir.x * distance;
-      rayPos.y = Joueur.Camera.position.y + Raydir.y * distance;
-      rayPos.z = Joueur.Camera.position.z + Raydir.z * distance;
-
-      int bx = (int)floorf(rayPos.x);
-      int by = (int)floorf(rayPos.y);
-      int bz = (int)floorf(rayPos.z);
-
-      if ((b = getBlock(chunkL,SIZE,bx, by, bz)) != AIR){
-        targetX = bx;
-        targetY = by;
-        targetZ = bz;
-        blockTargeted = true;
-        if (previousValid && !checkCollision(Joueur.Position, Joueur.hitbox,
-                                              (ivec3_t){.x=previousX,
-                                                .y=previousY,
-                                                .z=previousZ}, blocks)){
-            
-          if((keysDown() | keysHeld()) & KEY_R){
-            if(specialmode != true && delay <= 0){
-              setBlock(chunkL, SIZE, previousX, previousY, previousZ, indexB);
-              majChunk = true;
-              delay = DELAY;
-            }
-          }
-        }
-        if((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)){
-          if(delay <= 0 && b != BEDROCK){
-            setBlock(chunkL, SIZE, targetX, targetY, targetZ, AIR);
-            majChunk = true;
-            delay = DELAY;
-          }
-        }
-        break;
-      }
-      else{
-        blockTargeted = false;
-      }
-      previousX = bx;
-      previousY = by;
-      previousZ = bz;
-      previousValid = 1;
-    }
-    
-    if (blockTargeted) {
-      drawBlockOutline(targetX, targetY, targetZ);
-    }
+    playerInterract(&Joueur, chunkL, SIZE, indexB,
+                    (const bool) specialmode, &majChunk, &delay);
     
 
     calculRenderView();

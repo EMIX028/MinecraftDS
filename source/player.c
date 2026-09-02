@@ -3,6 +3,8 @@
 #include "utils.h"
 #include <nds.h>
 #include <math.h>
+#include "mesh.h"
+#include "Blocks.h"
 
 void setPlayer(player_t *player){
   player->Position.x = 0.5f;
@@ -199,5 +201,68 @@ void loadPlayerMovement(player_t *player, chunk_t chunk[], int n, block_t list[]
     if(specialmode != true && sinf(player->Camera.pitch) < MAX_ANGLE){
       player->Camera.pitch += P_SENSI;
     }
+  }
+}
+
+void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
+                      const bool specialmode, bool *majChunk, int *delay){
+  vec3_t target;
+  bool blockTargeted;
+  vec3_t Raydir;
+
+  Raydir = getDir(player->Camera);
+  vec3_t rayPos = player->Camera.position;
+
+  vec3_t previous;
+  uint8_t b;
+
+  int previousValid = 0;
+
+  for (float distance = 0.0f ; distance < P_REACH ; distance += 0.05f){
+    rayPos.x = player->Camera.position.x + Raydir.x * distance;
+    rayPos.y = player->Camera.position.y + Raydir.y * distance;
+    rayPos.z = player->Camera.position.z + Raydir.z * distance;
+
+    int bx = (int)floorf(rayPos.x);
+    int by = (int)floorf(rayPos.y);
+    int bz = (int)floorf(rayPos.z);
+
+    if ((b = getBlock(chunkL,size,bx, by, bz)) != AIR){
+      target.x = bx;
+      target.y = by;
+      target.z = bz;
+      blockTargeted = true;
+      if (previousValid && !checkCollision(player->Position, player->hitbox,
+                                            (ivec3_t){.x=previous.x,
+                                              .y=previous.y,
+                                              .z=previous.z}, blocks)){
+            
+        if((keysDown() | keysHeld()) & KEY_R){
+          if(specialmode != true && *delay <= 0){
+            setBlock(chunkL, size, previous.x, previous.y, previous.z, indexB);
+            *majChunk = true;
+            *delay = DELAY;
+          }
+        }
+      }
+      if((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)){
+        if(*delay <= 0 && b != BEDROCK){
+          setBlock(chunkL, size, target.x, target.y, target.z, AIR);
+          *majChunk = true;
+          *delay = DELAY;
+        }
+      }
+      break;
+    }
+    else{
+      blockTargeted = false;
+    }
+    previous.x = bx;
+    previous.y = by;
+    previous.z = bz;
+    previousValid = 1;
+  } 
+  if (blockTargeted) {
+    drawBlockOutline(target.x, target.y, target.z);
   }
 }
