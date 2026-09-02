@@ -66,3 +66,18 @@ void InitBlocks(void){
         .texture.x = 2, .texture.z = 2
     };
 }
+
+const char *getBlockName(uint8_t block){
+    switch (block) {
+        case AIR:   return "Air";
+        case STONE: return "Stone";
+        case DIRT:  return "Dirt";
+        case COBBLESTONE: return "Cobblestone";
+        case BEDROCK: return "Bedrock";
+        case MOSS: return "Moss";
+        case GLASS: return "Glass";
+        case PLANK: return "Plank";
+        case DIAMOND: return "Diamond";
+        default:          return "UNKNOWN";
+    }
+}

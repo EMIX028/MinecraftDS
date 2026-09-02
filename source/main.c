@@ -5,6 +5,7 @@
 #include <nds.h>
 #include <stdio.h>
 #include "calico/gba/keypad.h"
+#include "calico/nds/pm.h"
 #include "calico/types.h"
 #include "utils.h"
 #include "mesh.h"
@@ -108,26 +109,25 @@ int main() {
   #endif  
 
   while (pmMainLoop()) {
-    struct mallinfo info = mallinfo();
-    glBindTexture(0, TextureID);
     scanKeys();
-
     if(keysDown() & KEY_SELECT){
       if(gameState == RUNNING) { //pause switch
         gameState = PAUSED;
       } else {
         gameState = RUNNING;
       }
-      ledBlink(0);
+      ledBlink(PmLedMode_BlinkFast);
     }
-
     if(gameState == PAUSED){
       continue;
     }
+    struct mallinfo info = mallinfo();
+    glBindTexture(0, TextureID);
+
     subscreenAff(pseudo,info);
     loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,blocks);
     loadKeyAssignation(&Joueur);
-    
+
     if(keysDown() & KEY_START){
       setPlayground();
       movePlayer(&Joueur, (vec3_t){.x=-Joueur.Position.x+5.0f,
@@ -195,13 +195,13 @@ void subscreenAff(char *pseudo,struct mallinfo info){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
+  iprintf("\x1b[8;1H Block: %s",getBlockName(indexB));
   #if DEBUG_MODE
-    iprintf("\x1b[8;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
-    iprintf("\x1b[9;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
+    iprintf("\x1b[9;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
+    iprintf("\x1b[10;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
   #endif
   printf("\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %.1f s",(float)totalTicks / TIMER_TICKS_PER_SECOND);
   printf("\t\t\tfps:%d", fps);
-  iprintf("\x1b[6;18H Bloc : %d/%d",indexB,BLOCK_COUNT-1);
 }
 
 void setCam(){
