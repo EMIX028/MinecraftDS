@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stdbool.h>
-#include "ChunkStruct.h"
 #include <malloc.h>
 
 #define GRAVITY 0.008f
@@ -14,11 +13,11 @@ void subscreenAff(char *pseudo,struct mallinfo info);
 void setCam();
 
 //applique le calcul de la gravité au joueur
-void ApplyGravity(chunk_t *chunk_list[],int size);
+void ApplyGravity(int size);
 
 //calcul le timer du jeu et les fps
 void updatePerformance(void);
 
-void calculRenderView(chunk_t *chunk_list[]);
+void calculRenderView();
 
-void setPlayground(chunk_t *chunk_list[]);
+void setPlayground();

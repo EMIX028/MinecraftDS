@@ -1,6 +1,6 @@
 #include "player.h"
 #include "ChunkStruct.h"
-#include "mctypes.h"
+#include "utils.h"
 #include <nds.h>
 #include <math.h>
 
@@ -72,7 +72,7 @@ bool checkCollision(vec3_t apos , hitbox_t a , ivec3_t bpos , hitbox_t b){
     );
 }
 
-bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks){
+bool canMovePlayer(player_t *player , vec3_t movement, chunk_t chunk[], int n, block_t list[], hitbox_t blocks){
   vec3_t futurePosition = {
     .x = player->Position.x + movement.x,
     .y = player->Position.y + movement.y,
@@ -80,8 +80,8 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
   };
 
   for (int i = 0; i < n; i++){
-    int chunkX = chunk[i]->position.x;
-    int chunkZ = chunk[i]->position.z;
+    int chunkX = chunk[i].position.x;
+    int chunkZ = chunk[i].position.z;
 
     for (int x = (int)floor(futurePosition.x) - 1;
           x <= (int)floor(futurePosition.x) + 1;
@@ -108,7 +108,7 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
             continue;
           }
 
-          int blockID = chunk[i]->blocks[localX][y][localZ].id;
+          int blockID = chunk[i].blocks[localX][y][localZ].id;
 
           if (list[blockID].solid){
                         
@@ -130,7 +130,7 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t *chunk[], int n, 
 bool specialmode = false;
 
 
-void loadPlayerMovement(player_t *player, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks){
+void loadPlayerMovement(player_t *player, chunk_t chunk[], int n, block_t list[], hitbox_t blocks){
   vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
   player->Direction = getDir(player->Camera);
   

@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "mctypes.h"
+#include "utils.h"
 #include <stdbool.h>
 #include <nds.h>
 

@@ -1,4 +1,4 @@
-#include "mctypes.h"
+#include "utils.h"
 #include <stdbool.h>
 #include "ChunkStruct.h"
 
@@ -49,7 +49,7 @@ void movePlayer(player_t *player, vec3_t d);
 bool checkCollision(vec3_t apos , hitbox_t a , ivec3_t bpos , hitbox_t b);
 
 //vérifie si le mouvement du joueur est possible avant de l'exécuter
-bool canMovePlayer(player_t *player ,vec3_t movement, chunk_t *chunk[], int n, block_t list[], hitbox_t blocks);
+bool canMovePlayer(player_t *player ,vec3_t movement, chunk_t chunk[], int n, block_t list[], hitbox_t blocks);
 
 //gère les inputs de déplacement du joueur
-void loadPlayerMovement(player_t *player , chunk_t *chunk[], int n, block_t list[], hitbox_t blocks);
+void loadPlayerMovement(player_t *player , chunk_t chunk[], int n, block_t list[], hitbox_t blocks);

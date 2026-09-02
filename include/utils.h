@@ -5,6 +5,8 @@
 #define SCREEN_H 192
 #define MAX_ANGLE 0.995
 
+#define DEBUG_MODE 1
+
 //vecteur 3d en flottant
 typedef struct fvec3{
   float x;
@@ -45,3 +47,8 @@ typedef enum {
     DIAMOND,
     BLOCK_COUNT
 } Blocks;
+
+typedef enum{
+  RUNNING,
+  PAUSED,
+}GAMESTATE;

@@ -1,9 +1,9 @@
 #include <nds.h>
 #include "ChunkStruct.h"
-#include "mctypes.h"
+#include "utils.h"
 #include "mesh.h"
 
-void initChunk(chunk_t *chunk, int id){
+void initChunk(chunk_t chunk[], int id){
   for(short x = 0; x < L_CHUNK; ++x){
     for(short y = 0 ; y < H_CHUNK ; ++y){
       for(short z = 0 ; z < L_CHUNK ; ++z){
@@ -13,19 +13,20 @@ void initChunk(chunk_t *chunk, int id){
   }
 }
 
-chunk_t *getChunk(chunk_t *chunks[], int size, int chunkX, int chunkZ){
-  for (int i = 0; i < size; ++i){
-    if (chunks[i]->position.x == chunkX && chunks[i]->position.z == chunkZ){
-      return chunks[i];
+chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ){
+    for (int i = 0; i < size; ++i){
+        if (chunks[i].position.x == chunkX &&
+            chunks[i].position.z == chunkZ){
+            return &chunks[i];
+        }
     }
-  }
-  return NULL;
+    return NULL;
 }
 
 
-void blockVisibility(chunk_t *chunks[], int size, block_t *list){
+void blockVisibility(chunk_t chunks[], int size, block_t *list){
   for (int i = 0; i < size; ++i){
-    chunk_t *chunk = chunks[i];
+    chunk_t *chunk = &chunks[i];
     for (short x = 0; x < L_CHUNK; ++x){
       for (short y = 0; y < H_CHUNK; ++y){
         for (short z = 0; z < L_CHUNK; ++z){
@@ -112,7 +113,7 @@ void blockVisibility(chunk_t *chunks[], int size, block_t *list){
   }
 }
 
-void RenderChunk(chunk_t *chunk, block_t *list, bool cull, vec3_t *playerpos){
+void RenderChunk(chunk_t chunk[], block_t *list, bool cull, vec3_t *playerpos){
   glPushMatrix();
   glTranslatef32(
     inttof32(chunk->position.x * L_CHUNK),
@@ -171,7 +172,7 @@ int floorMod(int a, int b){
   return r;
 }
 
-uint8_t getBlock(chunk_t *chunk[], int size, int x, int y, int z){
+uint8_t getBlock(chunk_t chunk[], int size, int x, int y, int z){
   int chunkX = floorDiv(x, L_CHUNK);
   int chunkZ = floorDiv(z, L_CHUNK);
 
@@ -179,14 +180,14 @@ uint8_t getBlock(chunk_t *chunk[], int size, int x, int y, int z){
   int localZ = floorMod(z, L_CHUNK);
 
   for (int i = 0; i < size; ++i) {
-    if (chunk[i]->position.x == chunkX && chunk[i]->position.z == chunkZ) {
-      return chunk[i]->blocks[localX][y][localZ].id;
+    if (chunk[i].position.x == chunkX && chunk[i].position.z == chunkZ) {
+      return chunk[i].blocks[localX][y][localZ].id;
     }
   }
   return AIR;
 }
 
-void setBlock(chunk_t *chunk[], int size,int x, int y, int z,uint8_t block){
+void setBlock(chunk_t chunk[], int size,int x, int y, int z,uint8_t block){
   int chunkX = floorDiv(x, L_CHUNK);
   int chunkZ = floorDiv(z, L_CHUNK);
 
@@ -194,9 +195,9 @@ void setBlock(chunk_t *chunk[], int size,int x, int y, int z,uint8_t block){
   int localZ = floorMod(z, L_CHUNK);
 
   for (int i = 0; i < size; ++i) {
-    if (chunk[i]->position.x == chunkX &&
-      chunk[i]->position.z == chunkZ) {
-      chunk[i]->blocks[localX][y][localZ].id = block;
+    if (chunk[i].position.x == chunkX &&
+      chunk[i].position.z == chunkZ) {
+      chunk[i].blocks[localX][y][localZ].id = block;
       return;
     }
   }

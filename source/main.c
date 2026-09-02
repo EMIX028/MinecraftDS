@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "calico/gba/keypad.h"
 #include "calico/types.h"
-#include "mctypes.h"
+#include "utils.h"
 #include "mesh.h"
 #include "main.h"
 #include "nds/arm9/input.h"
@@ -18,33 +18,28 @@
 #include "Blocks.h"
 #include "TextureAtlas.h"
 #include <malloc.h>
-#include <maxmod9.h>
 
-#include "soundbank.h"
-#include "soundbank_bin.h"
-
+#if !DEBUG_MODE
+  #include <maxmod9.h>
+  #include "soundbank.h"
+  #include "mm_types.h"
+  #include "soundbank_bin.h"
+#endif
 
 player_t Joueur;
 uint8_t indexB = 1;
 int delay = 0; //delay entre chaque bloc posé ou cassé
 #define DELAY 11
 bool majChunk = true;
-bool mainLCD = false;
+uint8_t gameState = RUNNING;
 
-
-chunk_t chunk00 = {
-  .position.x = 0, .position.z = 0
+#define SIZE 4
+chunk_t chunkL[SIZE] = {
+  (chunk_t){.position.x = 0, .position.z = 0},
+  (chunk_t){.position.x = 1, .position.z = 0},
+  (chunk_t){.position.x = 0, .position.z = -1},
+  (chunk_t){.position.x = 1, .position.z = -1}
 };
-chunk_t chunkTest = {
-  .position.x = 1, .position.z = 0
-};
-chunk_t chunk01 = {
-  .position.x = 0, .position.z = -1
-};
-chunk_t chunk02 = {
-  .position.x = 1, .position.z = -1
-};
-
 
 //définition d'un TIMER et du compteur de fps
 #define TIMER_TICKS_PER_SECOND (BUS_CLOCK / 1024)
@@ -79,10 +74,11 @@ int main() {
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, DISPLAY_DISTANCE);
   
 
-  char pseudo[PersonalData->nameLen];
+  char pseudo[PersonalData->nameLen + 1];
   for(uint8_t i = 0 ; i < PersonalData->nameLen ; ++i){
     pseudo[i] = PersonalData->name[i];
   }
+  pseudo[PersonalData->nameLen] = '\0';
 
   int TextureID;
 
@@ -101,36 +97,45 @@ int main() {
   ) == 0){
     printf("\nerreur init texture\n");
   }
-  
 
-  #define SIZE 4
-  chunk_t *chunk_list[SIZE] = {&chunk00,&chunk01,&chunk02,&chunkTest};
+  setPlayground();
 
-  setPlayground(chunk_list);
+  movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 2.0f,.z=5.0f});
 
-  movePlayer(&Joueur,(vec3_t){.x = 5.0f,.y = 3.0f,.z=5.0f});
-
-  mmInitDefaultMem((mm_addr)soundbank_bin);
-  mm_sfxhand handle = mmEffect(SFX_WET_HANDS);
-  mmEffectVolume(handle, 255);
+  #if !DEBUG_MODE
+    mmInitDefaultMem((mm_addr)soundbank_bin);
+    mm_sfxhand handle = mmEffect(SFX_WET_HANDS);
+    mmEffectVolume(handle, 255);
+  #endif  
 
   while (pmMainLoop()) {
     struct mallinfo info = mallinfo();
     glBindTexture(0, TextureID);
-    subscreenAff(pseudo,info);
     scanKeys();
-    loadPlayerMovement(&Joueur,chunk_list,SIZE,gBlocks,blocks);
+
+    if(keysDown() & KEY_SELECT){
+      if(gameState == RUNNING) { //pause switch
+        gameState = PAUSED;
+      } else {
+        gameState = RUNNING;
+      }
+      ledBlink(0);
+    }
+
+    if(gameState == PAUSED){
+      continue;
+    }
+    subscreenAff(pseudo,info);
+    loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,blocks);
     loadKeyAssignation(&Joueur);
     
     if(keysDown() & KEY_START){
-      setPlayground(chunk_list);
+      setPlayground();
       movePlayer(&Joueur, (vec3_t){.x=-Joueur.Position.x+5.0f,
                                 .y=-Joueur.Position.y+10.0f,
                                 .z = -Joueur.Position.z+5.0f});
     }
-    if(keysDown() & KEY_SELECT){
-      break; //quitte le jeu
-    }
+    
     if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
       if(indexB < BLOCK_COUNT-1){
         ++indexB;
@@ -147,23 +152,14 @@ int main() {
         indexB = BLOCK_COUNT-1;
       }
     }
-    if((keysHeld() & KEY_L) && (keysDown() & KEY_X)){
-      if(!mainLCD){
-        lcdMainOnBottom();
-        mainLCD = true;
-      }
-      else{
-        lcdMainOnTop();
-        mainLCD = false;
-      }
-    }
 
-    ApplyGravity(chunk_list,SIZE);
+    ApplyGravity(SIZE);
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
     setCam();
 
+    
     int targetX;
     int targetY;
     int targetZ;
@@ -189,7 +185,7 @@ int main() {
       int by = (int)floorf(rayPos.y);
       int bz = (int)floorf(rayPos.z);
 
-      if ((b = getBlock(chunk_list,SIZE,bx, by, bz)) != AIR){
+      if ((b = getBlock(chunkL,SIZE,bx, by, bz)) != AIR){
         targetX = bx;
         targetY = by;
         targetZ = bz;
@@ -201,7 +197,7 @@ int main() {
             
           if((keysDown() | keysHeld()) & KEY_R){
             if(specialmode != true && delay <= 0){
-              setBlock(chunk_list, SIZE, previousX, previousY, previousZ, indexB);
+              setBlock(chunkL, SIZE, previousX, previousY, previousZ, indexB);
               majChunk = true;
               delay = DELAY;
             }
@@ -209,7 +205,7 @@ int main() {
         }
         if((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)){
           if(delay <= 0 && b != BEDROCK){
-            setBlock(chunk_list, SIZE, targetX, targetY, targetZ, AIR);
+            setBlock(chunkL, SIZE, targetX, targetY, targetZ, AIR);
             majChunk = true;
             delay = DELAY;
           }
@@ -228,11 +224,12 @@ int main() {
     if (blockTargeted) {
       drawBlockOutline(targetX, targetY, targetZ);
     }
+    
 
-    calculRenderView(chunk_list);
+    calculRenderView();
 
     for(uint8_t i=0;i<SIZE;i++){
-      RenderChunk(chunk_list[i],gBlocks,true,&Joueur.Position);
+      RenderChunk(&chunkL[i],gBlocks,true,&Joueur.Position);
     }
     
 
@@ -262,8 +259,10 @@ void subscreenAff(char *pseudo,struct mallinfo info){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  iprintf("\x1b[8;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
-  iprintf("\x1b[9;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
+  #if DEBUG_MODE
+    iprintf("\x1b[8;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
+    iprintf("\x1b[9;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
+  #endif
   printf("\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %.1f s",(float)totalTicks / TIMER_TICKS_PER_SECOND);
   printf("\t\t\tfps:%d", fps);
   iprintf("\x1b[6;18H Bloc : %d/%d",indexB,BLOCK_COUNT-1);
@@ -290,7 +289,7 @@ void setCam(){
     );
 }
 
-void ApplyGravity(chunk_t *chunk_list[], int size){
+void ApplyGravity(int size){
     vec3_t gravityMove = {
         .x = 0.0f,
         .y = Joueur.velocityY,
@@ -298,7 +297,7 @@ void ApplyGravity(chunk_t *chunk_list[], int size){
     };
 
     if (canMovePlayer(&Joueur, gravityMove,
-                      chunk_list, size, gBlocks, blocks)){
+                      chunkL, size, gBlocks, blocks)){
         movePlayer(&Joueur, gravityMove);
     }
     else{
@@ -334,23 +333,23 @@ void updatePerformance(void){
   }
 }
 
-void calculRenderView(chunk_t *chunk_list[]){
+void calculRenderView(){
   if(majChunk){
-    blockVisibility(chunk_list, SIZE, gBlocks);
+    blockVisibility(chunkL, SIZE, gBlocks);
     majChunk = false;
   }
 }
 
-void setPlayground(chunk_t *chunk_list[]){
+void setPlayground(){
   for(int i = 0 ; i < SIZE ; ++i){
-    initChunk(chunk_list[i],AIR);
+    initChunk(&chunkL[i],AIR);
     for(int x = 0 ; x < L_CHUNK ; ++x){
       for(int z = 0; z < L_CHUNK ; ++z){
-      chunk_list[i]->blocks[x][0][z].id = BEDROCK;
-      chunk_list[i]->blocks[x][1][z].id = MOSS;
+      chunkL[i].blocks[x][0][z].id = BEDROCK;
+      chunkL[i].blocks[x][1][z].id = MOSS;
       }
     }
   }
   majChunk = true;
-  calculRenderView(chunk_list);
+  calculRenderView();
 }

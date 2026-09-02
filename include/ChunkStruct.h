@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "mctypes.h"
+#include "utils.h"
 #define L_CHUNK 14 //chunk minecraft 15
 #define H_CHUNK 22 // hauteur max 256
 
@@ -50,17 +50,17 @@ typedef struct chunk{
 } chunk_t;
 
 //initialise tous les blocs du chunk avec une id
-void initChunk(chunk_t *chunk, int id);
+void initChunk(chunk_t chunk[], int id);
 
 //sert à obtenir le pointeur d'un chunk
 //dans une liste à partir de ses coordonnées
-chunk_t *getChunk(chunk_t *chunks[], int size, int chunkX, int chunkZ);
+chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ);
 
 //caluls les faces visibles ou non dans une liste de chunk
-void blockVisibility(chunk_t *chunks[], int size, block_t *list);
+void blockVisibility(chunk_t chunks[], int size, block_t *list);
 
 // dessine dans le rendu 3d un chunk
-void RenderChunk(chunk_t *chunk, block_t *list, bool cull, vec3_t *playerpos);
+void RenderChunk(chunk_t chunk[], block_t *list, bool cull, vec3_t *playerpos);
 
 //renvoie le quotient d'une division pour un entier <0 ou >0
 int floorDiv(int a, int b);
@@ -70,9 +70,9 @@ int floorMod(int a, int b);
 
 //renvoie l'id d'un bloc dans une liste de chunk
 // avec sa position global
-uint8_t getBlock(chunk_t *chunk[],int size,int x,int y, int z);
+uint8_t getBlock(chunk_t chunk[],int size,int x,int y, int z);
 
 //remplace un bloc dans une liste de chunk avec sa position global
-void setBlock(chunk_t *chunk[],int size,int x,int y, int z, uint8_t block);
+void setBlock(chunk_t chunk[],int size,int x,int y, int z, uint8_t block);
 
 #endif
