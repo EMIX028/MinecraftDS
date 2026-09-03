@@ -1,6 +1,4 @@
-#include <nds.h>
 #include "mesh.h"
-#include "nds/arm9/videoGL.h"
 #define TNBR0 16
 #define TNBR1 16
 

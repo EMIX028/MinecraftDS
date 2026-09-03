@@ -1,6 +1,4 @@
-#include <nds.h>
 #include "ChunkStruct.h"
-#include "utils.h"
 #include "mesh.h"
 
 void initChunk(chunk_t chunk[], int id){

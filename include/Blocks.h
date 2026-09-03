@@ -2,7 +2,6 @@
 #define BLOCKS_H
 
 #include "ChunkStruct.h"
-#include <stdint.h>
 
 //listes des blocs du jeu avec leur caractéristiques
 extern block_t gBlocks[BLOCK_COUNT];

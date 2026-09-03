@@ -1,24 +1,12 @@
-#include <math.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <nds.h>
 #include <stdio.h>
-#include "calico/gba/keypad.h"
-#include "calico/nds/pm.h"
-#include "calico/types.h"
-#include "utils.h"
-#include "mesh.h"
+#include <math.h>
+#include <malloc.h>
+
 #include "main.h"
-#include "nds/arm9/input.h"
-#include "nds/arm9/videoGL.h"
-#include "nds/system.h"
 #include "player.h"
-#include "ChunkStruct.h"
-#include "keyAssignation.h"
 #include "Blocks.h"
 #include "TextureAtlas.h"
-#include <malloc.h>
+#include "keyAssignation.h"
 
 #if !DEBUG_MODE
   #include <maxmod9.h>
@@ -42,7 +30,7 @@ chunk_t chunkL[SIZE] = {
 };
 
 //définition d'un TIMER et du compteur de fps
-#define TIMER_TICKS_PER_SECOND (BUS_CLOCK / 1024)
+#define TIMER_TICKS_PER_SECOND ((float)BUS_CLOCK / 1024)
 static u32 totalTicks = 0;
 static u16 previousTimer = 0;
 static u16 lastFpsTimer = 0;

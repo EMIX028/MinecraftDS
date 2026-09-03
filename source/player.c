@@ -1,8 +1,5 @@
-#include "player.h"
-#include "ChunkStruct.h"
-#include "utils.h"
-#include <nds.h>
 #include <math.h>
+#include "player.h"
 #include "mesh.h"
 #include "Blocks.h"
 

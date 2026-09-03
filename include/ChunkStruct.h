@@ -2,7 +2,6 @@
 #define CHUNKSTRUCT_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include "utils.h"
 #define L_CHUNK 14 //chunk minecraft 15
 #define H_CHUNK 22 // hauteur max 256

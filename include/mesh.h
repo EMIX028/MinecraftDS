@@ -1,9 +1,16 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "utils.h"
 #include <stdbool.h>
 #include <nds.h>
+#ifdef NORMAL_PACK
+#undef NORMAL_PACK
+#endif
+#define NORMAL_PACK(x, y, z)                                                   \
+  (u32)(((u32)(x) & 0x3FF) | (((u32)(y) & 0x3FF) << 10) | (((u32)(z) & 0x3FF) << 20))
+
+
+#include "utils.h"
 
 #define AMBIENT_RATIO 0.5
 #define OUTLINE_SIZE 16 // Épaisseur des arêtes

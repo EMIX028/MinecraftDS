@@ -1,6 +1,8 @@
-#include <stdint.h>
-#include <stdbool.h>
+#ifndef MAIN_H
+#define MAIN_H
+
 #include <malloc.h>
+
 
 #define GRAVITY 0.008f
 #define DISPLAY_DISTANCE 30
@@ -21,3 +23,5 @@ void updatePerformance(void);
 void calculRenderView();
 
 void setPlayground();
+
+#endif

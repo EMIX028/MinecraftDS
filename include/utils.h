@@ -1,4 +1,6 @@
-#pragma once
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <stdint.h>
 #include <sys/_intsup.h>
 #define SCREEN_W 256
@@ -52,3 +54,5 @@ typedef enum{
   RUNNING,
   PAUSED,
 }GAMESTATE;
+
+#endif

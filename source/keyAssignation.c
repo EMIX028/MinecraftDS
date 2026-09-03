@@ -1,7 +1,3 @@
-#include <nds.h>
-#include "nds/arm9/input.h"
-#include "player.h"
-//#include "mctypes.h"
 #include "keyAssignation.h"
 
 bool mainLCD = false;

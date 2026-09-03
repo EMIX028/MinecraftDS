@@ -1,6 +1,4 @@
 #include "Blocks.h"
-#include "utils.h"
-#include <stdbool.h>
 
 block_t gBlocks[BLOCK_COUNT];
 
