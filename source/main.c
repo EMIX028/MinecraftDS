@@ -1,18 +1,26 @@
+#include <_ansi.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <math.h>
 #include <malloc.h>
 
 #include "main.h"
+#include "ChunkStruct.h"
+#include "nds/arm9/videoGL.h"
 #include "player.h"
 #include "Blocks.h"
 #include "TextureAtlas.h"
 #include "keyAssignation.h"
+#include "utils.h"
 
 #if !DEBUG_MODE
   #include <maxmod9.h>
   #include "soundbank.h"
   #include "mm_types.h"
   #include "soundbank_bin.h"
+#endif
+#if DEBUG_MODE
+  #include "mesh.h"
 #endif
 
 player_t Joueur;
@@ -63,8 +71,9 @@ int main() {
   
 
   char pseudo[PersonalData->nameLen + 1];
-  for(uint8_t i = 0 ; i < PersonalData->nameLen ; ++i){
-    pseudo[i] = PersonalData->name[i];
+  void *s = PersonalData->name;
+  for (uint16_t *p = s; p < (uint16_t*)s + PersonalData->nameLen; ++p) {
+    pseudo[p - (uint16_t*)s] = *p;
   }
   pseudo[PersonalData->nameLen] = '\0';
 
@@ -77,8 +86,8 @@ int main() {
     0,
     0,
     GL_RGBA,
-    TEXTURE_SIZE_64,
-    TEXTURE_SIZE_64,
+    TEXTURE_SIZE_256,
+    TEXTURE_SIZE_256,
     0,
     TEXGEN_TEXCOORD,
     TextureAtlasBitmap
@@ -153,8 +162,21 @@ int main() {
     calculRenderView();
 
     for(uint8_t i=0;i<SIZE;i++){
-      RenderChunk(&chunkL[i],gBlocks,true,&Joueur.Position);
+      RenderChunk(&chunkL[i],gBlocks,true,&Joueur);
     }
+
+    #if DEBUG_MODE
+      glPushMatrix();
+  
+        glTranslatef32(inttof32(2),inttof32(3),inttof32(2));
+
+        // rotation autour de l'axe Y (0,1,0) — version rapide, pas de float au runtime
+        glRotatef32i(degreesToAngle(45), 0, floattof32(1.0f), 0);
+
+        drawCubeFront(gBlocks[CRAFTING_TABLE].texture[front]);
+
+      glPopMatrix(1);
+    #endif
     
 
     if(delay>0){
@@ -187,6 +209,7 @@ void subscreenAff(char *pseudo,struct mallinfo info){
   #if DEBUG_MODE
     iprintf("\x1b[9;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
     iprintf("\x1b[10;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
+    printf(" yaw:%0.1f", fmod((double)Joueur.Camera.yaw * (180.0 / M_PI), 360.0));
   #endif
   printf("\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %.1f s",(float)totalTicks / TIMER_TICKS_PER_SECOND);
   printf("\t\t\tfps:%d", fps);
@@ -214,7 +237,7 @@ void setCam(){
 }
 
 void ApplyGravity(int size){
-    vec3_t gravityMove = {
+    const vec3_t gravityMove = {
         .x = 0.0f,
         .y = Joueur.velocityY,
         .z = 0.0f
@@ -270,7 +293,7 @@ void setPlayground(){
     for(int x = 0 ; x < L_CHUNK ; ++x){
       for(int z = 0; z < L_CHUNK ; ++z){
       chunkL[i].blocks[x][0][z].id = BEDROCK;
-      chunkL[i].blocks[x][1][z].id = MOSS;
+      chunkL[i].blocks[x][1][z].id = DIRT;
       }
     }
   }

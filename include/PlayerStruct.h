@@ -10,6 +10,7 @@
 #define P_hitbox 0.6f
 #define P_REACH 4.5f
 #define DELAY 11
+#define MAX_ANGLE 1.4f
 
 //structure camera avec sa position en vecteur 3d
 //sa rotation horizontal yaw et vertical pitch

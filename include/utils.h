@@ -5,9 +5,8 @@
 #include <sys/_intsup.h>
 #define SCREEN_W 256
 #define SCREEN_H 192
-#define MAX_ANGLE 0.995
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 //vecteur 3d en flottant
 typedef struct fvec3{
@@ -43,10 +42,10 @@ typedef enum {
     STONE,
     COBBLESTONE,
     BEDROCK,
-    MOSS,
     GLASS,
-    PLANK,
-    DIAMOND,
+    OAK_PLANK,
+    DIAMOND_ORE,
+    CRAFTING_TABLE,
     BLOCK_COUNT
 } Blocks;
 

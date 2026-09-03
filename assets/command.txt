@@ -4,7 +4,7 @@ grit TextureAtlas.png -gb -gB16 -ftc -fh
 
 texture avec transparence : 
 
-grit TextureAtlas.png -gx -gb -gB16 -gTFFFFFF -ftc -fh
+grit TextureAtlas.png -gx -gb -gB16 -gTFF00FF -ftc -fh
 
 pour les sons (temporaire) :
 

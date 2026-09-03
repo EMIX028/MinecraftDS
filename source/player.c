@@ -190,12 +190,12 @@ void loadPlayerMovement(player_t *player, chunk_t chunk[], int n, block_t list[]
     }
   }
   if(keysHeld() & KEY_B){
-    if( specialmode != true && sinf(player->Camera.pitch) > -MAX_ANGLE){
+    if( specialmode != true && player->Camera.pitch > -MAX_ANGLE){
       player->Camera.pitch -= P_SENSI;
     }
   }
   if(keysHeld() & KEY_X){
-    if(specialmode != true && sinf(player->Camera.pitch) < MAX_ANGLE){
+    if(specialmode != true && player->Camera.pitch < MAX_ANGLE){
       player->Camera.pitch += P_SENSI;
     }
   }

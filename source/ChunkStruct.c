@@ -1,5 +1,7 @@
 #include "ChunkStruct.h"
+#include "PlayerStruct.h"
 #include "mesh.h"
+#include "nds/arm9/videoGL.h"
 
 void initChunk(chunk_t chunk[], int id){
   for(short x = 0; x < L_CHUNK; ++x){
@@ -111,7 +113,7 @@ void blockVisibility(chunk_t chunks[], int size, block_t *list){
   }
 }
 
-void RenderChunk(chunk_t chunk[], block_t *list, bool cull, vec3_t *playerpos){
+void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){
   glPushMatrix();
   glTranslatef32(
     inttof32(chunk->position.x * L_CHUNK),
@@ -133,17 +135,17 @@ void RenderChunk(chunk_t chunk[], block_t *list, bool cull, vec3_t *playerpos){
           inttof32(z)
         );
         if (chunk->blocks[x][y][z].faces & FACE_TOP)
-          drawCubeTop(block->texture);
-        if ((chunk->blocks[x][y][z].faces & FACE_BOTTOM) && y >= playerpos->y)
-          drawCubeBottom(block->texture);
+          drawCubeTop(block->texture[top]);
+        if ((chunk->blocks[x][y][z].faces & FACE_BOTTOM) && y >= player->Position.y)
+          drawCubeBottom(block->texture[bottom]);
         if (chunk->blocks[x][y][z].faces & FACE_LEFT)
-          drawCubeLeft(block->texture);
+          drawCubeLeft(block->texture[left]);
         if (chunk->blocks[x][y][z].faces & FACE_RIGHT)
-          drawCubeRight(block->texture);
+          drawCubeRight(block->texture[right]);
         if (chunk->blocks[x][y][z].faces & FACE_FRONT)
-          drawCubeFront(block->texture);
+          drawCubeFront(block->texture[front]);
         if (chunk->blocks[x][y][z].faces & FACE_BACK)
-          drawCubeBack(block->texture);
+          drawCubeBack(block->texture[back]);
         glPopMatrix(1);
       }
     }
