@@ -1,8 +1,8 @@
 # Minecraft DS
 
-Minecraft DS is a Minecraft-inspired homebrew project for the Nintendo DS.
+Minecraft DS is a Minecraft-inspired homebrew project for the Nintendo DS made with libnds from devkitpro.
 
-<img width="2558" height="961" alt="Capture d&#39;écran 2026-08-28 191954" src="https://github.com/user-attachments/assets/7e68cc96-9ff7-48ec-ae29-433784dbd87d" />
+<img width="2558" height="961" alt="Ingame ScreenShot" src="https://github.com/user-attachments/assets/7e68cc96-9ff7-48ec-ae29-433784dbd87d" />
 
 ## Features
 
