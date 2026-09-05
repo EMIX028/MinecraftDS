@@ -6,7 +6,7 @@
 #define SCREEN_W 256
 #define SCREEN_H 192
 
-#define DEBUG_MODE 0
+#define DEBUG_MODE 1
 
 //vecteur 3d en flottant
 typedef struct fvec3{

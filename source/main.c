@@ -165,20 +165,6 @@ int main() {
       RenderChunk(&chunkL[i],gBlocks,true,&Joueur);
     }
 
-    #if DEBUG_MODE
-      glPushMatrix();
-  
-        glTranslatef32(inttof32(2),inttof32(3),inttof32(2));
-
-        // rotation autour de l'axe Y (0,1,0) — version rapide, pas de float au runtime
-        glRotatef32i(degreesToAngle(45), 0, floattof32(1.0f), 0);
-
-        drawCubeFront(gBlocks[CRAFTING_TABLE].texture[front]);
-
-      glPopMatrix(1);
-    #endif
-    
-
     if(delay>0){
       --delay;
     }

@@ -16,6 +16,16 @@
 #define FACE_FRONT  (1 << 4)
 #define FACE_BACK   (1 << 5)
 
+#define front_to_front (0 << 6)
+#define front_to_left (1 << 6)
+#define front_to_back (2 <<6)
+#define front_to_right (3 << 6)
+
+#define ORIENTATION_MASK  (3 << 6)
+#define SET_ORIENTATION(data, orientation) \
+    ((data) = ((data) & ~ORIENTATION_MASK) | (orientation))
+    
+
 typedef enum{
     top,
     bottom,
