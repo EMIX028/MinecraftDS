@@ -6,7 +6,7 @@
 #define SCREEN_W 256
 #define SCREEN_H 192
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 //vecteur 3d en flottant
 typedef struct fvec3{
@@ -39,13 +39,22 @@ typedef struct hitbox{
 typedef enum {
     AIR,
     DIRT,
+    GRASS,
+    SAND,
     STONE,
     COBBLESTONE,
     BEDROCK,
     GLASS,
     OAK_PLANK,
+    OAK_LOG,
+    OBSIDIAN,
+    COAL_ORE,
+    IRON_ORE,
+    GOLD_ORE,
+    REDSTONE_ORE,
     DIAMOND_ORE,
     CRAFTING_TABLE,
+    FURNACE,
     BLOCK_COUNT
 } Blocks;
 

@@ -2,6 +2,8 @@
 #include "PlayerStruct.h"
 #include "mesh.h"
 #include "nds/arm9/videoGL.h"
+#include "utils.h"
+#include <stdint.h>
 
 void initChunk(chunk_t chunk[], int id){
   for(short x = 0; x < L_CHUNK; ++x){
@@ -30,7 +32,7 @@ void blockVisibility(chunk_t chunks[], int size, block_t *list){
     for (short x = 0; x < L_CHUNK; ++x){
       for (short y = 0; y < H_CHUNK; ++y){
         for (short z = 0; z < L_CHUNK; ++z){
-          chunk->blocks[x][y][z].faces = 0;
+          chunk->blocks[x][y][z].faces &= ORIENTATION_MASK;
           // L'air n'a pas de faces à dessiner
           if (list[chunk->blocks[x][y][z].id].transparent == 2){
              continue;
@@ -125,6 +127,7 @@ void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){
     for (short y = 0; y < H_CHUNK; ++y) {
       for (short z = 0; z < L_CHUNK; ++z) {
         block_t *block = &list[chunk->blocks[x][y][z].id];
+        uint8_t faces = chunk->blocks[x][y][z].faces;
         if (block->transparent >= 2){
           continue;
         }
@@ -134,18 +137,35 @@ void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){
           inttof32(y),
           inttof32(z)
         );
-        if (chunk->blocks[x][y][z].faces & FACE_TOP)
+        if (faces & FACE_TOP)
           drawCubeTop(block->texture[top]);
-        if ((chunk->blocks[x][y][z].faces & FACE_BOTTOM) && y >= player->Position.y)
+        if ((faces & FACE_BOTTOM) && y >= player->Position.y)
           drawCubeBottom(block->texture[bottom]);
-        if (chunk->blocks[x][y][z].faces & FACE_LEFT)
-          drawCubeLeft(block->texture[left]);
-        if (chunk->blocks[x][y][z].faces & FACE_RIGHT)
-          drawCubeRight(block->texture[right]);
-        if (chunk->blocks[x][y][z].faces & FACE_FRONT)
-          drawCubeFront(block->texture[front]);
-        if (chunk->blocks[x][y][z].faces & FACE_BACK)
-          drawCubeBack(block->texture[back]);
+
+        if (faces & FACE_LEFT){
+          if(GET_ORIENTATION(faces) == front_to_left)
+            drawCubeLeft(block->texture[front]);  
+          else
+            drawCubeLeft(block->texture[side]);
+        }
+        if (faces & FACE_RIGHT){
+          if(GET_ORIENTATION(faces) == front_to_right)
+            drawCubeRight(block->texture[front]);
+          else
+            drawCubeRight(block->texture[side]);
+        }
+        if (faces & FACE_FRONT){
+          if(GET_ORIENTATION(faces) == front_to_front)
+            drawCubeFront(block->texture[front]);
+          else
+             drawCubeFront(block->texture[side]);
+        }
+        if (faces & FACE_BACK){
+          if(GET_ORIENTATION(faces) == front_to_back)
+            drawCubeBack(block->texture[front]);
+          else
+           drawCubeBack(block->texture[side]);
+        }
         glPopMatrix(1);
       }
     }
@@ -187,7 +207,7 @@ uint8_t getBlock(chunk_t chunk[], int size, int x, int y, int z){
   return AIR;
 }
 
-void setBlock(chunk_t chunk[], int size,int x, int y, int z,uint8_t block){
+void setBlock(chunk_t chunk[], int size,int x, int y, int z,uint8_t block, uint8_t orientation){
   int chunkX = floorDiv(x, L_CHUNK);
   int chunkZ = floorDiv(z, L_CHUNK);
 
@@ -198,6 +218,7 @@ void setBlock(chunk_t chunk[], int size,int x, int y, int z,uint8_t block){
     if (chunk[i].position.x == chunkX &&
       chunk[i].position.z == chunkZ) {
       chunk[i].blocks[localX][y][localZ].id = block;
+      SET_ORIENTATION(chunk[i].blocks[localX][y][localZ].faces, orientation);
       return;
     }
   }

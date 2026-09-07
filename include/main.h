@@ -1,14 +1,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <malloc.h>
-
 
 #define GRAVITY 0.008f
 #define DISPLAY_DISTANCE 30
 
 //fonction d'affichage d'information sur l'écran du bas de la DS
-void subscreenAff(char *pseudo,struct mallinfo info);
+void subscreenAff(char *pseudo);
 
 //active une lumière pour la caméra ainsi que le transfert d'info
 //de la structure camera du joueur au module GluLookAt

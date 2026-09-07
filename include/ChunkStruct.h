@@ -2,6 +2,7 @@
 #define CHUNKSTRUCT_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "PlayerStruct.h"
 #include "utils.h"
 #define L_CHUNK 14 //chunk minecraft 15
@@ -16,23 +17,23 @@
 #define FACE_FRONT  (1 << 4)
 #define FACE_BACK   (1 << 5)
 
-#define front_to_front (0 << 6)
-#define front_to_left (1 << 6)
-#define front_to_back (2 <<6)
-#define front_to_right (3 << 6)
+#define front_to_front 0
+#define front_to_left 1
+#define front_to_back 2
+#define front_to_right 3
 
-#define ORIENTATION_MASK  (3 << 6)
+#define ORIENTATION_MASK (3 << 6)
+
 #define SET_ORIENTATION(data, orientation) \
-    ((data) = ((data) & ~ORIENTATION_MASK) | (orientation))
+    ((data) = ((data) & 0x3F) | ((orientation) << 6))
+#define GET_ORIENTATION(data) (((data) >> 6) & 0x03)
     
 
 typedef enum{
     top,
     bottom,
-    left,
-    right,
-    front,
-    back
+    side,
+    front
 }faces;
 
 /*structure d'un type de bloc avec son ID
@@ -47,7 +48,7 @@ typedef struct block_s {
     bool solid;
     uint8_t transparent;
     //int hardness; //temps de destruction
-    vec2_t texture[6];
+    vec2_t texture[4];
     //void (*draw)(const struct block_s *block);
     //void (*onBreak)(int x, int y, int z);
     //void (*onTick)(int x, int y, int z);
@@ -92,6 +93,6 @@ int floorMod(int a, int b);
 uint8_t getBlock(chunk_t chunk[],int size,int x,int y, int z);
 
 //remplace un bloc dans une liste de chunk avec sa position global
-void setBlock(chunk_t chunk[],int size,int x,int y, int z, uint8_t block);
+void setBlock(chunk_t chunk[],int size,int x,int y, int z, uint8_t block, uint8_t orientation);
 
 #endif

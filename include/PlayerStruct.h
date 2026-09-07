@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "utils.h"
 
-#define P_SPEED 0.08
+#define P_SPEED 0.1
 #define P_SENSI 0.06
 #define P_FLYSPEED 0.25
 #define P_hitbox 0.6f

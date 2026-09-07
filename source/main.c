@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
-#include <malloc.h>
 
 #include "main.h"
 #include "ChunkStruct.h"
@@ -18,9 +17,6 @@
   #include "soundbank.h"
   #include "mm_types.h"
   #include "soundbank_bin.h"
-#endif
-#if DEBUG_MODE
-  #include "mesh.h"
 #endif
 
 player_t Joueur;
@@ -38,7 +34,7 @@ chunk_t chunkL[SIZE] = {
 };
 
 //définition d'un TIMER et du compteur de fps
-#define TIMER_TICKS_PER_SECOND ((float)BUS_CLOCK / 1024)
+#define TIMER_TICKS_PER_SECOND (BUS_CLOCK / 1024)
 static u32 totalTicks = 0;
 static u16 previousTimer = 0;
 static u16 lastFpsTimer = 0;
@@ -118,10 +114,9 @@ int main() {
     if(gameState == PAUSED){
       continue;
     }
-    struct mallinfo info = mallinfo();
     glBindTexture(0, TextureID);
 
-    subscreenAff(pseudo,info);
+    subscreenAff(pseudo);
     loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,blocks);
     loadKeyAssignation(&Joueur);
 
@@ -181,7 +176,7 @@ int main() {
 
 
 
-void subscreenAff(char *pseudo,struct mallinfo info){
+void subscreenAff(char *pseudo){
   consoleClear();
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
   iprintf("\x1b[1;3H|Minecraft DS Edition 1.0a|");
@@ -191,14 +186,14 @@ void subscreenAff(char *pseudo,struct mallinfo info){
           (int)Joueur.Position.x,
           (int)Joueur.Position.y,
           (int)Joueur.Position.z);
-  iprintf("\x1b[8;1H Block: %s",getBlockName(indexB));
+  iprintf("\x1b[8;0H Block: %s",getBlockName(indexB));
   #if DEBUG_MODE
-    iprintf("\x1b[9;1HRAM heap: %lu KB",(unsigned long)(info.uordblks / 1024));
-    iprintf("\x1b[10;1HRAM free: %lu KB", (unsigned long)(info.fordblks / 1024));
-    printf(" yaw:%0.1f", fmod((double)Joueur.Camera.yaw * (180.0 / M_PI), 360.0));
+    printf("\tyaw:%0.1f", fmodf(Joueur.Camera.yaw * (180.0f / (float)M_PI), 360.0f));
   #endif
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n\ntime : %.1f s",(float)totalTicks / TIMER_TICKS_PER_SECOND);
-  printf("\t\t\tfps:%d", fps);
+  unsigned long wholeSec = totalTicks / TIMER_TICKS_PER_SECOND;
+  unsigned long rem = totalTicks % TIMER_TICKS_PER_SECOND;
+  unsigned long deciSec = (rem * 10) / TIMER_TICKS_PER_SECOND;
+  iprintf("\x1b[21;0Htime : %lu.%lu s \t\t fps:%d", wholeSec, deciSec,fps);
 }
 
 void setCam(){
@@ -279,7 +274,7 @@ void setPlayground(){
     for(int x = 0 ; x < L_CHUNK ; ++x){
       for(int z = 0; z < L_CHUNK ; ++z){
       chunkL[i].blocks[x][0][z].id = BEDROCK;
-      chunkL[i].blocks[x][1][z].id = DIRT;
+      chunkL[i].blocks[x][1][z].id = GRASS;
       }
     }
   }

@@ -1,5 +1,7 @@
 #include <math.h>
+#include <stdint.h>
 #include "player.h"
+#include "ChunkStruct.h"
 #include "mesh.h"
 #include "Blocks.h"
 
@@ -128,77 +130,66 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t chunk[], int n, b
 
 bool specialmode = false;
 
+void loadPlayerMovement(player_t *player,chunk_t chunk[],int n,block_t list[],hitbox_t blocks){
+  vec3_t m = {
+    .x = 0.0f,
+    .y = 0.0f,
+    .z = 0.0f
+  };
+  float inputX = 0.0f;
+  float inputZ = 0.0f;
 
-void loadPlayerMovement(player_t *player, chunk_t chunk[], int n, block_t list[], hitbox_t blocks){
-  vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
   player->Direction = getDir(player->Camera);
-  
-  if(keysHeld() & KEY_L){
+
+  if (keysHeld() & KEY_L) {
     specialmode = true;
   }
-  if(keysUp() & KEY_L){
+  if (keysUp() & KEY_L) {
     specialmode = false;
   }
+
   if (keysHeld() & KEY_LEFT) {
-    m.x = -(cosf(player->Camera.yaw) * P_SPEED);
-    m.z = -(sinf(player->Camera.yaw) * P_SPEED);
-    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
-    }
-    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
-    }
+    inputX -= 1.0f;
   }
   if (keysHeld() & KEY_RIGHT) {
-    m.x = cosf(player->Camera.yaw) * P_SPEED;
-    m.z = sinf(player->Camera.yaw) * P_SPEED;
-    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
-    }
-    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
-    }
+    inputX += 1.0f;
   }
   if (keysHeld() & KEY_UP) {
-    m.x = sinf(player->Camera.yaw) * P_SPEED;
-    m.z = -cosf(player->Camera.yaw) * P_SPEED;
-    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
-    }
-    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
-    }
+    inputZ += 1.0f;
   }
   if (keysHeld() & KEY_DOWN) {
-    m.x = -(sinf(player->Camera.yaw) * P_SPEED);
-    m.z = cosf(player->Camera.yaw) * P_SPEED;
-    if (canMovePlayer(player,(vec3_t){.x=m.x,.y=0,.z=0},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=m.x,.y=0,.z=0});
+    inputZ -= 1.0f;
+  }
+
+  float l = sqrtf(inputX * inputX +inputZ * inputZ);
+
+  if (l > 0.0f) {
+    inputX /= l;
+    inputZ /= l;
+
+    m.x = ( inputX * cosf(player->Camera.yaw) + inputZ * sinf(player->Camera.yaw) ) * P_SPEED;
+    m.z = ( inputX * sinf(player->Camera.yaw) - inputZ * cosf(player->Camera.yaw) ) * P_SPEED;
+
+    if (canMovePlayer(player,(vec3_t){.x = m.x,.y = 0.0f,.z = 0.0f}, chunk, n, list, blocks)){
+      movePlayer(player,(vec3_t){.x = m.x,.y = 0.0f,.z = 0.0f});
     }
-    if (canMovePlayer(player,(vec3_t){.x=0,.y=0,.z=m.z},chunk,n,list,blocks)) {
-      movePlayer(player, (vec3_t){.x=0,.y=0,.z=m.z});
+
+    if (canMovePlayer(player,(vec3_t){.x = 0.0f,.y = 0.0f,.z = m.z}, chunk, n, list, blocks)){
+      movePlayer(player,(vec3_t){.x = 0.0f,.y = 0.0f,.z = m.z});
     }
   }
-  if(keysHeld() & KEY_Y){
-    if(specialmode != true){
-      player->Camera.yaw -= P_SENSI;
-    }
-  }
-  if(keysHeld() & KEY_A){
-    if(specialmode != true){
-      player->Camera.yaw += P_SENSI;
-    }
-  }
-  if(keysHeld() & KEY_B){
-    if( specialmode != true && player->Camera.pitch > -MAX_ANGLE){
-      player->Camera.pitch -= P_SENSI;
-    }
-  }
-  if(keysHeld() & KEY_X){
-    if(specialmode != true && player->Camera.pitch < MAX_ANGLE){
-      player->Camera.pitch += P_SENSI;
-    }
-  }
+
+  if ((keysHeld() & KEY_Y) && !specialmode)
+    player->Camera.yaw -= P_SENSI;
+
+  if ((keysHeld() & KEY_A) && !specialmode)
+    player->Camera.yaw += P_SENSI;
+
+  if ((keysHeld() & KEY_B) && !specialmode && player->Camera.pitch > -MAX_ANGLE)
+    player->Camera.pitch -= P_SENSI;
+
+  if ((keysHeld() & KEY_X) && !specialmode && player->Camera.pitch < MAX_ANGLE)
+    player->Camera.pitch += P_SENSI;
 }
 
 void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
@@ -214,6 +205,22 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
   uint8_t b;
 
   int previousValid = 0;
+
+  int16_t Pdeg = fmodf(player->Camera.yaw * (180.0f / (float)M_PI), 360.0f);
+  if (Pdeg > 180.0)
+    Pdeg -= 360.0;
+  else if (Pdeg < -180.0)
+    Pdeg += 360.0;
+  uint8_t orientation;
+  if (Pdeg >= -45 && Pdeg < 45)
+    orientation = front_to_front;
+  else if (Pdeg >= 45 && Pdeg < 135)
+    orientation = front_to_left;
+  else if (Pdeg >= -135 && Pdeg < -45)
+    orientation = front_to_right;
+  else
+    orientation = front_to_back;
+
 
   for (float distance = 0.0f ; distance < P_REACH ; distance += 0.05f){
     rayPos.x = player->Camera.position.x + Raydir.x * distance;
@@ -236,7 +243,7 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
             
         if((keysDown() | keysHeld()) & KEY_R){
           if(specialmode != true && *delay <= 0){
-            setBlock(chunkL, size, previous.x, previous.y, previous.z, indexB);
+            setBlock(chunkL, size, previous.x, previous.y, previous.z, indexB,orientation);
             *majChunk = true;
             *delay = DELAY;
           }
@@ -244,7 +251,7 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
       }
       if((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)){
         if(*delay <= 0 && b != BEDROCK){
-          setBlock(chunkL, size, target.x, target.y, target.z, AIR);
+          setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
           *majChunk = true;
           *delay = DELAY;
         }
