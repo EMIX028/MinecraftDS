@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <nds.h>
+#include <stdint.h>
 #ifdef NORMAL_PACK
 #undef NORMAL_PACK
 #endif
@@ -24,12 +25,12 @@ void startingDraw(bool cullback);
 void drawCube(bool cullback,vec2_t t);
 
 //dessine sur le rendu 3D une face
-void drawCubeTop(vec2_t t);
-void drawCubeBottom(vec2_t t);
-void drawCubeLeft(vec2_t t);
-void drawCubeRight(vec2_t t);
-void drawCubeFront(vec2_t t);
-void drawCubeBack(vec2_t t);
+void drawCubeTop(vec2_t t,uint8_t angle);
+void drawCubeBottom(vec2_t t,uint8_t angle);
+void drawCubeLeft(vec2_t t,uint8_t angle);
+void drawCubeRight(vec2_t t,uint8_t angle);
+void drawCubeFront(vec2_t t, uint8_t angle);
+void drawCubeBack(vec2_t t,uint8_t angle);
 
 //dessine un contour noir autour du bloc que l'on regarde
 //si il est dans notre rayon d'action

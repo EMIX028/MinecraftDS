@@ -18,8 +18,11 @@
 #define FACE_BACK   (1 << 5)
 
 #define front_to_front 0
+#define top_to_Z 0
 #define front_to_left 1
+#define top_to_X 1
 #define front_to_back 2
+#define top_to_Y 2
 #define front_to_right 3
 
 #define ORIENTATION_MASK (3 << 6)
@@ -46,6 +49,7 @@ typedef struct block_s {
     uint8_t id;
 
     bool solid;
+    bool isLog;
     uint8_t transparent;
     //int hardness; //temps de destruction
     vec2_t texture[4];

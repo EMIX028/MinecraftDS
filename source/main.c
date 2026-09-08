@@ -150,7 +150,7 @@ int main() {
     glLoadIdentity();
     setCam();
 
-    playerInterract(&Joueur, chunkL, SIZE, indexB,
+    playerInterract(&Joueur, chunkL, SIZE, indexB,gBlocks,
                     (const bool) specialmode, &majChunk, &delay);
     
 
@@ -179,7 +179,7 @@ int main() {
 void subscreenAff(char *pseudo){
   consoleClear();
   BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
-  iprintf("\x1b[1;3H|Minecraft DS Edition 1.0a|");
+  iprintf("\x1b[1;3H|Minecraft DS Edition 1.1a|");
   iprintf("\x1b[2;3H--------------------------");
   iprintf("\x1b[4;1HHey %s !",pseudo);
   iprintf("\x1b[6;1Hx:%3d y:%3d z:%3d",
@@ -189,6 +189,7 @@ void subscreenAff(char *pseudo){
   iprintf("\x1b[8;0H Block: %s",getBlockName(indexB));
   #if DEBUG_MODE
     printf("\tyaw:%0.1f", fmodf(Joueur.Camera.yaw * (180.0f / (float)M_PI), 360.0f));
+    printf("\n\tpitch : %0.3f",Joueur.Camera.pitch);
   #endif
   unsigned long wholeSec = totalTicks / TIMER_TICKS_PER_SECOND;
   unsigned long rem = totalTicks % TIMER_TICKS_PER_SECOND;

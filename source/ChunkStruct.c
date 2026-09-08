@@ -128,6 +128,7 @@ void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){
       for (short z = 0; z < L_CHUNK; ++z) {
         block_t *block = &list[chunk->blocks[x][y][z].id];
         uint8_t faces = chunk->blocks[x][y][z].faces;
+        uint8_t orientation = GET_ORIENTATION(faces);
         if (block->transparent >= 2){
           continue;
         }
@@ -137,34 +138,119 @@ void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){
           inttof32(y),
           inttof32(z)
         );
-        if (faces & FACE_TOP)
-          drawCubeTop(block->texture[top]);
-        if ((faces & FACE_BOTTOM) && y >= player->Position.y)
-          drawCubeBottom(block->texture[bottom]);
+        
+        if (faces & FACE_TOP){
+          if(block->isLog){
+            if(orientation == top_to_Y){
+              drawCubeTop(block->texture[top],0);
+            }
+            else{
+              if(orientation == top_to_Z)
+                drawCubeTop(block->texture[side],90);
+              else
+                drawCubeTop(block->texture[side],0); 
+            }
+          }
+          else
+            drawCubeTop(block->texture[top],0);
+        }
+
+        if ((faces & FACE_BOTTOM) && y >= player->Position.y){
+          if(block->isLog){
+            if(orientation == top_to_Y){
+              drawCubeBottom(block->texture[top],0);
+            }
+            else{
+              if(orientation == top_to_Z)
+                drawCubeBottom(block->texture[side],90); 
+              else
+                drawCubeBottom(block->texture[side],0);
+            }
+          }
+          else
+            drawCubeBottom(block->texture[bottom],0);
+        }
 
         if (faces & FACE_LEFT){
-          if(GET_ORIENTATION(faces) == front_to_left)
-            drawCubeLeft(block->texture[front]);  
-          else
-            drawCubeLeft(block->texture[side]);
+          if(block->isLog){
+            if(orientation == top_to_X){
+              drawCubeLeft(block->texture[top],0);
+            }
+            else{
+              if(orientation == top_to_Z)
+                drawCubeLeft(block->texture[side],90);
+              else
+                drawCubeLeft(block->texture[side],0);
+            }
+          }
+          else{
+            if(orientation == front_to_left){
+              drawCubeLeft(block->texture[front],0);
+            }
+            else{
+              drawCubeLeft(block->texture[side],0);
+            }
+          }
         }
+
         if (faces & FACE_RIGHT){
-          if(GET_ORIENTATION(faces) == front_to_right)
-            drawCubeRight(block->texture[front]);
-          else
-            drawCubeRight(block->texture[side]);
+          if(block->isLog){
+            if(orientation == top_to_X){
+              drawCubeRight(block->texture[top],0);
+            }
+            else{
+              if(orientation == top_to_Z)
+                drawCubeRight(block->texture[side],90);
+              else
+                drawCubeRight(block->texture[side],0);
+            }
+          }
+          else{
+            if(orientation == front_to_right)
+              drawCubeRight(block->texture[front],0);
+            else
+              drawCubeRight(block->texture[side],0);
+          }
         }
+
         if (faces & FACE_FRONT){
-          if(GET_ORIENTATION(faces) == front_to_front)
-            drawCubeFront(block->texture[front]);
-          else
-             drawCubeFront(block->texture[side]);
+          if(block->isLog){
+            if(orientation == top_to_Z){
+              drawCubeFront(block->texture[top], 0);
+            }
+            else{
+              if(orientation == top_to_X)
+                drawCubeFront(block->texture[side], 90);
+              else
+                drawCubeFront(block->texture[side], 0);
+            }
+          }
+          else{
+            if(orientation == front_to_front)
+              drawCubeFront(block->texture[front],0);
+            else
+              drawCubeFront(block->texture[side],0);
+          }
         }
+
         if (faces & FACE_BACK){
-          if(GET_ORIENTATION(faces) == front_to_back)
-            drawCubeBack(block->texture[front]);
-          else
-           drawCubeBack(block->texture[side]);
+          if(block->isLog){
+            if(orientation == top_to_Z){
+              drawCubeBack(block->texture[top],0);
+            }
+            else{
+              if(orientation == top_to_X)
+                drawCubeBack(block->texture[side],90);
+              else
+                drawCubeBack(block->texture[side],0);
+            }
+          }
+          else{
+            if(orientation == front_to_back)
+              drawCubeBack(block->texture[front],0);
+            else
+            drawCubeBack(block->texture[side],0);
+          }
         }
         glPopMatrix(1);
       }

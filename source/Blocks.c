@@ -96,6 +96,7 @@ void InitBlocks(void){
         .id = OAK_LOG,
         .transparent = 0,
         .solid = true,
+        .isLog = true,
         .texture[top].x = 1, .texture[top].z = 3,
         .texture[bottom].x = 1, .texture[bottom].z = 3,
         .texture[side].x = 1, .texture[side].z = 2,

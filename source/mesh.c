@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include <stdint.h>
 #define TNBR0 16
 #define TNBR1 16
 
@@ -12,182 +13,350 @@ void startingDraw(bool cullback){
 	glBegin(GL_QUADS);
 }
 
-void drawCubeTop(vec2_t t){
+void drawCubeTop(vec2_t t,uint8_t angle){
+
 	glNormal(NORMAL_PACK(0,floattov10(1.0),0));
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    );//Texture
-	glVertex3v16(inttov16(1), inttov16(1),0);
+    int u0 = 1  + 18 * t.z;
+    int u1 = 17 + 18 * t.z;
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(1  + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0, inttov16(1), 0);
+    int v0 = 1  + 18 * t.x;
+    int v1 = 17 + 18 * t.x;
 
-	glTexCoord2t16(
-        inttot16(1  + 18 * t.z),
-        inttot16(1 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0, inttov16(1), inttov16(1));
+    switch(angle){
+        case 0:
+        default:
+	        glTexCoord2t16(inttot16(u1),inttot16(v1));
+	        glVertex3v16(inttov16(1), inttov16(1),0);
 
-    glTexCoord2t16(
-        inttot16(1 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), inttov16(1), inttov16(1));    
+	        glTexCoord2t16(inttot16(u1),inttot16(v0));
+	        glVertex3v16(0, inttov16(1), 0);
+
+	        glTexCoord2t16(inttot16(u0),inttot16(v0));
+	        glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0),inttot16(v1));
+	        glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+            break;
+
+        case 90:
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1),0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+            break;
+
+        case 180:
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(inttov16(1), inttov16(1),0);
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+            break;
+    }
 }
 
-void drawCubeBottom(vec2_t t){
+void drawCubeBottom(vec2_t t, uint8_t angle){
+
 	glNormal(NORMAL_PACK(0,floattov10(-1.0),0));
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0,0, 0);
+    int u0 = 1  + 18 * t.z;
+    int u1 = 17 + 18 * t.z;
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(1  + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1),0, 0);
+    int v0 = 1  + 18 * t.x;
+    int v1 = 17 + 18 * t.x;
 
-	glTexCoord2t16(
-        inttot16(1  + 18 * t.z),
-        inttot16(1 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), 0, inttov16(1));
+    switch(angle){
+        case 0:
+        default:
+	        glTexCoord2t16(inttot16(u1),inttot16(v1));
+	        glVertex3v16(0,0, 0);
 
-    glTexCoord2t16(
-        inttot16(1 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0, 0, inttov16(1));
+	        glTexCoord2t16(inttot16(u1),inttot16(v0));
+	        glVertex3v16(inttov16(1),0, 0);
+
+	        glTexCoord2t16(inttot16(u0),inttot16(v0));
+	        glVertex3v16(inttov16(1), 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u0),inttot16(v1));
+	        glVertex3v16(0, 0, inttov16(1));
+            break;
+
+        case 90:
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0,0, 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1),0, 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0, 0, inttov16(1));
+            break;
+
+        case 180:
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0,0, 0);
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(inttov16(1),0, 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(0, 0, inttov16(1));
+            break;
+    }
 }
 
-void drawCubeBack(vec2_t t){
-	glNormal(NORMAL_PACK(0,0,floattov10(-1.0)));
+void drawCubeBack(vec2_t t,uint8_t angle){
+	
+    glNormal(NORMAL_PACK(0,0,floattov10(-1.0)));
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0,0,0);
+    int u0 = 1  + 18 * t.z;
+    int u1 = 17 + 18 * t.z;
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(1  + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0, inttov16(1), 0);
+    int v0 = 1  + 18 * t.x;
+    int v1 = 17 + 18 * t.x;
 
-	glTexCoord2t16(
-        inttot16(1  + 18 * t.z),
-        inttot16(1 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), inttov16(1), 0);
+    switch(angle){
+        case 0:
+        default:
+	        glTexCoord2t16(inttot16(u1),inttot16(v1));
+	        glVertex3v16(0,0,0);
 
-    glTexCoord2t16(
-        inttot16(1 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1),0, 0);    
+	        glTexCoord2t16(inttot16(u1),inttot16(v0));
+	        glVertex3v16(0, inttov16(1), 0);
+
+	        glTexCoord2t16(inttot16(u0),inttot16(v0));
+	        glVertex3v16(inttov16(1), inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u0),inttot16(v1));
+	        glVertex3v16(inttov16(1),0, 0);
+            break;
+
+        case 90:
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0,0,0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1), inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(inttov16(1),0, 0);
+            break;
+
+        case 180:
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0,0,0);
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1),0, 0);
+            break;
+    }
 }
 
-void drawCubeRight(vec2_t t){
-	glNormal(NORMAL_PACK(floattov10(1.0),0,0));
+void drawCubeRight(vec2_t t, uint8_t angle){
+	
+    glNormal(NORMAL_PACK(floattov10(1.0),0,0));
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), 0,0);
+    int u0 = 1  + 18 * t.z;
+    int u1 = 17 + 18 * t.z;
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(1  + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), inttov16(1), 0);
+    int v0 = 1  + 18 * t.x;
+    int v1 = 17 + 18 * t.x;
 
-	glTexCoord2t16(
-        inttot16(1  + 18 * t.z),
-        inttot16(1 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+    switch(angle){
+        case 0:
+        default:
+	        glTexCoord2t16(inttot16(u1),inttot16(v1));
+	        glVertex3v16(inttov16(1), 0,0);
 
-    glTexCoord2t16(
-        inttot16(1 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    );  //Texture
-	glVertex3v16(inttov16(1), 0, inttov16(1));
+	        glTexCoord2t16(inttot16(u1),inttot16(v0));
+	        glVertex3v16(inttov16(1), inttov16(1), 0);
+
+	        glTexCoord2t16(inttot16(u0),inttot16(v0));
+	        glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0),inttot16(v1));
+	        glVertex3v16(inttov16(1), 0, inttov16(1));
+            break;
+        
+        case 90:
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(inttov16(1), 0,0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+            break;
+
+        case 180:
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(inttov16(1), 0,0);
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+            break;
+    }
 }
 
-void drawCubeFront(vec2_t t){
-	glNormal(NORMAL_PACK(0,0,floattov10(1.0)));
+void drawCubeFront(vec2_t t, uint8_t angle){
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), 0, inttov16(1));
+    glNormal(NORMAL_PACK(0,0,floattov10(1.0)));
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(1  + 18 * t.x)
-    ); //Texture
-	glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+    int u0 = 1  + 18 * t.z;
+    int u1 = 17 + 18 * t.z;
 
-	glTexCoord2t16(
-        inttot16(1  + 18 * t.z),
-        inttot16(1 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0, inttov16(1), inttov16(1));
+    int v0 = 1  + 18 * t.x;
+    int v1 = 17 + 18 * t.x;
 
-    glTexCoord2t16(
-        inttot16(1 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    ); //Texture
-	glVertex3v16(0,0, inttov16(1));
+    switch(angle){
+        case 0:
+        default:
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0, 0, inttov16(1));
+            break;
+
+        case 90:
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0, 0, inttov16(1));
+            break;
+
+        case 180:
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(inttov16(1), 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(0, 0, inttov16(1));
+            break;
+    }
 }
 
-void drawCubeLeft(vec2_t t){
+void drawCubeLeft(vec2_t t,uint8_t angle){
+
     glNormal(NORMAL_PACK(floattov10(-1.0), 0, 0));
-    
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    );
-    glVertex3v16(0, 0, inttov16(1));
 
-	glTexCoord2t16(
-        inttot16(17 + 18 * t.z),
-        inttot16(1  + 18 * t.x)
-    );
-    glVertex3v16(0, inttov16(1), inttov16(1));
+    int u0 = 1  + 18 * t.z;
+    int u1 = 17 + 18 * t.z;
 
-    glTexCoord2t16(
-        inttot16(1  + 18 * t.z),
-        inttot16(1 + 18 * t.x)
-    );
-    glVertex3v16(0, inttov16(1), 0);
+    int v0 = 1  + 18 * t.x;
+    int v1 = 17 + 18 * t.x;
 
-    glTexCoord2t16(
-        inttot16(1 + 18 * t.z),
-        inttot16(17 + 18 * t.x)
-    );
-    glVertex3v16(0, 0, 0);
+    switch(angle){
+        case 0:
+        default:
+	        glTexCoord2t16(inttot16(u1),inttot16(v1));
+            glVertex3v16(0, 0, inttov16(1));
+
+	        glTexCoord2t16(inttot16(u1),inttot16(v0));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u0),inttot16(v0));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u0),inttot16(v1));
+            glVertex3v16(0, 0, 0);
+            break;
+
+        case 90:
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0, 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0, 0, 0);
+            break;
+
+        case 180:
+            glTexCoord2t16(inttot16(u0), inttot16(v0));
+            glVertex3v16(0, 0, inttov16(1));
+
+            glTexCoord2t16(inttot16(u0), inttot16(v1));
+            glVertex3v16(0, inttov16(1), inttov16(1));
+
+            glTexCoord2t16(inttot16(u1), inttot16(v1));
+            glVertex3v16(0, inttov16(1), 0);
+
+            glTexCoord2t16(inttot16(u1), inttot16(v0));
+            glVertex3v16(0, 0, 0);
+            break;
+    }
 }
 
 void drawCube(bool cullback, vec2_t t){
 	startingDraw(cullback);
-	drawCubeLeft(t);
-    drawCubeFront(t);
-	drawCubeBack(t);
-	drawCubeRight(t);
-	drawCubeTop(t);
-	drawCubeBottom(t);
+	drawCubeLeft(t,0);
+    drawCubeFront(t, 0);
+	drawCubeBack(t,0);
+	drawCubeRight(t,0);
+	drawCubeTop(t,0);
+	drawCubeBottom(t,0);
 	glEnd();
 }
 

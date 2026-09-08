@@ -192,7 +192,7 @@ void loadPlayerMovement(player_t *player,chunk_t chunk[],int n,block_t list[],hi
     player->Camera.pitch += P_SENSI;
 }
 
-void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
+void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,block_t list[],
                       const bool specialmode, bool *majChunk, int *delay){
   vec3_t target;
   bool blockTargeted;
@@ -211,16 +211,30 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,
     Pdeg -= 360.0;
   else if (Pdeg < -180.0)
     Pdeg += 360.0;
-  uint8_t orientation;
-  if (Pdeg >= -45 && Pdeg < 45)
-    orientation = front_to_front;
-  else if (Pdeg >= 45 && Pdeg < 135)
-    orientation = front_to_left;
-  else if (Pdeg >= -135 && Pdeg < -45)
-    orientation = front_to_right;
-  else
-    orientation = front_to_back;
-
+  uint8_t orientation = front_to_front;
+  if(list[indexB].isLog){
+    if(-1.0f >= player->Camera.pitch || player->Camera.pitch >= 1.0f){
+      orientation = top_to_Y;
+    }
+    else{
+      if ((Pdeg >= 45 && Pdeg < 135) || (Pdeg >= -135 && Pdeg < -45)){
+        orientation = top_to_X;
+      }
+      else{
+        orientation = top_to_Z;
+      }
+    }
+  }
+  else{
+    if (Pdeg >= -45 && Pdeg < 45)
+      orientation = front_to_front;
+    else if (Pdeg >= 45 && Pdeg < 135)
+      orientation = front_to_left;
+    else if (Pdeg >= -135 && Pdeg < -45)
+      orientation = front_to_right;
+    else
+      orientation = front_to_back;
+  }
 
   for (float distance = 0.0f ; distance < P_REACH ; distance += 0.05f){
     rayPos.x = player->Camera.position.x + Raydir.x * distance;
