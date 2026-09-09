@@ -2,8 +2,9 @@
 #define MAIN_H
 
 
+#include <stdint.h>
+#include <sys/types.h>
 #define GRAVITY 0.008f
-#define DISPLAY_DISTANCE 30
 
 //fonction d'affichage d'information sur l'écran du bas de la DS
 void subscreenAff(char *pseudo);
@@ -20,6 +21,11 @@ void updatePerformance(void);
 
 void calculRenderView();
 
-void setPlayground();
+typedef enum{
+    DEBUG_MAP,
+    MAP_0
+} map_type;
+
+void setPlayground(int8_t type);
 
 #endif

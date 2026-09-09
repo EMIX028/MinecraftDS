@@ -115,7 +115,7 @@ void blockVisibility(chunk_t chunks[], int size, block_t *list){
   }
 }
 
-void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){
+void __attribute__((section(".itcm"))) RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player){ //attribute en fix temporaire pour les performances
   glPushMatrix();
   glTranslatef32(
     inttof32(chunk->position.x * L_CHUNK),

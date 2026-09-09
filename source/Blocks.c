@@ -103,6 +103,16 @@ void InitBlocks(void){
         .texture[front].x = 1, .texture[front].z = 2
     };
 
+    gBlocks[OAK_LEAVE] = (block_t){
+        .id = OAK_LEAVE,
+        .transparent = 1,
+        .solid = true,
+        .texture[top].x = 1, .texture[top].z = 9,
+        .texture[bottom].x = 1, .texture[bottom].z = 9,
+        .texture[side].x = 1, .texture[side].z = 9,
+        .texture[front].x = 1, .texture[front].z = 9
+    };
+
     gBlocks[OBSIDIAN] = (block_t){
         .id = OBSIDIAN,
         .transparent = 0,
@@ -196,6 +206,7 @@ const char *getBlockName(uint8_t block){
         case GLASS: return "Glass";
         case OAK_PLANK: return "Oak Plank";
         case OAK_LOG: return "Oak Log";
+        case OAK_LEAVE: return "Oak Leave";
         case OBSIDIAN: return "Obsidian";
         case COAL_ORE: return "Coal Ore";
         case IRON_ORE: return "Iron Ore";

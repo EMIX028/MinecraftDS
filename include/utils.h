@@ -47,6 +47,7 @@ typedef enum {
     GLASS,
     OAK_PLANK,
     OAK_LOG,
+    OAK_LEAVE,
     OBSIDIAN,
     COAL_ORE,
     IRON_ORE,
