@@ -18,7 +18,7 @@ Minecraft DS is a Minecraft-inspired homebrew project for the Nintendo DS made w
 | ----------------- | -------------------------------------------------------- |
 | **D-Pad**         | Move the player                                          |
 | **A / B / X / Y** | Control the camera                                       |
-| **START**         | Reset the map and teleport the player back to the ground |
+| **START**         | Reset & switch map                                       |
 | **SELECT**        | Pause the game                                           |
 | **R**             | Place a block                                            |
 | **L**             | Activate Special Mode                                    |
@@ -46,7 +46,8 @@ There are currently **17 block types** available:
 * Bedrock
 * Glass
 * Oak Plank
-* Oak log
+* Oak Log
+* Oak Leave
 * Obsidian
 * Coal Ore
 * Iron Ore
