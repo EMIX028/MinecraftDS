@@ -43,6 +43,8 @@ The release contains the `.nds` ROM required to run Minecraft DS on compatible N
 
 If you want to build the source code, Minecraft DS requires **devkitPro** and **libnds**.
 
+> **Note:** Audio files are not included in this repository.
+
 ## ⚙️ Technical
 
 Minecraft DS is developed in **C** using **devkitPro** and **libnds**.
