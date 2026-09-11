@@ -81,6 +81,14 @@ fixed_t inttofixed(int32_t x);
 
 int32_t fixedtoint(fixed_t x);
 
+fixed_t ftofixed(float x);
+
+float fixedtofloat(fixed_t x);
+
+vec3_t fxvec3tovec3(fxvec3_t d);
+
+fxvec3_t vec3tofxvec3(vec3_t d);
+
 fixed_t fixed_mul(fixed_t a, fixed_t b);
 
 fixed_t fixed_div(fixed_t a, fixed_t b);
