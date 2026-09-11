@@ -4,7 +4,7 @@
 
 block_t gBlocks[BLOCK_COUNT];
 
-const hitbox_t blocks = {.w = 1, .h = 1,.d = 1};
+const hitbox_t HitboxBlocks = {.w = 1, .h = 1,.d = 1};
 
 //x -> ligne, z -> colonne
 void InitBlocks(void){

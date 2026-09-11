@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "PlayerStruct.h"
 #include "utils.h"
-#define L_CHUNK 14 //chunk minecraft 15
+#define L_CHUNK 15 //chunk minecraft 15
 #define H_CHUNK 22 // hauteur max 256
 
 //macro constante qui gère l'affichage d'un bloc sur un octet
@@ -63,6 +63,7 @@ typedef struct block_s {
 typedef struct instance{
     uint8_t id;
     uint8_t faces;
+    //dans le futur ajouté luminosité des blocs
 }instance_t;
 
 //chunk est un regroupement de bloc avec

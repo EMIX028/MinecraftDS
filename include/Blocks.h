@@ -7,7 +7,7 @@
 extern block_t gBlocks[BLOCK_COUNT];
 
 //hitbox d'un bloc classique 
-extern const hitbox_t blocks;
+extern const hitbox_t HitboxBlocks;
 
 //fonction d'initialisation de tous les blocs
 void InitBlocks(void);

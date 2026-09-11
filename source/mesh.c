@@ -367,7 +367,7 @@ void drawCube(bool cullback, vec2_t t){
 
 //     glMaterialf(
 //         GL_DIFFUSE,
-//         RGB15(color.r,color.g,color.b)
+//         RGB15(color.r,color.g,color.b) // Influe sur la couleur de la texture
 //     );
 
 //     glMaterialf(

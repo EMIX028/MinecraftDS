@@ -17,6 +17,9 @@ void setPlayer(player_t *player);
 //déplace le joueur en addition sa position actuel avec un vecteur 3D
 void movePlayer(player_t *player, vec3_t d);
 
+//téléporte le joueur à une position d données
+void teleportPlayer(player_t *player, vec3_t d);
+
 //calcul la collision entre deux objet A et B avec leur hitbox
 // utilise la méthode AABB (Axis Aligned Bounded Box)
 bool checkCollision(vec3_t apos , hitbox_t a , ivec3_t bpos , hitbox_t b);

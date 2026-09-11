@@ -19,13 +19,13 @@ void ApplyGravity(int size);
 //calcul le timer du jeu et les fps
 void updatePerformance(void);
 
+//recalcul les faces visibles des chunks
 void calculRenderView();
 
-typedef enum{
-    DEBUG_MAP,
-    MAP_0
-} map_type;
+//créer la map temporaire pour le jeu
+void setPlayground();
 
-void setPlayground(int8_t type);
+//récupère le pseudo du joueur qu'il a inscrit dans la DS
+char *GetPlayerName(char *name);
 
 #endif

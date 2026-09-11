@@ -30,8 +30,14 @@ void movePlayer(player_t *player, vec3_t d){
   player->Position.y += d.y;
   player->Position.z += d.z;
   player->Camera.position.x = player->Position.x;
-  player->Camera.position.y = player->Position.y +1.5f;
+  player->Camera.position.y = player->Position.y +1.62f;
   player->Camera.position.z = player->Position.z;
+}
+
+void teleportPlayer(player_t *player, vec3_t d){
+  player->Position = d;
+  player->Camera.position = d;
+  player->Camera.position.y += 1.62f;
 }
 
 vec3_t getDir(camera_t cam){
@@ -253,7 +259,7 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,bl
       if (previousValid && !checkCollision(player->Position, player->hitbox,
                                             (ivec3_t){.x=previous.x,
                                               .y=previous.y,
-                                              .z=previous.z}, blocks)){
+                                              .z=previous.z}, HitboxBlocks)){
             
         if((keysDown() | keysHeld()) & KEY_R){
           if(specialmode != true && *delay <= 0){

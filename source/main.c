@@ -1,11 +1,9 @@
-#include <_ansi.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
 
 #include "main.h"
 #include "ChunkStruct.h"
-#include "nds/arm9/videoGL.h"
 #include "nds/system.h"
 #include "player.h"
 #include "Blocks.h"
@@ -13,21 +11,12 @@
 #include "keyAssignation.h"
 #include "utils.h"
 
-#if !DEBUG_MODE
-  #include <maxmod9.h>
-  #include "soundbank.h"
-  #include "mm_types.h"
-  #include "soundbank_bin.h"
-#endif
-
 player_t Joueur;
-uint8_t indexB = 1;
+uint8_t indexB = DIRT;
 int delay = 0; //delay entre chaque bloc posé ou cassé
 bool majChunk = true;
 uint8_t gameState = RUNNING;
 const uint8_t RenderDistance = 2;
-
-int8_t map = 1;
 
 #define SIZE 4
 chunk_t chunkL[SIZE] = {
@@ -70,12 +59,8 @@ int main() {
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, L_CHUNK*RenderDistance);
   
 
-  char pseudo[PersonalData->nameLen + 1];
-  void *s = PersonalData->name;
-  for (uint16_t *p = s; p < (uint16_t*)s + PersonalData->nameLen; ++p) {
-    pseudo[p - (uint16_t*)s] = *p;
-  }
-  pseudo[PersonalData->nameLen] = '\0';
+  char pseudo[PersonalData->nameLen+1];
+  GetPlayerName(pseudo);
 
   int TextureID;
 
@@ -95,15 +80,9 @@ int main() {
     printf("\nerreur init texture\n");
   }
 
-  setPlayground(MAP_0);
+  setPlayground();
 
-  movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 5.0f,.z=0.0f});
-
-  #if !DEBUG_MODE
-    mmInitDefaultMem((mm_addr)soundbank_bin);
-    mm_sfxhand handle = mmEffect(SFX_WET_HANDS);
-    mmEffectVolume(handle, 255);
-  #endif  
+  movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 5.0f,.z=0.0f}); 
 
   while (pmMainLoop()) {
     scanKeys();
@@ -113,7 +92,6 @@ int main() {
       } else {
         gameState = RUNNING;
       }
-      ledBlink(PmLedMode_BlinkFast);
     }
     if(gameState == PAUSED){
       continue;
@@ -121,15 +99,14 @@ int main() {
     glBindTexture(0, TextureID);
 
     subscreenAff(pseudo);
-    loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,blocks);
+    loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,HitboxBlocks);
     loadKeyAssignation(&Joueur);
 
     if(keysDown() & KEY_START){
-      setPlayground(powf(-1, map));
+      setPlayground();
       movePlayer(&Joueur, (vec3_t){.x=-Joueur.Position.x+5.0f,
                                 .y=-Joueur.Position.y+10.0f,
                                 .z = -Joueur.Position.z+5.0f});
-      ++map;
     }
     
     if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
@@ -179,7 +156,15 @@ int main() {
 
 
 
-
+char *GetPlayerName(char *pseudo){
+  //char pseudo[PersonalData->nameLen + 1];
+  void *s = PersonalData->name;
+  for (uint16_t *p = s; p < (uint16_t*)s + PersonalData->nameLen; ++p) {
+    pseudo[p - (uint16_t*)s] = *p;
+  }
+  pseudo[PersonalData->nameLen] = '\0';
+  return pseudo;
+}
 
 void subscreenAff(char *pseudo){
   consoleClear();
@@ -231,7 +216,7 @@ void ApplyGravity(int size){
     };
 
     if (canMovePlayer(&Joueur, gravityMove,
-                      chunkL, size, gBlocks, blocks)){
+                      chunkL, size, gBlocks, HitboxBlocks)){
         movePlayer(&Joueur, gravityMove);
     }
     else{
@@ -274,170 +259,16 @@ void calculRenderView(){
   }
 }
 
-void setPlayground(int8_t type){
-  switch(type){
-    case DEBUG_MAP:
-    default:
-      for(int i = 0 ; i < SIZE ; ++i){
-        initChunk(&chunkL[i],AIR);
-        for(int x = 0 ; x < L_CHUNK ; ++x){
-          for(int z = 0; z < L_CHUNK ; ++z){
-            chunkL[i].blocks[x][0][z].id = BEDROCK;
-            chunkL[i].blocks[x][1][z].id = GRASS;
-          }
+void setPlayground(){
+    for(int i = 0 ; i < SIZE ; ++i){
+      initChunk(&chunkL[i],AIR);
+      for(int x = 0 ; x < L_CHUNK ; ++x){
+        for(int z = 0; z < L_CHUNK ; ++z){
+          chunkL[i].blocks[x][0][z].id = BEDROCK;
+          chunkL[i].blocks[x][1][z].id = GRASS;
         }
       }
-      break;
-    case MAP_0:
-      for(int i = 0 ; i < SIZE ; ++i){
-        initChunk(&chunkL[i],AIR);
-        for(int x = 0 ; x < L_CHUNK ; ++x){
-          for(int z = 0; z < L_CHUNK ; ++z){
-            chunkL[i].blocks[x][0][z].id = BEDROCK;
-            chunkL[i].blocks[x][1][z].id = GRASS;
-          }
-        }
-      }
-
-
-      //CHUNK 0
-      for(int x = 0; x < 11; ++x){
-        for( int z =0; z < 11; ++z){
-          chunkL[0].blocks[x][2][z].id = GRASS;
-        }
-      }
-      for(int x = 0; x < 8; ++x){
-        for( int z =0; z < 8; ++z){
-          chunkL[0].blocks[x][3][z].id = GRASS;
-        }
-      }
-      for(int x = 0; x < 4; ++x){
-        for( int z =0; z < 3; ++z){
-          chunkL[0].blocks[x][4][z].id = GRASS;
-        }
-      }
-      for( int x =0; x < 10; ++x){
-          chunkL[0].blocks[x][2][11].id = GRASS;
-      }
-      for( int x =0; x < 8; ++x){
-          chunkL[0].blocks[x][2][12].id = GRASS;
-      }
-      for( int z =0; z < 9; ++z){
-          chunkL[0].blocks[11][2][z].id = GRASS;
-      }
-      for( int z =0; z < 7; ++z){
-          chunkL[0].blocks[12][2][z].id = GRASS;
-      }
-      for( int x =0; x < 5; ++x){
-          chunkL[0].blocks[x][2][13].id = GRASS;
-      }
-      for( int z = 0; z < 7; ++z){
-          chunkL[0].blocks[8][3][z].id = GRASS;
-      }
-      for( int x = 0; x < 6; ++x){
-          chunkL[0].blocks[x][3][8].id = GRASS;
-      }
-      for( int x = 0; x < 5; ++x){
-          chunkL[0].blocks[x][3][9].id = GRASS;
-      }
-      for( int x = 0; x < 3; ++x){
-          chunkL[0].blocks[x][3][10].id = GRASS;
-      }
-      chunkL[0].blocks[0][4][3].id = GRASS;
-
-
-      //CHUNK 1
-      for(int x = 0; x < 14; ++x){
-        for (int z = 0; z <10; ++z){
-          chunkL[1].blocks[x][2][z].id = GRASS;
-        }
-      }
-      for(int x = 8; x < 14; ++x){
-        for (int z = 10; z <14; ++z){
-          chunkL[1].blocks[x][2][z].id = GRASS;
-        }
-      }
-      chunkL[1].blocks[8][2][11].id = AIR;
-      chunkL[1].blocks[8][2][12].id = AIR;
-      chunkL[1].blocks[8][2][13].id = AIR;
-      chunkL[1].blocks[9][2][13].id = AIR;
-      chunkL[1].blocks[10][2][13].id = AIR;
-      chunkL[1].blocks[10][3][10].id = GRASS;
-      chunkL[1].blocks[11][3][10].id = GRASS;
-      chunkL[1].blocks[12][3][10].id = GRASS;
-      chunkL[1].blocks[13][3][10].id = GRASS;
-      chunkL[1].blocks[8][3][8].id = GRASS;
-      chunkL[1].blocks[8][3][7].id = GRASS;
-      chunkL[1].blocks[8][3][6].id = GRASS;
-      chunkL[1].blocks[7][3][6].id = GRASS;
-      chunkL[1].blocks[0][3][6].id = GRASS;
-      for(int x = 0; x < 14; ++x){
-        for (int z = 0; z <6; ++z){
-          chunkL[1].blocks[x][3][z].id = GRASS;
-        }
-      }
-      for(int x = 9; x < 14; ++x){
-        for (int z = 6; z < 10; ++z){
-          chunkL[1].blocks[x][3][z].id = GRASS;
-        }
-      }
-      for(int x = 0; x < 14; ++x){
-        for (int z = 0; z <5; ++z){
-          chunkL[1].blocks[x][4][z].id = GRASS;
-        }
-      }
-      chunkL[1].blocks[9][4][5].id = GRASS;
-      chunkL[1].blocks[10][4][5].id = GRASS;
-      chunkL[1].blocks[11][4][5].id = GRASS;
-
-      chunkL[1].blocks[3][5][1].id = OAK_LOG;
-      SET_ORIENTATION(chunkL[1].blocks[3][5][1].faces,top_to_Y);
-      chunkL[1].blocks[3][6][1].id = OAK_LOG;
-      SET_ORIENTATION(chunkL[1].blocks[3][6][1].faces,top_to_Y);
-      chunkL[1].blocks[3][7][1].id = OAK_LOG;
-      SET_ORIENTATION(chunkL[1].blocks[3][7][1].faces,top_to_Y);
-      chunkL[1].blocks[3][8][1].id = OAK_LOG;
-      SET_ORIENTATION(chunkL[1].blocks[3][8][1].faces,top_to_Y);
-      chunkL[1].blocks[3][9][1].id = OAK_LOG;
-      SET_ORIENTATION(chunkL[1].blocks[3][9][1].faces,top_to_Y);
-      chunkL[1].blocks[3][10][1].id = OAK_LEAVE;
-
-      chunkL[1].blocks[4][10][1].id = OAK_LEAVE;
-      chunkL[1].blocks[3][10][2].id = OAK_LEAVE;
-      chunkL[1].blocks[2][10][1].id = OAK_LEAVE;
-      chunkL[1].blocks[3][10][0].id = OAK_LEAVE;
-
-      chunkL[1].blocks[4][9][1].id = OAK_LEAVE;
-      chunkL[1].blocks[3][9][2].id = OAK_LEAVE;
-      chunkL[1].blocks[2][9][1].id = OAK_LEAVE;
-      chunkL[1].blocks[3][9][0].id = OAK_LEAVE;
-
-      for( int x = 4; x < 6; ++x){
-        for(int y = 7; y < 9; ++y){
-          for(int z = 0; z < 4; ++z){
-            chunkL[1].blocks[x][y][z].id = OAK_LEAVE;
-          }
-        }
-      }
-
-      for( int x = 1; x < 3; ++x){
-        for(int y = 7; y < 9; ++y){
-          for(int z = 0; z < 4; ++z){
-            chunkL[1].blocks[x][y][z].id = OAK_LEAVE;
-          }
-        }
-      }
-      chunkL[1].blocks[3][7][0].id = OAK_LEAVE;
-      chunkL[1].blocks[3][8][0].id = OAK_LEAVE;
-
-      chunkL[1].blocks[3][7][2].id = OAK_LEAVE;
-      chunkL[1].blocks[3][8][2].id = OAK_LEAVE;
-      chunkL[1].blocks[3][7][3].id = OAK_LEAVE;
-      chunkL[1].blocks[3][8][3].id = OAK_LEAVE;
-      
-      
-      break;
-  }
+    }
   majChunk = true;
   calculRenderView();
 }

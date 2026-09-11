@@ -2,11 +2,15 @@
 #define UTILS_H
 
 #include <stdint.h>
-#include <sys/_intsup.h>
 #define SCREEN_W 256
 #define SCREEN_H 192
 
 #define DEBUG_MODE 0
+
+#define FIXED_SHIFT 12
+#define FIXED_ONE   (1 << FIXED_SHIFT)
+
+typedef int32_t fixed_t;
 
 //vecteur 3d en flottant
 typedef struct fvec3{
@@ -14,6 +18,12 @@ typedef struct fvec3{
   float y;
   float z;
 } vec3_t;
+
+typedef struct fxvec3{
+  fixed_t x;
+  fixed_t y;
+  fixed_t z;
+} fxvec3_t;
 
 //vecteur 3d en entier
 typedef struct ivec3{
@@ -34,6 +44,9 @@ typedef struct hitbox{
   float h;
   float d;
 }hitbox_t;
+
+//type qui permet de définir tout ce qui est relatif aux id d'un bloc
+typedef uint8_t blockId_t;
 
 //Alias de plusieurs ID de bloc
 typedef enum {
@@ -63,5 +76,13 @@ typedef enum{
   RUNNING,
   PAUSED,
 }GAMESTATE;
+
+fixed_t inttofixed(int32_t x);
+
+int32_t fixedtoint(fixed_t x);
+
+fixed_t fixed_mul(fixed_t a, fixed_t b);
+
+fixed_t fixed_div(fixed_t a, fixed_t b);
 
 #endif

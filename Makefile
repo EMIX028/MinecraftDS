@@ -30,7 +30,7 @@ SOURCES  := source
 INCLUDES := include
 DATA     := data
 GRAPHICS :=
-AUDIO    := assets/sound
+AUDIO    :=
 ICON     :=
 
 # specify a directory which contains the nitro filesystem
