@@ -14,10 +14,7 @@ void subscreenAff(char *pseudo);
 void setCam();
 
 //applique le calcul de la gravité au joueur
-void ApplyGravity(int size);
-
-//calcul le timer du jeu et les fps
-void updatePerformance(void);
+void ApplyGravity();
 
 //recalcul les faces visibles des chunks
 void calculRenderView();

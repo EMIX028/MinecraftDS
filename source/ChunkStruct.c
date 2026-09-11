@@ -1,7 +1,6 @@
 #include "ChunkStruct.h"
 #include "PlayerStruct.h"
 #include "mesh.h"
-#include "nds/arm9/videoGL.h"
 #include "utils.h"
 #include <stdint.h>
 
@@ -260,23 +259,6 @@ void __attribute__((section(".itcm"))) RenderChunk(chunk_t chunk[], block_t *lis
   glPopMatrix(1);
 }
 
-
-int floorDiv(int a, int b){
-  int q = a / b;
-  int r = a % b;
-  if (r != 0 && a < 0) {
-    q--;
-  }
-  return q;
-}
-
-int floorMod(int a, int b){
-  int r = a % b;
-  if (r < 0) {
-    r += b;
-  }
-  return r;
-}
 
 uint8_t getBlock(chunk_t chunk[], int size, int x, int y, int z){
   int chunkX = floorDiv(x, L_CHUNK);

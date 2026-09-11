@@ -87,12 +87,6 @@ void blockVisibility(chunk_t chunks[], int size, block_t *list);
 // dessine dans le rendu 3d un chunk
 void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player);
 
-//renvoie le quotient d'une division pour un entier <0 ou >0
-int floorDiv(int a, int b);
-
-//renvoie le reste d'une division pour un entier <0 ou >0
-int floorMod(int a, int b);
-
 //renvoie l'id d'un bloc dans une liste de chunk
 // avec sa position global
 uint8_t getBlock(chunk_t chunk[],int size,int x,int y, int z);

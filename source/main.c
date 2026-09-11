@@ -4,7 +4,6 @@
 
 #include "main.h"
 #include "ChunkStruct.h"
-#include "nds/system.h"
 #include "player.h"
 #include "Blocks.h"
 #include "TextureAtlas.h"
@@ -15,7 +14,6 @@ player_t Joueur;
 uint8_t indexB = DIRT;
 int delay = 0; //delay entre chaque bloc posé ou cassé
 bool majChunk = true;
-uint8_t gameState = RUNNING;
 const uint8_t RenderDistance = 2;
 
 #define SIZE 4
@@ -26,22 +24,8 @@ chunk_t chunkL[SIZE] = {
   (chunk_t){.position.x = -1, .position.z = -1}
 };
 
-//définition d'un TIMER et du compteur de fps
-#define TIMER_TICKS_PER_SECOND (BUS_CLOCK / 1024)
-static u32 totalTicks = 0;
-static u16 previousTimer = 0;
-static u16 lastFpsTimer = 0;
-static int frames = 0;
-static int fps = 0;
 
-
-int main() {
-  TIMER0_DATA = 0;
-  TIMER0_CR = TIMER_ENABLE | TIMER_DIV_1024;
-  previousTimer = TIMER0_DATA;
-  lastFpsTimer = TIMER0_DATA;
-  
-  
+int main() {  
   setPlayer(&Joueur);
   InitBlocks();
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
@@ -84,49 +68,18 @@ int main() {
 
   movePlayer(&Joueur,(vec3_t){.x = 0.0f,.y = 5.0f,.z=0.0f}); 
 
+
+
   while (pmMainLoop()) {
     scanKeys();
-    if(keysDown() & KEY_SELECT){
-      if(gameState == RUNNING) { //pause switch
-        gameState = PAUSED;
-      } else {
-        gameState = RUNNING;
-      }
-    }
-    if(gameState == PAUSED){
-      continue;
-    }
-    glBindTexture(0, TextureID);
-
-    subscreenAff(pseudo);
     loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,HitboxBlocks);
     loadKeyAssignation(&Joueur);
 
-    if(keysDown() & KEY_START){
-      setPlayground();
-      movePlayer(&Joueur, (vec3_t){.x=-Joueur.Position.x+5.0f,
-                                .y=-Joueur.Position.y+10.0f,
-                                .z = -Joueur.Position.z+5.0f});
-    }
-    
-    if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
-      if(indexB < BLOCK_COUNT-1){
-        ++indexB;
-      }
-      else{
-        indexB = 1;
-      }
-    }
-    if((keysHeld() & KEY_L) && (keysDown() & KEY_Y)){
-      if(indexB > 1){
-        --indexB;
-      }
-      else{
-        indexB = BLOCK_COUNT-1;
-      }
-    }
+    subscreenAff(pseudo);
 
-    ApplyGravity(SIZE);
+    glBindTexture(0, TextureID);
+
+    ApplyGravity();
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
@@ -138,16 +91,15 @@ int main() {
 
     calculRenderView();
 
-    for(uint8_t i=0;i<SIZE;i++){
+    for(u8 i = 0 ; i < SIZE ; i++){
       RenderChunk(&chunkL[i],gBlocks,true,&Joueur);
     }
 
-    if(delay>0){
+    if(delay > 0){
       --delay;
     }
 
     glFlush(0);
-    updatePerformance();
     swiWaitForVBlank();
   }
   return EXIT_SUCCESS;
@@ -156,8 +108,9 @@ int main() {
 
 
 
+
+
 char *GetPlayerName(char *pseudo){
-  //char pseudo[PersonalData->nameLen + 1];
   void *s = PersonalData->name;
   for (uint16_t *p = s; p < (uint16_t*)s + PersonalData->nameLen; ++p) {
     pseudo[p - (uint16_t*)s] = *p;
@@ -165,6 +118,8 @@ char *GetPlayerName(char *pseudo){
   pseudo[PersonalData->nameLen] = '\0';
   return pseudo;
 }
+
+
 
 void subscreenAff(char *pseudo){
   consoleClear();
@@ -181,11 +136,9 @@ void subscreenAff(char *pseudo){
     printf("\tyaw:%0.1f", fmodf(Joueur.Camera.yaw * (180.0f / (float)M_PI), 360.0f));
     printf("\n\tpitch : %0.3f",Joueur.Camera.pitch);
   #endif
-  unsigned long wholeSec = totalTicks / TIMER_TICKS_PER_SECOND;
-  unsigned long rem = totalTicks % TIMER_TICKS_PER_SECOND;
-  unsigned long deciSec = (rem * 10) / TIMER_TICKS_PER_SECOND;
-  iprintf("\x1b[21;0Htime : %lu.%lu s \t\t fps:%d", wholeSec, deciSec,fps);
 }
+
+
 
 void setCam(){
   glLight(
@@ -208,7 +161,9 @@ void setCam(){
     );
 }
 
-void ApplyGravity(int size){
+
+
+void ApplyGravity(){
     const vec3_t gravityMove = {
         .x = 0.0f,
         .y = Joueur.velocityY,
@@ -216,7 +171,7 @@ void ApplyGravity(int size){
     };
 
     if (canMovePlayer(&Joueur, gravityMove,
-                      chunkL, size, gBlocks, HitboxBlocks)){
+                      chunkL, SIZE, gBlocks, HitboxBlocks)){
         movePlayer(&Joueur, gravityMove);
     }
     else{
@@ -232,25 +187,6 @@ void ApplyGravity(int size){
     Joueur.velocityY -= GRAVITY;
 }
 
-void updatePerformance(void){
-  //fonction bricoler rapidement avec l'IA
-  u16 now = TIMER0_DATA;
-
-  // Temps écoulé depuis la dernière frame
-  totalTicks += (u16)(now - previousTimer);
-
-  previousTimer = now;
-
-  // Nombre de frames calculées
-  frames++;
-
-  // Une vraie seconde s'est écoulée
-  if ((u16)(now - lastFpsTimer) >= TIMER_TICKS_PER_SECOND){
-    fps = frames;
-    frames = 0;
-    lastFpsTimer = now;
-  }
-}
 
 void calculRenderView(){
   if(majChunk){
@@ -258,6 +194,8 @@ void calculRenderView(){
     majChunk = false;
   }
 }
+
+
 
 void setPlayground(){
     for(int i = 0 ; i < SIZE ; ++i){

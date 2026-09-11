@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <stdint.h>
+#include <calico.h>
 #define SCREEN_W 256
 #define SCREEN_H 192
 
@@ -76,6 +77,12 @@ typedef enum{
   RUNNING,
   PAUSED,
 }GAMESTATE;
+
+//renvoie le quotient d'une division pour un entier <0 ou >0
+int floorDiv(int a, int b);
+
+//renvoie le reste d'une division pour un entier <0 ou >0
+int floorMod(int a, int b);
 
 fixed_t inttofixed(int32_t x);
 
