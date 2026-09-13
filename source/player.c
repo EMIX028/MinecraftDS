@@ -115,7 +115,7 @@ bool canMovePlayer(player_t *player , vec3_t movement, chunk_t chunk[], int n, b
             continue;
           }
 
-          int blockID = chunk[i].blocks[localX][y][localZ].id;
+          blockId_t blockID = chunk[i].blocks[localX][y][localZ].id;
 
           if (list[blockID].solid){
                         
@@ -198,7 +198,7 @@ void loadPlayerMovement(player_t *player,chunk_t chunk[],int n,block_t list[],hi
     player->Camera.pitch += P_SENSI;
 }
 
-void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,block_t list[],
+void playerInterract(player_t *player, chunk_t chunkL[], int size, blockId_t indexB,block_t list[],
                       const bool specialmode, bool *majChunk, int *delay){
   vec3_t target;
   bool blockTargeted;
@@ -289,4 +289,23 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,bl
   if (blockTargeted) {
     drawBlockOutline(target.x, target.y, target.z);
   }
+}
+
+void setCam(player_t *player){
+  glLight(
+      0,
+      RGB15(31,31,31),
+      floattov10(-0.5f),
+      floattov10(-1.0f),
+      floattov10(-0.3f)
+    );
+
+  glMaterialf(GL_AMBIENT, RGB15(15,15,15));
+  glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
+
+  gluLookAt(
+    player->Camera.position.x, player->Camera.position.y, player->Camera.position.z,
+    player->Camera.position.x + player->Direction.x, player->Camera.position.y + player->Direction.y, player->Camera.position.z + player->Direction.z,
+    0.0f, 1.0f, 0.0f
+  );
 }

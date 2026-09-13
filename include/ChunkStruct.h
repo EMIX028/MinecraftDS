@@ -46,11 +46,11 @@ transparent qui sert de valeur de 0 à 2 de transparence
 texture est la coordonné de la texture dans l'atlas
 */
 typedef struct block_s {
-    uint8_t id;
+    blockId_t id;
 
     bool solid;
     bool isLog;
-    uint8_t transparent;
+    u8 transparent;
     //int hardness; //temps de destruction
     vec2_t texture[4];
     //void (*draw)(const struct block_s *block);
@@ -61,8 +61,8 @@ typedef struct block_s {
 //structure présente dans les tableaux de chunk
 // 1 octet pour l'id, 1 octet faces pour les faces à afficher ou non
 typedef struct instance{
-    uint8_t id;
-    uint8_t faces;
+    blockId_t id;
+    u8 faces;
     //dans le futur ajouté luminosité des blocs
 }instance_t;
 
@@ -75,7 +75,7 @@ typedef struct chunk{
 } chunk_t;
 
 //initialise tous les blocs du chunk avec une id
-void initChunk(chunk_t chunk[], int id);
+void initChunk(chunk_t chunk[], blockId_t id);
 
 //sert à obtenir le pointeur d'un chunk
 //dans une liste à partir de ses coordonnées
@@ -89,9 +89,9 @@ void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player);
 
 //renvoie l'id d'un bloc dans une liste de chunk
 // avec sa position global
-uint8_t getBlock(chunk_t chunk[],int size,int x,int y, int z);
+blockId_t getBlock(chunk_t chunk[],int size,int x,int y, int z);
 
 //remplace un bloc dans une liste de chunk avec sa position global
-void setBlock(chunk_t chunk[],int size,int x,int y, int z, uint8_t block, uint8_t orientation);
+void setBlock(chunk_t chunk[],int size,int x,int y, int z, blockId_t block, u8 orientation);
 
 #endif

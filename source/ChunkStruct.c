@@ -4,7 +4,7 @@
 #include "utils.h"
 #include <stdint.h>
 
-void initChunk(chunk_t chunk[], int id){
+void initChunk(chunk_t chunk[], blockId_t id){
   for(short x = 0; x < L_CHUNK; ++x){
     for(short y = 0 ; y < H_CHUNK ; ++y){
       for(short z = 0 ; z < L_CHUNK ; ++z){
@@ -260,7 +260,7 @@ void __attribute__((section(".itcm"))) RenderChunk(chunk_t chunk[], block_t *lis
 }
 
 
-uint8_t getBlock(chunk_t chunk[], int size, int x, int y, int z){
+blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z){
   int chunkX = floorDiv(x, L_CHUNK);
   int chunkZ = floorDiv(z, L_CHUNK);
 
@@ -275,7 +275,7 @@ uint8_t getBlock(chunk_t chunk[], int size, int x, int y, int z){
   return AIR;
 }
 
-void setBlock(chunk_t chunk[], int size,int x, int y, int z,uint8_t block, uint8_t orientation){
+void setBlock(chunk_t chunk[], int size,int x, int y, int z,blockId_t block, u8 orientation){
   int chunkX = floorDiv(x, L_CHUNK);
   int chunkZ = floorDiv(z, L_CHUNK);
 

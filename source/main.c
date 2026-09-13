@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "main.h"
+#include "HUD.h"
 #include "ChunkStruct.h"
 #include "player.h"
 #include "Blocks.h"
@@ -11,10 +12,10 @@
 #include "utils.h"
 
 player_t Joueur;
-uint8_t indexB = DIRT;
+blockId_t indexB = DIRT;
 int delay = 0; //delay entre chaque bloc posé ou cassé
 bool majChunk = true;
-const uint8_t RenderDistance = 2;
+const u8 RenderDistance = 2;
 
 #define SIZE 4
 chunk_t chunkL[SIZE] = {
@@ -29,15 +30,21 @@ int main() {
   setPlayer(&Joueur);
   InitBlocks();
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
-  videoSetMode(MODE_0_3D);
+
+   //MAIN : 3D + texte + sprites
+  initMainScreen3D(true, true);
   glInit();
-  vramSetBankA(VRAM_A_TEXTURE);
-  glClearColor(10, 20, 31, 31); // fond bleu ciel
-  consoleDemoInit();
-  BG_PALETTE_SUB[0] = RGB15(24,24,24); //fond écran sub
+  initMainScreenText();
+  initMainScreenSprites();
+  glClearColor(10, 20, 31, 31);
+
+  //SUB : texte + sprites
+  initSubScreen(true, true);
+
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
   glEnable(GL_BLEND);
+
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
   glMatrixMode(GL_PROJECTION);
   gluPerspective(70, (float)SCREEN_W / (float)SCREEN_H, 0.1, L_CHUNK*RenderDistance);
@@ -75,7 +82,8 @@ int main() {
     loadPlayerMovement(&Joueur,chunkL,SIZE,gBlocks,HitboxBlocks);
     loadKeyAssignation(&Joueur);
 
-    subscreenAff(pseudo);
+    SubScreenInfos(pseudo, indexB);
+    MainScreenInfos(&Joueur);
 
     glBindTexture(0, TextureID);
 
@@ -83,7 +91,7 @@ int main() {
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
-    setCam();
+    setCam(&Joueur);
 
     playerInterract(&Joueur, chunkL, SIZE, indexB,gBlocks,
                     (const bool) specialmode, &majChunk, &delay);
@@ -100,6 +108,8 @@ int main() {
     }
 
     glFlush(0);
+    oamUpdate(&oamMain);
+    oamUpdate(&oamSub);
     swiWaitForVBlank();
   }
   return EXIT_SUCCESS;
@@ -118,49 +128,6 @@ char *GetPlayerName(char *pseudo){
   pseudo[PersonalData->nameLen] = '\0';
   return pseudo;
 }
-
-
-
-void subscreenAff(char *pseudo){
-  consoleClear();
-  BG_PALETTE_SUB[255] = RGB15(10, 10, 10);
-  iprintf("\x1b[1;3H|Minecraft DS Edition 1.1a|");
-  iprintf("\x1b[2;3H--------------------------");
-  iprintf("\x1b[4;1HHey %s !",pseudo);
-  iprintf("\x1b[6;1Hx:%3d y:%3d z:%3d",
-          (int)Joueur.Position.x,
-          (int)Joueur.Position.y,
-          (int)Joueur.Position.z);
-  iprintf("\x1b[8;0H Block: %s",getBlockName(indexB));
-  #if DEBUG_MODE
-    printf("\tyaw:%0.1f", fmodf(Joueur.Camera.yaw * (180.0f / (float)M_PI), 360.0f));
-    printf("\n\tpitch : %0.3f",Joueur.Camera.pitch);
-  #endif
-}
-
-
-
-void setCam(){
-  glLight(
-      0,
-      RGB15(31,31,31),
-      floattov10(-0.5f),
-      floattov10(-1.0f),
-      floattov10(-0.3f)
-    );
-
-    glMaterialf(GL_AMBIENT, RGB15(15,15,15));
-    glMaterialf(GL_DIFFUSE, RGB15(31,31,31));
-
-    gluLookAt(
-      Joueur.Camera.position.x, Joueur.Camera.position.y, Joueur.Camera.position.z,
-      
-      Joueur.Camera.position.x + Joueur.Direction.x, Joueur.Camera.position.y +Joueur.Direction.y, Joueur.Camera.position.z + Joueur.Direction.z,
-
-      0.0f, 1.0f, 0.0f
-    );
-}
-
 
 
 void ApplyGravity(){
@@ -194,7 +161,6 @@ void calculRenderView(){
     majChunk = false;
   }
 }
-
 
 
 void setPlayground(){

@@ -30,7 +30,12 @@ bool canMovePlayer(player_t *player ,vec3_t movement, chunk_t chunk[], int n, bl
 //gère les inputs de déplacement du joueur
 void loadPlayerMovement(player_t *player , chunk_t chunk[], int n, block_t list[], hitbox_t blocks);
 
-void playerInterract(player_t *player, chunk_t chunkL[], int size, int indexB,block_t list[],
+void playerInterract(player_t *player, chunk_t chunkL[], int size, blockId_t indexB,block_t list[],
                       const bool specialmode, bool *majChunk, int *delay);
+
+
+//active une lumière pour la caméra ainsi que le transfert d'info
+//de la structure camera du joueur au module GluLookAt
+void setCam(player_t *player);
 
 #endif
