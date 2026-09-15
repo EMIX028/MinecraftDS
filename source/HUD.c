@@ -3,47 +3,41 @@
 PrintConsole hudConsole;
 PrintConsole subConsole;
 
-void initMainScreen3D(bool withText, bool withSprites) {
+
+void initMainBG(bool WithText, bool WithSprites){
     int flags = MODE_0_3D;
-    if (withText)    flags |= DISPLAY_BG3_ACTIVE;
-    if (withSprites) flags |= DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D;
+    if (WithText)    flags |= DISPLAY_BG3_ACTIVE;
+    if (WithSprites) flags |= DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D;
 
     videoSetMode(flags);
 
     vramSetBankA(VRAM_A_TEXTURE);
 
-    if (withSprites) {
+    glInit();
+    if (WithSprites) {
         vramSetBankB(VRAM_B_MAIN_SPRITE);
+        oamInit(&oamMain, SpriteMapping_1D_32, false);
     }
-    if (withText) {
+    if (WithText) {
         vramSetBankE(VRAM_E_MAIN_BG); // <- changé de D à E
+        consoleInit(&hudConsole, 3, BgType_Text4bpp, BgSize_T_256x256, 4, 1, true, true);
+        bgSetPriority(hudConsole.bgId, 0);
+        bgSetPriority(0, 1); //position BG z-index
     }
 }
 
-void initMainScreenText(void){
-    consoleInit(&hudConsole, 3, BgType_Text4bpp, BgSize_T_256x256, 4, 1, true, true);
-    // priorité : le texte doit passer devant la 3D
-    bgSetPriority(hudConsole.bgId, 0); // texte -> devant
-    bgSetPriority(0, 1);              // BG0 = layer 3D -> derrière
-    
-}
 
-void initMainScreenSprites(void){
-    oamInit(&oamMain, SpriteMapping_1D_32, false);
-}
-
-
-void initSubScreen(bool withText, bool withSprites){
+void initSubBG(bool WithText, bool WithSprites){
     int flags = MODE_0_2D;
-    if (withSprites) flags |= DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D;
+    if (WithSprites) flags |= DISPLAY_SPR_ACTIVE | DISPLAY_SPR_1D;
 
     videoSetModeSub(flags);
 
-    if (withText){
+    if (WithText){
         vramSetBankC(VRAM_C_SUB_BG);
         consoleInit(&subConsole, 0, BgType_Text4bpp, BgSize_T_256x256, 4, 1, false, true);
     }
-    if (withSprites){
+    if (WithSprites){
         vramSetBankD(VRAM_D_SUB_SPRITE);
         oamInit(&oamSub, SpriteMapping_1D_32, false);
     }

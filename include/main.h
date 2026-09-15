@@ -3,8 +3,11 @@
 
 
 #include <stdint.h>
-#include <sys/types.h>
 #define GRAVITY 0.008f
+#define MAIN_TEXT true
+#define MAIN_SPRITE true
+#define SUB_TEXT true
+#define SUB_SPRITE true
 
 //applique le calcul de la gravité au joueur
 void ApplyGravity();

@@ -12,7 +12,7 @@
 #include "utils.h"
 
 player_t Joueur;
-blockId_t indexB = DIRT;
+blockId_t indexB = OAK_PLANK;
 int delay = 0; //delay entre chaque bloc posé ou cassé
 bool majChunk = true;
 const u8 RenderDistance = 2;
@@ -29,17 +29,13 @@ chunk_t chunkL[SIZE] = {
 int main() {  
   setPlayer(&Joueur);
   InitBlocks();
+
   powerOn(POWER_ALL_2D | POWER_3D_CORE | POWER_MATRIX);
+  initMainBG(MAIN_TEXT,MAIN_SPRITE);
+  initSubBG(SUB_TEXT, SUB_SPRITE);
 
-   //MAIN : 3D + texte + sprites
-  initMainScreen3D(true, true);
-  glInit();
-  initMainScreenText();
-  initMainScreenSprites();
-  glClearColor(10, 20, 31, 31);
-
-  //SUB : texte + sprites
-  initSubScreen(true, true);
+  //couleur approximative du ciel dans minecraft
+  glClearColor(15, 25, 31, 31);
 
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
@@ -100,7 +96,7 @@ int main() {
     calculRenderView();
 
     for(u8 i = 0 ; i < SIZE ; i++){
-      RenderChunk(&chunkL[i],gBlocks,true,&Joueur);
+      RenderChunk(&chunkL[i],gBlocks,false,&Joueur);
     }
 
     if(delay > 0){
@@ -108,8 +104,10 @@ int main() {
     }
 
     glFlush(0);
-    oamUpdate(&oamMain);
-    oamUpdate(&oamSub);
+    if(MAIN_SPRITE)
+      oamUpdate(&oamMain);
+    if(SUB_SPRITE)
+      oamUpdate(&oamSub);
     swiWaitForVBlank();
   }
   return EXIT_SUCCESS;

@@ -10,16 +10,9 @@
 extern PrintConsole hudConsole;
 extern PrintConsole subConsole;
 
-// Doit être appelée avant glInit() (elle configure juste le mode vidéo + VRAM)
-void initMainScreen3D(bool withText, bool withSprites);
+void initSubBG(bool WithText, bool WithSprites);
 
-// Console texte pour l'écran du haut (à appeler après videoSetMode, avant la boucle)
-void initMainScreenText();
-
-// Sprites pour l'écran du haut (à appeler après videoSetMode, avant la boucle)
-void initMainScreenSprites();
-
-void initSubScreen(bool withText, bool withSprites);
+void initMainBG(bool WithText, bool WithSprites);
 
 //fonction d'affichage d'information sur l'écran du bas de la DS
 void SubScreenInfos(char *pseudo, blockId_t indexB);
