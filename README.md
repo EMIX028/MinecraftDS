@@ -1,6 +1,6 @@
 # Minecraft DS
 
-Minecraft DS is a Minecraft-inspired homebrew project for the Nintendo DS, written in C using **libnds** and **devkitPro**.
+Minecraft DS is a Minecraft Demake project for the Nintendo DS, written in C using **libnds** and **devkitPro**.
 
 > **A playable voxel-based technical demo running on Nintendo DS hardware.**
 >
@@ -14,13 +14,13 @@ Minecraft DS is currently a **playable technical demo rather than a complete gam
 
 The current version focuses on:
 
-* 3D voxel rendering
-* Chunk-based world management
-* Player movement and collision
-* Block placement and breaking
-* Multiple block types and orientations
-* Texture transparency
-* Basic HUD and performance information
+- 3D voxel rendering
+- Chunk-based world management
+- Player movement and collision
+- Block placement and breaking
+- Multiple block types and orientations
+- Texture transparency
+- Basic HUD and performance information
 
 More gameplay systems and technical improvements may be added in future versions.
 
@@ -30,8 +30,8 @@ Minecraft DS is designed for Nintendo DS homebrew.
 
 Currently tested on:
 
-* Nintendo DS
-* [melonDS](https://melonds.kuribo64.net/)
+- Nintendo DS
+- [melonDS](https://melonds.kuribo64.net/)
 
 > Compatibility with other Nintendo DS models and emulators may vary.
 
@@ -41,9 +41,7 @@ The latest playable version can be downloaded from the [Releases](../../releases
 
 The release contains the `.nds` ROM required to run Minecraft DS on compatible Nintendo DS hardware or an emulator.
 
-If you want to build the source code, Minecraft DS requires **devkitPro** and **libnds**.
-
-> **Note:** Audio files are not included in this repository.
+If you want to build the source code, Minecraft DS requires **devkitPro** and **libnds** toolkit.
 
 ## ⚙️ Technical
 
@@ -51,24 +49,24 @@ Minecraft DS is developed in **C** using **devkitPro** and **libnds**.
 
 Current technical features include:
 
-* Nintendo DS hardware 3D rendering
-* Chunk-based world system
-* Voxel block rendering
-* Block face visibility culling
-* Texture atlas
-* Texture transparency
-* Block orientation system
-* Basic player collision
-* Real-time FPS and player position display
+- Nintendo DS hardware 3D rendering
+- Chunk-based world system
+- Voxel block rendering
+- Block face visibility culling
+- Texture atlas
+- Texture transparency
+- Block orientation system
+- Basic player collision
+- Real-time FPS and player position display
 
 ## ✨ Features
 
 ### 🌍 World
 
-* Chunk-based voxel world
-* Currently loaded area consisting of **4 chunks**
-* Each chunk is **14 × 14 blocks**
-* Maximum world height of **20 blocks**
+- Chunk-based voxel world
+- Currently loaded area consisting of **4 chunks**
+- Each chunk is **14 × 14 blocks**
+- Maximum world height of **20 blocks**
 
 ### 🎮 Controls
 
@@ -76,7 +74,7 @@ Current technical features include:
 | ----------------- | ------------------------- |
 | **D-Pad**         | Move the player           |
 | **A / B / X / Y** | Control the camera        |
-| **START**         | Reset & switch maps        |
+| **START**         | Reset & switch maps       |
 | **SELECT**        | Pause the game            |
 | **R**             | Place a block             |
 | **L**             | Activate Special Mode     |
@@ -88,43 +86,43 @@ Current technical features include:
 
 Holding **L** activates the **Special Mode**, allowing additional actions to be performed by combining it with other buttons:
 
-* **L + B** → Jump
-* **L + R** → Break the targeted block
-* **L + A / Y** → Change the block selected for placement
+- **L + B** → Jump
+- **L + R** → Break the targeted block
+- **L + A / Y** → Change the block selected for placement
 
 ### 🧱 Blocks
 
 There are currently **19 block types** available:
 
-* Dirt
-* Grass
-* Sand
-* Stone
-* Cobblestone
-* Bedrock
-* Moss
-* Glass
-* Oak Plank
-* Oak Log
-* Oak Leaves
-* Obsidian
-* Coal Ore
-* Iron Ore
-* Gold Ore
-* Redstone Ore
-* Diamond Ore
-* Crafting Table
-* Furnace
+- Dirt
+- Grass
+- Sand
+- Stone
+- Cobblestone
+- Bedrock
+- Moss
+- Glass
+- Oak Plank
+- Oak Log
+- Oak Leaves
+- Obsidian
+- Coal Ore
+- Iron Ore
+- Gold Ore
+- Redstone Ore
+- Diamond Ore
+- Crafting Table
+- Furnace
 
 ### 📊 HUD
 
 The bottom screen displays useful gameplay and performance information:
 
-* Game version
-* Player position
-* Selected block name
-* Play time
-* FPS
+- Game version
+- Player position
+- Selected block name
+- Play time
+- FPS
 
 ### 🎵 Music
 
@@ -132,30 +130,29 @@ The music currently played at startup is **Wet Hands**, composed by **C418** for
 
 This music is a third-party asset and is not owned or created by this project. See the [NOTICE](NOTICE) file for attribution and additional information.
 
-
 ## Roadmap
 
 Minecraft DS is still in early development. Future features I'm considering include:
 
-* [ ] Expand the playable world
-* [ ] Dynamic chunk loading
-* [ ] World generation
-* [ ] More blocks
-* [ ] Inventory system
-* [ ] Crafting
-* [ ] Save / load system
-* [ ] Additional gameplay mechanics
-* [ ] Further performance improvements
-* [ ] New HUD and interface
-* [ ] Game icon
+- [ ] Expand the playable world
+- [ ] Dynamic chunk loading
+- [ ] World generation
+- [ ] More blocks
+- [ ] Inventory system
+- [ ] Crafting
+- [ ] Save / load system
+- [ ] Additional gameplay mechanics
+- [ ] Further performance improvements
+- [ ] New HUD and interface
+- [ ] Game icon
 
 Some features listed here are experimental or may change as development progresses.
 
 ## Credits
 
-* **Mojang Studios** — Creator of Minecraft.
-* **C418** — Composer of *Wet Hands*.
-* Third-party textures, music and other assets used by the project are not original assets created by this project.
+- **Mojang Studios** — Creator of Minecraft.
+- **C418** — Composer of _Wet Hands_.
+- Third-party textures, music and other assets used by the project are not original assets created by this project.
 
 See the [NOTICE](NOTICE) file for detailed attribution and legal information.
 

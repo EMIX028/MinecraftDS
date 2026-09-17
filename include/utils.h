@@ -8,6 +8,8 @@
 
 #define DEBUG_MODE 0
 
+#define ATTR_FUN_INI __attribute__((section(".itcm")))
+
 #define FIXED_SHIFT 12
 #define FIXED_ONE   (1 << FIXED_SHIFT)
 
