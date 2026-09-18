@@ -33,6 +33,7 @@ Currently tested on:
 - Nintendo DS
 - [melonDS](https://melonds.kuribo64.net/)
 
+> ⚠️ Don't work currently on DeSmuME
 > Compatibility with other Nintendo DS models and emulators may vary.
 
 ## 📥 Download
