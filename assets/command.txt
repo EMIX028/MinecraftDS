@@ -6,6 +6,9 @@ texture avec transparence :
 
 grit TextureAtlas.png -gx -gb -gB16 -gTFF00FF -ftc -fh
 
+sprite test :
+grit Crosshair.png -gt -gB8 -gTFF00FF -pn256 -pu16 -ftc -fh
+
 pour les sons (temporaire) :
 
 ffmpeg -i wet_hands.ogg -ar 11025 -ac 1 -c:a pcm_s16le wet_hands.wav

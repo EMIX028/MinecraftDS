@@ -19,12 +19,12 @@
 #define MAX (inttov16(1) + OUTLINE_SIZE)
 
 // initialise le rendu 3D de Quads
-void startingDraw(bool cullback);
+void startingDraw(bool cullback, int TextureID);
 
 void setFog(int renderDistance);
 
 // dessine un bloc entier
-void drawCube(bool cullback, vec2_t t);
+void drawCube(bool cullback, vec2_t t, int TextureID);
 
 // dessine sur le rendu 3D une face
 void drawCubeTop(vec2_t t, uint8_t angle);

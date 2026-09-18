@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #define L_CHUNK 15 // chunk minecraft 15
-#define H_CHUNK 22 // hauteur max 256
+#define H_CHUNK 35 // hauteur max 256
 
 // macro constante qui gère l'affichage d'un bloc sur un octet
 //  1 bit par face, soit 6 bits d'utilisé sur 8
@@ -68,6 +68,8 @@ typedef struct chunk {
   instance_t blocks[L_CHUNK][H_CHUNK][L_CHUNK];
 } chunk_t;
 
+void parcoursChunk(void (*func)(int x, int y, int z));
+
 // initialise tous les blocs du chunk avec une id
 void initChunk(chunk_t chunk[], blockId_t id);
 
@@ -79,7 +81,8 @@ chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ);
 void blockVisibility(chunk_t chunks[], int size, block_t *list);
 
 // dessine dans le rendu 3d un chunk
-void RenderChunk(chunk_t chunk[], block_t *list, bool cull, player_t *player);
+void RenderChunk(chunk_t chunk[], block_t *list, bool cull, int TextureID,
+                 player_t *player);
 
 // renvoie l'id d'un bloc dans une liste de chunk
 //  avec sa position global

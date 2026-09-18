@@ -15,7 +15,8 @@ void SetupFog(int renderDistance) {
   }
 }
 
-void startingDraw(bool cullback) {
+void startingDraw(bool cullback, int TextureID) {
+  glBindTexture(0, TextureID);
   glPolyFmt(POLY_ALPHA(31) | (cullback ? POLY_CULL_BACK : POLY_CULL_NONE) |
             POLY_FORMAT_LIGHT0 | POLY_ID(1) | POLY_FOG);
 
@@ -355,8 +356,8 @@ void drawCubeLeft(vec2_t t, uint8_t angle) {
   }
 }
 
-void drawCube(bool cullback, vec2_t t) {
-  startingDraw(cullback);
+void drawCube(bool cullback, vec2_t t, int TextureID) {
+  startingDraw(cullback, TextureID);
   drawCubeLeft(t, 0);
   drawCubeFront(t, 0);
   drawCubeBack(t, 0);

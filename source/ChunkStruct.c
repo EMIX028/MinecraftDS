@@ -4,6 +4,16 @@
 #include "utils.h"
 #include <stdint.h>
 
+void parcoursChunk(void (*func)(int x, int y, int z)) {
+  for (u8 x = 0; x < L_CHUNK; ++x) {
+    for (u8 y = 0; y < H_CHUNK; ++y) {
+      for (u8 z = 0; z < L_CHUNK; ++z) {
+        func(x, y, z);
+      }
+    }
+  }
+}
+
 void initChunk(chunk_t chunk[], blockId_t id) {
   for (u8 x = 0; x < L_CHUNK; ++x) {
     for (u8 y = 0; y < H_CHUNK; ++y) {
@@ -115,12 +125,12 @@ void blockVisibility(chunk_t chunks[], int size, block_t *list) {
 }
 
 void ATTR_FUN_INI RenderChunk(
-    chunk_t chunk[], block_t *list, bool cull,
+    chunk_t chunk[], block_t *list, bool cull, int TextureID,
     player_t *player) { // attribute en fix temporaire pour les performances
   glPushMatrix();
   glTranslatef32(inttof32(chunk->position.x * L_CHUNK), 0,
                  inttof32(chunk->position.z * L_CHUNK));
-  startingDraw(cull);
+  startingDraw(cull, TextureID);
   for (u8 x = 0; x < L_CHUNK; ++x) {
     for (u8 y = 0; y < H_CHUNK; ++y) {
       for (u8 z = 0; z < L_CHUNK; ++z) {

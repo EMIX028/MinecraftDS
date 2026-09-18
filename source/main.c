@@ -9,6 +9,7 @@
 #include "keyAssignation.h"
 #include "main.h"
 #include "player.h"
+#include "spriteManager.h"
 #include "utils.h"
 
 player_t Joueur;
@@ -47,6 +48,8 @@ int main() {
   char pseudo[PersonalData->nameLen + 1];
   GetPlayerName(pseudo);
 
+  setCrosshair();
+
   int TextureID;
 
   glGenTextures(1, &TextureID);
@@ -69,8 +72,6 @@ int main() {
     SubScreenInfos(pseudo, indexB);
     MainScreenInfos(&Joueur);
 
-    glBindTexture(0, TextureID);
-
     ApplyGravity();
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
@@ -83,7 +84,7 @@ int main() {
     calculRenderView();
 
     for (u8 i = 0; i < SIZE; i++) {
-      RenderChunk(&chunkL[i], gBlocks, true, &Joueur);
+      RenderChunk(&chunkL[i], gBlocks, true, TextureID, &Joueur);
     }
 
     if (delay > 0) {
