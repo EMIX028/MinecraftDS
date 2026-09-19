@@ -6,8 +6,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <nds/ndstypes.h>
-#define L_CHUNK 15 // chunk minecraft 15
-#define H_CHUNK 35 // hauteur max 256
+#define L_CHUNK 14 // chunk minecraft 15
+#define H_CHUNK 20 // hauteur max 256
 
 // macro constante qui gère l'affichage d'un bloc sur un octet
 //  1 bit par face, soit 6 bits d'utilisé sur 8

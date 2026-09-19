@@ -6,9 +6,12 @@ Minecraft DS is a Minecraft Demake project for the Nintendo DS, written in C usi
 >
 > The project explores how far a Minecraft-inspired game can be pushed on Nintendo DS hardware.
 
+>[!IMPORTANT]
+>MinecraftDS is not affiliated with Mojang or Microsoft.
+
 <img width="2558" height="1346" alt="v1.1a new features" src="https://github.com/user-attachments/assets/1689104c-7c6d-4448-9af2-c6fa3c14da59" />
 
-## 🚧 Current Status
+## Current Status
 
 Minecraft DS is currently a **playable technical demo rather than a complete game**.
 
@@ -24,7 +27,7 @@ The current version focuses on:
 
 More gameplay systems and technical improvements may be added in future versions.
 
-## 💻 Compatibility
+## Compatibility
 
 Minecraft DS is designed for Nintendo DS homebrew.
 
@@ -36,7 +39,7 @@ Currently tested on:
 
 > Compatibility with other Nintendo DS models and emulators may vary.
 
-## 📥 Download
+## Download
 
 The latest playable version can be downloaded from the [Releases](../../releases) page.
 
@@ -44,7 +47,7 @@ The release contains the `.nds` ROM required to run Minecraft DS on compatible N
 
 If you want to build the source code, Minecraft DS requires **[BlocksDS](https://blocksds.skylyrac.net/)** toolkit.
 
-## ⚙️ Technical
+## Technical
 
 Current technical features include:
 
@@ -58,16 +61,16 @@ Current technical features include:
 - Basic player collision
 - Player position display
 
-## ✨ Features
+## Features
 
-### 🌍 World
+### World
 
 - Chunk-based voxel world
 - Currently loaded area consisting of **4 chunks**
 - Each chunk is **14 × 14 blocks**
 - Maximum world height of **20 blocks**
 
-### 🎮 Controls
+### Controls
 
 | Button            | Action                    |
 | ----------------- | ------------------------- |
@@ -81,7 +84,7 @@ Current technical features include:
 | **L + R**         | Break a block             |
 | **L + A / Y**     | Change the selected block |
 
-### ✨ Special Mode
+### Special Mode
 
 Holding **L** activates the **Special Mode**, allowing additional actions to be performed by combining it with other buttons:
 
@@ -89,7 +92,7 @@ Holding **L** activates the **Special Mode**, allowing additional actions to be 
 - **L + R** → Break the targeted block
 - **L + A / Y** → Change the block selected for placement
 
-### 🧱 Blocks
+### Blocks
 
 There are currently **19 block types** available:
 
@@ -113,7 +116,7 @@ There are currently **19 block types** available:
 - Crafting Table
 - Furnace
 
-### 📊 HUD
+### HUD
 
 The bottom screen displays useful gameplay and performance information:
 
@@ -123,7 +126,7 @@ The bottom screen displays useful gameplay and performance information:
 - Play time
 - FPS
 
-### 🎵 Music
+### Music
 
 The music currently played at startup is **Wet Hands**, composed by **C418** for Minecraft.
 
@@ -155,7 +158,7 @@ Some features listed here are experimental or may change as development progress
 
 See the [NOTICE](NOTICE) file for detailed attribution and legal information.
 
-## 📜 License
+## License
 
 The original source code of Minecraft DS is distributed under the **GNU General Public License v3.0**.
 
@@ -163,7 +166,7 @@ See the [LICENSE](LICENSE) file for the complete license.
 
 Third-party assets are not necessarily covered by the project's source code license. See [NOTICE](NOTICE) for more information.
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 Minecraft DS is an **unofficial, fan-made homebrew project** and is not affiliated with, endorsed by, or sponsored by **Mojang Studios, Microsoft, or Nintendo**.
 
