@@ -5,6 +5,7 @@
 #include "utils.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <nds/ndstypes.h>
 #define L_CHUNK 15 // chunk minecraft 15
 #define H_CHUNK 35 // hauteur max 256
 

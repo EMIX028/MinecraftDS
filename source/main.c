@@ -64,7 +64,7 @@ int main() {
 
   movePlayer(&Joueur, (vec3_t){.x = 0.0f, .y = 5.0f, .z = 0.0f});
 
-  while (pmMainLoop()) {
+  while (1) {
     scanKeys();
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
     loadKeyAssignation(&Joueur);
