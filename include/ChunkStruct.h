@@ -72,7 +72,9 @@ typedef struct chunk {
 void parcoursChunk(void (*func)(int x, int y, int z));
 
 // initialise tous les blocs du chunk avec une id
-void initChunk(chunk_t chunk[], blockId_t id);
+void initChunk(chunk_t *chunk, blockId_t id);
+
+int initBlock(chunk_t *chunk, blockId_t id, ivec3_t p);
 
 // sert à obtenir le pointeur d'un chunk
 // dans une liste à partir de ses coordonnées

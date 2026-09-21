@@ -64,6 +64,7 @@ void InitBlocks(void){
         .texture[side].x = 0, .texture[side].z = 3,
         .texture[front].x = 0, .texture[front].z = 3
     };
+
     gBlocks[BEDROCK] = (block_t){
         .id = BEDROCK,
         .transparent = 0,
@@ -73,6 +74,7 @@ void InitBlocks(void){
         .texture[side].x = 0, .texture[side].z = 1,
         .texture[front].x = 0, .texture[front].z = 1
     };
+
     gBlocks[GLASS] = (block_t){
         .id = GLASS,
         .transparent = 1,
@@ -82,6 +84,7 @@ void InitBlocks(void){
         .texture[side].x = 0, .texture[side].z = 4,
         .texture[front].x = 0, .texture[front].z = 4
     };
+
     gBlocks[OAK_PLANK] = (block_t){
         .id = OAK_PLANK,
         .transparent = 0,
@@ -191,7 +194,6 @@ void InitBlocks(void){
         .texture[side].x = 1, .texture[side].z = 0,
         .texture[front].x = 0, .texture[front].z = 13
     };
-
 }
 
 const char *getBlockName(uint8_t block){

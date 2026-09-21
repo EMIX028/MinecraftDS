@@ -14,21 +14,33 @@ void parcoursChunk(void (*func)(int x, int y, int z)) {
   }
 }
 
-void initChunk(chunk_t chunk[], blockId_t id) {
-  for (u8 x = 0; x < L_CHUNK; ++x) {
-    for (u8 y = 0; y < H_CHUNK; ++y) {
-      for (u8 z = 0; z < L_CHUNK; ++z) {
-        chunk->blocks[x][y][z].id = id;
+int initBlock(chunk_t *chunk, blockId_t id, ivec3_t p){
+  if(p.x >= L_CHUNK || p.y >= H_CHUNK || p.z >= L_CHUNK){
+    fprintf(stderr,"\x1b[15;10H\x1b[31mErreur d'acces memoire d'un bloc dans un chunk\x1b[0m");
+    return -1;
+  }
+  chunk->blocks[p.x][p.y][p.z].id = id;
+  return 0;
+}
+
+void initChunk(chunk_t *chunk, blockId_t id) {
+  ivec3_t p;
+  for (p.x = 0 ; p.x < L_CHUNK; ++p.x) {
+    for (p.y = 0 ; p.y < H_CHUNK; ++p.y) {
+      for (p.z = 0 ; p.z < L_CHUNK; ++p.z) {
+        initBlock(chunk, id, p);
       }
     }
   }
 }
 
 chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ) {
-  for (u8 i = 0; i < size; ++i) {
-    if (chunks[i].position.x == chunkX && chunks[i].position.z == chunkZ) {
-      return &chunks[i];
+  chunk_t *p = chunks;
+  while(p < chunks + size){
+    if(p->position.x == chunkX && p->position.z == chunkZ){
+      return p;
     }
+    ++p;
   }
   return NULL;
 }
@@ -124,16 +136,15 @@ void blockVisibility(chunk_t chunks[], int size, block_t *list) {
   }
 }
 
-void ATTR_FUN_INI RenderChunk(
-    chunk_t chunk[], block_t *list, bool cull, int TextureID,
+void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int TextureID,
     player_t *player) { // attribute en fix temporaire pour les performances
   glPushMatrix();
   glTranslatef32(inttof32(chunk->position.x * L_CHUNK), 0,
                  inttof32(chunk->position.z * L_CHUNK));
   startingDraw(cull, TextureID);
-  for (u8 x = 0; x < L_CHUNK; ++x) {
-    for (u8 y = 0; y < H_CHUNK; ++y) {
-      for (u8 z = 0; z < L_CHUNK; ++z) {
+  for (u8 x = 0 ; x < L_CHUNK ; ++x) {
+    for (u8 y = 0 ; y < H_CHUNK ; ++y) {
+      for (u8 z = 0 ; z < L_CHUNK ; ++z) {
         block_t *block = &list[chunk->blocks[x][y][z].id];
         u8 faces = chunk->blocks[x][y][z].faces;
         u8 orientation = GET_ORIENTATION(faces);
@@ -261,11 +272,14 @@ blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z) {
   int localX = floorMod(x, L_CHUNK);
   int localZ = floorMod(z, L_CHUNK);
 
-  for (u8 i = 0; i < size; ++i) {
-    if (chunk[i].position.x == chunkX && chunk[i].position.z == chunkZ) {
-      return chunk[i].blocks[localX][y][localZ].id;
+  chunk_t *p = chunk;
+  while(p < chunk + size){
+    if (p->position.x == chunkX && p->position.z == chunkZ) {
+      return p->blocks[localX][y][localZ].id;
     }
+    p++;
   }
+
   return AIR;
 }
 
@@ -280,12 +294,14 @@ int setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
   int localX = floorMod(x, L_CHUNK);
   int localZ = floorMod(z, L_CHUNK);
 
-  for (u8 i = 0; i < size; ++i) {
-    if (chunk[i].position.x == chunkX && chunk[i].position.z == chunkZ) {
-      chunk[i].blocks[localX][y][localZ].id = block;
-      SET_ORIENTATION(chunk[i].blocks[localX][y][localZ].faces, orientation);
+  chunk_t *p = chunk;
+  while(p < chunk + size){
+    if (p->position.x == chunkX && p->position.z == chunkZ) {
+      p->blocks[localX][y][localZ].id = block;
+      SET_ORIENTATION(p->blocks[localX][y][localZ].faces, orientation);
       return 0;
     }
+    p++;
   }
   return 1;
 }
