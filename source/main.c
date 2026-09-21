@@ -83,8 +83,8 @@ int main() {
 
     calculRenderView();
 
-    for (u8 i = 0; i < SIZE; i++) {
-      RenderChunk(&chunkL[i], gBlocks, true, TextureID, &Joueur);
+    for(chunk_t *cp = chunkL ; cp < chunkL + SIZE ; cp++){
+      RenderChunk(cp, gBlocks, true, TextureID, &Joueur);
     }
 
     if (delay > 0) {
@@ -102,9 +102,9 @@ int main() {
 }
 
 char *GetPlayerName(char *pseudo) {
-  void *s = PersonalData->name;
-  for (uint16_t *p = s; p < (uint16_t *)s + PersonalData->nameLen; ++p) {
-    pseudo[p - (uint16_t *)s] = *p;
+  s16 *s = PersonalData->name;
+  for (s16 *p = s; p < s + PersonalData->nameLen; ++p) {
+    pseudo[p - s] = *p;
   }
   pseudo[PersonalData->nameLen] = '\0';
   return pseudo;
