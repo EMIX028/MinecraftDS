@@ -36,6 +36,7 @@ Currently tested on:
 - Nintendo DS
 - [melonDS](https://melonds.kuribo64.net/)
 - [DeSmuMe](https://github.com/TASEmulators/desmume/)
+- [DS Player](https://ds.44670.org) web DS emulator
 
 > Compatibility with other Nintendo DS models and emulators may vary.
 
