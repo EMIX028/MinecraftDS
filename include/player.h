@@ -5,9 +5,6 @@
 #include "ChunkStruct.h"
 #include "PlayerStruct.h"
 
-//booléen utilisé si on appuie sur la touche qui gère les combinaison (KEY_L)
-extern bool specialmode;
-
 //donne la direction du joueur a partir de l'angle de la caméra
 vec3_t getDir(camera_t cam);
 

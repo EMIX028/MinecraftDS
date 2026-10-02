@@ -23,6 +23,7 @@ void setPlayer(player_t *player) {
 
   player->isfalling = false;
   player->velocityY = 0.0f;
+  player->index = DIRT;
 }
 
 void movePlayer(player_t *player, vec3_t d) {
@@ -122,9 +123,7 @@ bool canMovePlayer(player_t *player, vec3_t movement, chunk_t chunk[], int n,
   return true;
 }
 
-bool specialmode = false;
-
-void loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
+void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
                         block_t list[], hitbox_t blocks) {
   vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
   float inputX = 0.0f;
@@ -192,54 +191,51 @@ void loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
     player->Camera.pitch += P_SENSI;
 }
 
-// Cette fonction à été modifié par claude /!\.
-void playerInterract(player_t *player, chunk_t chunkL[], int size,
-                     blockId_t indexB, block_t list[], const bool specialmode,
-                     bool *majChunk, int *delay) {
+
+
+
+
+
+bool ATTR_FUN_INI raycastBlock(player_t *player, chunk_t chunkL[], int size,
+                                       ivec3_t *outTarget, ivec3_t *outPrev,
+                                       int *outHitAxis, int *outHitSign,
+                                       uint8_t *outBlock) {
   vec3_t Raydir = getDir(player->Camera);
   vec3_t origin = player->Camera.position;
 
-  // Voxel à la position de la caméra
   ivec3_t cur = {.x = (int)floorf(origin.x),
-                  .y = (int)floorf(origin.y),
-                  .z = (int)floorf(origin.z)};
+                 .y = (int)floorf(origin.y),
+                 .z = (int)floorf(origin.z)};
 
-  // Bloc visé (celui qu'on casse) et bloc voisin (celui où on pose, collé à la
-  // face touchée)
   ivec3_t target = cur;
-
   ivec3_t prev = cur;
 
-  // Axe (0=X,1=Y,2=Z) et sens de la face du bloc visé qui a été traversée par
-  // le rayon
   int hitAxis = -1;
   int hitSign = 0;
 
-  // Traversée de grille façon DDA (Amanatides & Woo) : on avance exactement
-  // d'une frontière de voxel à la fois
   ivec3_t step = {.x = (Raydir.x > 0.0f) - (Raydir.x < 0.0f),
                   .y = (Raydir.y > 0.0f) - (Raydir.y < 0.0f),
                   .z = (Raydir.z > 0.0f) - (Raydir.z < 0.0f)};
-  
+
   vec3_t tDelta = {.x = (Raydir.x != 0.0f) ? fabsf(1.0f / Raydir.x) : 1e30f,
-                    .y = (Raydir.y != 0.0f) ? fabsf(1.0f / Raydir.y) : 1e30f,
-                    .z = (Raydir.z != 0.0f) ? fabsf(1.0f / Raydir.z) : 1e30f};
-  
+                   .y = (Raydir.y != 0.0f) ? fabsf(1.0f / Raydir.y) : 1e30f,
+                   .z = (Raydir.z != 0.0f) ? fabsf(1.0f / Raydir.z) : 1e30f};
+
   vec3_t tMax = {.x = (Raydir.x != 0.0f)
                     ? ((step.x > 0) ? ((float)(cur.x + 1) - origin.x)
-                                   : (origin.x - (float)cur.x)) *
+                                    : (origin.x - (float)cur.x)) *
                           tDelta.x
                     : 1e30f,
-                  
-                  .y = (Raydir.y != 0.0f)
+
+                 .y = (Raydir.y != 0.0f)
                     ? ((step.y > 0) ? ((float)(cur.y + 1) - origin.y)
-                                   : (origin.y - (float)cur.y)) *
+                                    : (origin.y - (float)cur.y)) *
                           tDelta.y
                     : 1e30f,
-                  
-                  .z = (Raydir.z != 0.0f)
+
+                 .z = (Raydir.z != 0.0f)
                     ? ((step.z > 0) ? ((float)(cur.z + 1) - origin.z)
-                                   : (origin.z - (float)cur.z)) *
+                                    : (origin.z - (float)cur.z)) *
                           tDelta.z
                     : 1e30f};
 
@@ -247,14 +243,14 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size,
   uint8_t b = AIR;
   float distance = 0.0f;
 
-  // Cas limite : la caméra elle même est déjà dans un bloc plein
+  //la caméra est dans un bloc
   b = getBlock(chunkL, size, cur.x, cur.y, cur.z);
   if (b != AIR) {
     blockTargeted = true;
     target = cur;
   }
 
-  while (!blockTargeted && distance < P_REACH) {
+  while (!blockTargeted) {
     if (tMax.x < tMax.y && tMax.x < tMax.z) {
       distance = tMax.x;
       tMax.x += tDelta.x;
@@ -283,66 +279,99 @@ void playerInterract(player_t *player, chunk_t chunkL[], int size,
     if (b != AIR) {
       blockTargeted = true;
       target = cur;
-      // Le voisin où poser un bloc est exactement celui d'où le rayon vient
-      prev.x = target.x - (hitAxis == 0 ? hitSign : 0);
-      prev.y = target.y - (hitAxis == 1 ? hitSign : 0);
-      prev.z = target.z - (hitAxis == 2 ? hitSign : 0);
+      // Un seul axe change : on part de target et on recule d'une case sur cet axe
+      prev = target;
+      switch (hitAxis) {
+        case 0: prev.x -= hitSign; break;
+        case 1: prev.y -= hitSign; break;
+        case 2: prev.z -= hitSign; break;
+      }
     }
   }
 
   if (!blockTargeted) {
+    return false;
+  }
+
+  *outTarget = target;
+  *outPrev = prev;
+  *outHitAxis = hitAxis;
+  *outHitSign = hitSign;
+  *outBlock = b;
+  return true;
+}
+
+
+
+static uint8_t computeOrientation(block_t list[], blockId_t indexB, int hitAxis, float yaw) {
+  if (list[indexB].isLog) {
+    // Buche : orientation dépend uniquement de la face touchée, pas du yaw
+    return (hitAxis == 1) ? front_to_right
+         : (hitAxis == 0) ? front_to_left
+         :                  front_to_front;
+  }
+
+  int16_t Pdeg = (int16_t)fmodf(yaw * (180.0f / (float)M_PI), 360.0f);
+  if (Pdeg > 180.0f)
+    Pdeg -= 360.0f;
+  else if (Pdeg < -180.0f)
+    Pdeg += 360.0f;
+
+  return (Pdeg >= -45 && Pdeg < 45)   ? front_to_front
+       : (Pdeg >= 45 && Pdeg < 135)   ? front_to_left
+       : (Pdeg >= -135 && Pdeg < -45) ? front_to_right
+       :                                front_to_back;
+}
+
+
+
+static inline void notifyBlockChange(bool *majChunk, int *delay) {
+  *majChunk = true;
+  *delay = DELAY;
+}
+
+
+
+
+void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
+                     blockId_t indexB, block_t list[], const bool specialmode,
+                     bool *majChunk, int *delay) {
+  ivec3_t target;
+  ivec3_t prev;
+  int hitAxis;
+  int hitSign;
+  uint8_t b;
+
+  if (!raycastBlock(player, chunkL, size, &target, &prev, &hitAxis, &hitSign, &b)) {
     return;
   }
 
   drawBlockOutline(target.x, target.y, target.z);
 
-  // Orientation du bloc à poser
-  uint8_t orientation = front_to_front;
-  if (list[indexB].isLog) {
-    // Buche orientée selon la face du bloc visé sur laquelle on pose
-    if (hitAxis == 1)
-      orientation = top_to_Y; // posée sur le dessus/dessous -> verticale
-    else if (hitAxis == 0)
-      orientation =
-          top_to_X; // posée sur une face le long de X -> couchée le long de X
-    else
-      orientation = top_to_Z; // posée sur une face le long de Z (ou cas caméra
-                              // dans un bloc) -> couchée le long de Z
-  } else {
-    int16_t Pdeg = fmodf(player->Camera.yaw * (180.0f / (float)M_PI), 360.0f);
-    if (Pdeg > 180.0f)
-      Pdeg -= 360.0f;
-    else if (Pdeg < -180.0f)
-      Pdeg += 360.0f;
+  // keysDown()/keysHeld() lisent un état figé pour la frame : on les appelle
+  // une seule fois au lieu de deux (ils ne changeront pas d'ici la fin de la fonction).
+  u32 down = keysDown();
+  u32 held = keysHeld();
+  u32 keys = down | held;
 
-    if (Pdeg >= -45 && Pdeg < 45)
-      orientation = front_to_front;
-    else if (Pdeg >= 45 && Pdeg < 135)
-      orientation = front_to_left;
-    else if (Pdeg >= -135 && Pdeg < -45)
-      orientation = front_to_right;
-    else
-      orientation = front_to_back;
-  }
+  bool wantsPlace = keys & KEY_R;
+  bool wantsBreak = (held & KEY_L) && (keys & KEY_R);
 
-  if (!checkCollision(player->Position, player->hitbox, prev, HitboxBlocks)) {
-    if ((keysDown() | keysHeld()) & KEY_R) {
-      if (specialmode != true && *delay <= 0) {
-        setBlock(chunkL, size, prev.x, prev.y, prev.z, indexB, orientation);
-        *majChunk = true;
-        *delay = DELAY;
-      }
+  if (wantsPlace && !specialmode && *delay <= 0) {
+    if (!checkCollision(player->Position, player->hitbox, prev, HitboxBlocks)) {
+      uint8_t orientation = computeOrientation(list, indexB, hitAxis, player->Camera.yaw);
+      setBlock(chunkL, size, prev.x, prev.y, prev.z, indexB, orientation);
+      notifyBlockChange(majChunk, delay);
     }
   }
 
-  if ((keysHeld() & KEY_L) && ((keysDown() | keysHeld()) & KEY_R)) {
-    if (*delay <= 0 && b != BEDROCK) {
-      setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
-      *majChunk = true;
-      *delay = DELAY;
-    }
+  if (wantsBreak && *delay <= 0 && b != BEDROCK) {
+    setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
+    notifyBlockChange(majChunk, delay);
   }
 }
+
+
 
 void setCam(player_t *player) {
   glLight(0, RGB15(31, 31, 31), floattov10(-0.5f), floattov10(-1.0f),

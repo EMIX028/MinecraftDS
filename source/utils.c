@@ -1,5 +1,7 @@
 #include "utils.h"
 
+bool specialmode = false;
+
 int floorDiv(int a, int b){
   int q = a / b;
   int r = a % b;
@@ -15,4 +17,8 @@ int floorMod(int a, int b){
     r += b;
   }
   return r;
+}
+
+bool flipflop(bool a){
+  return !a;
 }

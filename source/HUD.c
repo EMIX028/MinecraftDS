@@ -57,7 +57,7 @@ void SubScreenInfos(char *pseudo, blockId_t indexB) {
   printf("\x1b[1;3H|Minecraft DS Edition 1.1a|");
   printf("\x1b[2;3H---------------------------");
   printf("\x1b[4;1HHey %s !", pseudo);
-  printf("\x1b[6;0H Block: %s", getBlockName(indexB));
+  printf("\x1b[6;0H Block: %s                                                     ", getBlockName(indexB));
 }
 
 void MainScreenInfos(player_t *player) {
@@ -65,4 +65,5 @@ void MainScreenInfos(player_t *player) {
   BG_PALETTE[255] = RGB15(30, 30, 30); // couleur texte
   printf("\x1b[1;0Hposition x:%3d y:%3d z:%3d", (int)player->Position.x,
           (int)player->Position.y, (int)player->Position.z);
+  printf("\n%f\n",player->Camera.yaw);  
 }

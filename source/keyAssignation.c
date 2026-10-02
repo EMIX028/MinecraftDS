@@ -8,4 +8,20 @@ void loadKeyAssignation(player_t *player){
     player->velocityY = 0.13749f;
     player->isfalling = true;
   }
+  if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){
+      if(player->index < BLOCK_COUNT-1){
+        ++player->index;
+      }
+      else{
+        player->index = 1;
+      }
+    }
+    if((keysHeld() & KEY_L) && (keysDown() & KEY_Y)){
+      if(player->index > 1){
+        --player->index;
+      }
+      else{
+        player->index = BLOCK_COUNT-1;
+      }
+    }
 }

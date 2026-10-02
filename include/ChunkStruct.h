@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <nds/ndstypes.h>
-#define L_CHUNK 14 // chunk minecraft 15
+#define L_CHUNK 15 // chunk minecraft 15
 #define H_CHUNK 20 // hauteur max 256
 
 // macro constante qui gère l'affichage d'un bloc sur un octet
@@ -18,13 +18,12 @@
 #define FACE_FRONT (1 << 4)
 #define FACE_BACK (1 << 5)
 
-#define front_to_front 0
-#define top_to_Z 0
-#define front_to_left 1
-#define top_to_X 1
-#define front_to_back 2
-#define top_to_Y 2
-#define front_to_right 3
+typedef enum {
+  front_to_front, // même valeur que si un block isLog a sa face du dessus orienté sur Z
+  front_to_left, // même valeur que si un block isLog a sa face du dessus orienté sur X
+  front_to_back, // même valeur que si un block isLog a sa face du dessus orienté sur Y
+  front_to_right
+}orientation_facetex;
 
 #define ORIENTATION_MASK (3 << 6)
 
@@ -48,9 +47,6 @@ typedef struct block_s {
   u8 transparent;
   // int hardness; //temps de destruction
   vec2_t texture[4];
-  // void (*draw)(const struct block_s *block);
-  // void (*onBreak)(int x, int y, int z);
-  // void (*onTick)(int x, int y, int z);
 } block_t;
 
 // structure présente dans les tableaux de chunk
@@ -74,21 +70,21 @@ void parcoursChunk(void (*func)(int x, int y, int z));
 // initialise tous les blocs du chunk avec une id
 void initChunk(chunk_t *chunk, blockId_t id);
 
-int initBlock(chunk_t *chunk, blockId_t id, ivec3_t p);
-
 // sert à obtenir le pointeur d'un chunk
 // dans une liste à partir de ses coordonnées
 chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ);
 
 // caluls les faces visibles ou non dans une liste de chunk
-void blockVisibility(chunk_t chunks[], int size, block_t *list);
+void chunkVisibility(chunk_t chunks[], int size, block_t *list);
 
 // dessine dans le rendu 3d un chunk
 void RenderChunk(chunk_t chunk[], block_t *list, bool cull, int TextureID,
                  player_t *player);
 
-// renvoie l'id d'un bloc dans une liste de chunk
-//  avec sa position global
+//transforme la position x local d'un bloc dans un chunk en une position dans le monde
+int localblockXtoglobal(chunk_t chunk[],int x);
+
+// renvoie l'id d'un bloc dans une liste de chunk avec sa position global
 blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z);
 
 // remplace un bloc dans une liste de chunk avec sa position global

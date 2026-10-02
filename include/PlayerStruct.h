@@ -34,6 +34,7 @@ typedef struct player{
   hitbox_t hitbox;
   bool isfalling;
   float velocityY;
+  blockId_t index;
 }player_t;
 
 #endif

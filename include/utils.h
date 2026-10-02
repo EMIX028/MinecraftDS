@@ -9,6 +9,12 @@
 
 #define ATTR_FUN_INI __attribute__((section(".itcm")))
 
+//booléen utilisé si on appuie sur la touche qui gère les combinaison (KEY_L)
+extern bool specialmode;
+
+//Alias pour définir un float en virgule fixe
+typedef int32_t f32;
+
 //vecteur 3d en flottant
 typedef struct fvec3{
   float x;
@@ -73,5 +79,7 @@ int floorDiv(int a, int b);
 
 //renvoie le reste d'une division pour un entier <0 ou >0
 int floorMod(int a, int b);
+
+bool flipflop(bool a);
 
 #endif

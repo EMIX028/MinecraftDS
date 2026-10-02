@@ -13,7 +13,6 @@
 #include "utils.h"
 
 player_t Joueur;
-blockId_t indexB = OAK_LOG;
 int delay = 0; // delay entre chaque bloc posé ou cassé
 bool majChunk = true;
 const u8 RenderDistance = 2;
@@ -69,7 +68,7 @@ int main() {
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
     loadKeyAssignation(&Joueur);
 
-    SubScreenInfos(pseudo, indexB);
+    SubScreenInfos(pseudo, Joueur.index);
     MainScreenInfos(&Joueur);
 
     ApplyGravity();
@@ -78,7 +77,7 @@ int main() {
     glLoadIdentity();
     setCam(&Joueur);
 
-    playerInterract(&Joueur, chunkL, SIZE, indexB, gBlocks,
+    playerInterract(&Joueur, chunkL, SIZE, Joueur.index, gBlocks,
                     (const bool)specialmode, &majChunk, &delay);
 
     calculRenderView();
@@ -97,6 +96,10 @@ int main() {
     if (SUB_SPRITE)
       oamUpdate(&oamSub);
     swiWaitForVBlank();
+  }
+  
+  if(glDeinit() == 0){
+    return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;
 }
@@ -130,7 +133,7 @@ void ApplyGravity() {
 
 void calculRenderView() {
   if (majChunk) {
-    blockVisibility(chunkL, SIZE, gBlocks);
+    chunkVisibility(chunkL, SIZE, gBlocks);
     majChunk = false;
   }
 }

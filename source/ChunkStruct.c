@@ -14,24 +14,8 @@ void parcoursChunk(void (*func)(int x, int y, int z)) {
   }
 }
 
-int initBlock(chunk_t *chunk, blockId_t id, ivec3_t p){
-  if(p.x >= L_CHUNK || p.y >= H_CHUNK || p.z >= L_CHUNK){
-    fprintf(stderr,"\x1b[15;10H\x1b[31mErreur d'acces memoire d'un bloc dans un chunk\x1b[0m");
-    return -1;
-  }
-  chunk->blocks[p.x][p.y][p.z].id = id;
-  return 0;
-}
-
 void initChunk(chunk_t *chunk, blockId_t id) {
-  ivec3_t p;
-  for (p.x = 0 ; p.x < L_CHUNK; ++p.x) {
-    for (p.y = 0 ; p.y < H_CHUNK; ++p.y) {
-      for (p.z = 0 ; p.z < L_CHUNK; ++p.z) {
-        initBlock(chunk, id, p);
-      }
-    }
-  }
+  memset(chunk->blocks, id, sizeof chunk->blocks); //blockId_t fait 1 octet pour l'instant
 }
 
 chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ) {
@@ -45,99 +29,179 @@ chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ) {
   return NULL;
 }
 
-void blockVisibility(chunk_t chunks[], int size, block_t *list) {
+static void blockVisibility(block_t *list, chunk_t *chunk,
+                             chunk_t *leftChunk, chunk_t *rightChunk,
+                             chunk_t *backChunk, chunk_t *frontChunk,
+                             u8 x, u8 y, u8 z) {
+  u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
+
+  if (list[chunk->blocks[x][y][z].id].transparent == 2) {
+    chunk->blocks[x][y][z].faces = faces;
+    return;
+  }
+
+  // LEFT
+  if (x > 0) {
+    if (list[chunk->blocks[x - 1][y][z].id].transparent != 0) {
+      faces |= FACE_LEFT;
+    }
+  } else if (leftChunk == NULL || list[leftChunk->blocks[L_CHUNK - 1][y][z].id].transparent != 0) {
+    faces |= FACE_LEFT;
+  }
+
+  // RIGHT
+  if (x < L_CHUNK - 1) {
+    if (list[chunk->blocks[x + 1][y][z].id].transparent != 0) {
+      faces |= FACE_RIGHT;
+    }
+  } else if (rightChunk == NULL || list[rightChunk->blocks[0][y][z].id].transparent != 0) {
+    faces |= FACE_RIGHT;
+  }
+
+  // BACK
+  if (z > 0) {
+    if (list[chunk->blocks[x][y][z - 1].id].transparent != 0) {
+      faces |= FACE_BACK;
+    }
+  } else if (backChunk == NULL || list[backChunk->blocks[x][y][L_CHUNK - 1].id].transparent != 0) {
+    faces |= FACE_BACK;
+  }
+
+  // FRONT
+  if (z < L_CHUNK - 1) {
+    if (list[chunk->blocks[x][y][z + 1].id].transparent != 0) {
+      faces |= FACE_FRONT;
+    }
+  } else if (frontChunk == NULL || list[frontChunk->blocks[x][y][0].id].transparent != 0) {
+    faces |= FACE_FRONT;
+  }
+
+  // BOTTOM
+  if (y == 0) {
+    faces |= FACE_BOTTOM;
+  } else if (list[chunk->blocks[x][y - 1][z].id].transparent != 0) {
+    faces |= FACE_BOTTOM;
+  }
+
+  // TOP
+  if (y == H_CHUNK - 1) {
+    faces |= FACE_TOP;
+  } else if (list[chunk->blocks[x][y + 1][z].id].transparent != 0) {
+    faces |= FACE_TOP;
+  }
+  chunk->blocks[x][y][z].faces = faces;
+}
+
+void chunkVisibility(chunk_t chunks[], int size, block_t *list) {
   for (u8 i = 0; i < size; ++i) {
     chunk_t *chunk = &chunks[i];
+
+    chunk_t *leftChunk  = getChunk(chunks, size, chunk->position.x - 1, chunk->position.z);
+    chunk_t *rightChunk = getChunk(chunks, size, chunk->position.x + 1, chunk->position.z);
+    chunk_t *backChunk  = getChunk(chunks, size, chunk->position.x, chunk->position.z - 1);
+    chunk_t *frontChunk = getChunk(chunks, size, chunk->position.x, chunk->position.z + 1);
+
     for (u8 x = 0; x < L_CHUNK; ++x) {
       for (u8 y = 0; y < H_CHUNK; ++y) {
         for (u8 z = 0; z < L_CHUNK; ++z) {
-          chunk->blocks[x][y][z].faces &= ORIENTATION_MASK;
-          // L'air n'a pas de faces à dessiner
-          if (list[chunk->blocks[x][y][z].id].transparent == 2) {
-            continue;
-          }
-          // LEFT
-          if (x > 0) {
-            blockId_t neighborId = chunk->blocks[x - 1][y][z].id;
-            if (list[neighborId].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_LEFT;
-            }
-          } else {
-            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x - 1,
-                                         chunk->position.z);
-            if (neighbor == NULL ||
-                list[neighbor->blocks[L_CHUNK - 1][y][z].id].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_LEFT;
-            }
-          }
-          // RIGHT
-          if (x < L_CHUNK - 1) {
-            blockId_t neighborId = chunk->blocks[x + 1][y][z].id;
-            if (list[neighborId].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_RIGHT;
-            }
-          } else {
-            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x + 1,
-                                         chunk->position.z);
-            if (neighbor == NULL ||
-                list[neighbor->blocks[0][y][z].id].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_RIGHT;
-            }
-          }
-          // BACK
-          if (z > 0) {
-            blockId_t neighborId = chunk->blocks[x][y][z - 1].id;
-            if (list[neighborId].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_BACK;
-            }
-          } else {
-            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x,
-                                         chunk->position.z - 1);
-            if (neighbor == NULL ||
-                list[neighbor->blocks[x][y][L_CHUNK - 1].id].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_BACK;
-            }
-          }
-          // FRONT
-          if (z < L_CHUNK - 1) {
-            blockId_t neighborId = chunk->blocks[x][y][z + 1].id;
-            if (list[neighborId].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_FRONT;
-            }
-          } else {
-            chunk_t *neighbor = getChunk(chunks, size, chunk->position.x,
-                                         chunk->position.z + 1);
-            if (neighbor == NULL ||
-                list[neighbor->blocks[x][y][0].id].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_FRONT;
-            }
-          }
-          // BOTTOM
-          if (y == 0) {
-            chunk->blocks[x][y][z].faces |= FACE_BOTTOM;
-          } else {
-            blockId_t neighborId = chunk->blocks[x][y - 1][z].id;
-            if (list[neighborId].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_BOTTOM;
-            }
-          }
-          // TOP
-          if (y == H_CHUNK - 1) {
-            chunk->blocks[x][y][z].faces |= FACE_TOP;
-          } else {
-            blockId_t neighborId = chunk->blocks[x][y + 1][z].id;
-            if (list[neighborId].transparent != 0) {
-              chunk->blocks[x][y][z].faces |= FACE_TOP;
-            }
-          }
+          blockVisibility(list, chunk, leftChunk, rightChunk, backChunk, frontChunk, x, y, z);
         }
       }
     }
   }
 }
 
-void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int TextureID,
-    player_t *player) { // attribute en fix temporaire pour les performances
+static inline void logFaceTexAngle(block_t *block, u8 orientation,
+                                    u8 matchOrientation, u8 angleOrientation,
+                                    vec2_t *tex, int *angle) {
+  if (orientation == matchOrientation) {
+    *tex = block->texture[top];
+    *angle = 0;
+  } else {
+    *tex = block->texture[side];
+    *angle = (orientation == angleOrientation) ? 90 : 0;
+  }
+}
+
+static inline vec2_t sideOrFrontTex(block_t *block, u8 orientation, u8 pivotOrientation) {
+  return (orientation == pivotOrientation) ? block->texture[front] : block->texture[side];
+}
+
+static void RenderBlock(block_t *block, u8 faces, u8 orientation, int x, int y, int z, player_t *player) {
+  if (faces & FACE_TOP) {
+    vec2_t tex;
+    int angle;
+    if (block->isLog) {
+      logFaceTexAngle(block, orientation, front_to_right, front_to_front, &tex, &angle);
+    } else {
+      tex = block->texture[top];
+      angle = 0;
+    }
+    drawCubeTop(tex, angle);
+  }
+
+  if ((faces & FACE_BOTTOM) && y >= player->Position.y) {
+    vec2_t tex;
+    int angle;
+    if (block->isLog) {
+      logFaceTexAngle(block, orientation, front_to_right, front_to_front, &tex, &angle);
+    } else {
+      tex = block->texture[bottom];
+      angle = 0;
+    }
+    drawCubeBottom(tex, angle);
+  }
+
+  if (faces & FACE_LEFT) {
+    vec2_t tex;
+    int angle;
+    if (block->isLog) {
+      logFaceTexAngle(block, orientation, front_to_left, front_to_front, &tex, &angle);
+    } else {
+      tex = sideOrFrontTex(block, orientation, front_to_left);
+      angle = 0;
+    }
+    drawCubeLeft(tex, angle);
+  }
+
+  if (faces & FACE_RIGHT) {
+    vec2_t tex;
+    int angle;
+    if (block->isLog) {
+      logFaceTexAngle(block, orientation, front_to_left, front_to_front, &tex, &angle);
+    } else {
+      tex = sideOrFrontTex(block, orientation, front_to_right);
+      angle = 0;
+    }
+    drawCubeRight(tex, angle);
+  }
+
+  if (faces & FACE_FRONT) {
+    vec2_t tex;
+    int angle;
+    if (block->isLog) {
+      logFaceTexAngle(block, orientation, front_to_front, front_to_left, &tex, &angle);
+    } else {
+      tex = sideOrFrontTex(block, orientation, front_to_front);
+      angle = 0;
+    }
+    drawCubeFront(tex, angle);
+  }
+
+  if (faces & FACE_BACK) {
+    vec2_t tex;
+    int angle;
+    if (block->isLog) {
+      logFaceTexAngle(block, orientation, front_to_front, front_to_left, &tex, &angle);
+    } else {
+      tex = sideOrFrontTex(block, orientation, front_to_back);
+      angle = 0;
+    }
+    drawCubeBack(tex, angle);
+  }
+}
+
+void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int TextureID, player_t *player){
   glPushMatrix();
   glTranslatef32(inttof32(chunk->position.x * L_CHUNK), 0,
                  inttof32(chunk->position.z * L_CHUNK));
@@ -154,112 +218,18 @@ void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int Tex
         glPushMatrix();
         glTranslatef32(inttof32(x), inttof32(y), inttof32(z));
 
-        if (faces & FACE_TOP) {
-          if (block->isLog) {
-            if (orientation == top_to_Y) {
-              drawCubeTop(block->texture[top], 0);
-            } else {
-              if (orientation == top_to_Z)
-                drawCubeTop(block->texture[side], 90);
-              else
-                drawCubeTop(block->texture[side], 0);
-            }
-          } else
-            drawCubeTop(block->texture[top], 0);
-        }
+        RenderBlock(block, faces, orientation, x, y, z, player);
 
-        if ((faces & FACE_BOTTOM) && y >= player->Position.y) {
-          if (block->isLog) {
-            if (orientation == top_to_Y) {
-              drawCubeBottom(block->texture[top], 0);
-            } else {
-              if (orientation == top_to_Z)
-                drawCubeBottom(block->texture[side], 90);
-              else
-                drawCubeBottom(block->texture[side], 0);
-            }
-          } else
-            drawCubeBottom(block->texture[bottom], 0);
-        }
-
-        if (faces & FACE_LEFT) {
-          if (block->isLog) {
-            if (orientation == top_to_X) {
-              drawCubeLeft(block->texture[top], 0);
-            } else {
-              if (orientation == top_to_Z)
-                drawCubeLeft(block->texture[side], 90);
-              else
-                drawCubeLeft(block->texture[side], 0);
-            }
-          } else {
-            if (orientation == front_to_left) {
-              drawCubeLeft(block->texture[front], 0);
-            } else {
-              drawCubeLeft(block->texture[side], 0);
-            }
-          }
-        }
-
-        if (faces & FACE_RIGHT) {
-          if (block->isLog) {
-            if (orientation == top_to_X) {
-              drawCubeRight(block->texture[top], 0);
-            } else {
-              if (orientation == top_to_Z)
-                drawCubeRight(block->texture[side], 90);
-              else
-                drawCubeRight(block->texture[side], 0);
-            }
-          } else {
-            if (orientation == front_to_right)
-              drawCubeRight(block->texture[front], 0);
-            else
-              drawCubeRight(block->texture[side], 0);
-          }
-        }
-
-        if (faces & FACE_FRONT) {
-          if (block->isLog) {
-            if (orientation == top_to_Z) {
-              drawCubeFront(block->texture[top], 0);
-            } else {
-              if (orientation == top_to_X)
-                drawCubeFront(block->texture[side], 90);
-              else
-                drawCubeFront(block->texture[side], 0);
-            }
-          } else {
-            if (orientation == front_to_front)
-              drawCubeFront(block->texture[front], 0);
-            else
-              drawCubeFront(block->texture[side], 0);
-          }
-        }
-
-        if (faces & FACE_BACK) {
-          if (block->isLog) {
-            if (orientation == top_to_Z) {
-              drawCubeBack(block->texture[top], 0);
-            } else {
-              if (orientation == top_to_X)
-                drawCubeBack(block->texture[side], 90);
-              else
-                drawCubeBack(block->texture[side], 0);
-            }
-          } else {
-            if (orientation == front_to_back)
-              drawCubeBack(block->texture[front], 0);
-            else
-              drawCubeBack(block->texture[side], 0);
-          }
-        }
         glPopMatrix(1);
       }
     }
   }
   glEnd();
   glPopMatrix(1);
+}
+
+int localblockXtoglobal(chunk_t chunk[],int x){
+  return x + L_CHUNK*chunk->position.x;
 }
 
 blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z) {
