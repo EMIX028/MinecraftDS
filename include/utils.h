@@ -2,6 +2,7 @@
 #define UTILS_H
 
 #include <stdint.h>
+#include "fixed_point.h"
 #define SCREEN_W 256
 #define SCREEN_H 192
 
@@ -12,15 +13,19 @@
 //booléen utilisé si on appuie sur la touche qui gère les combinaison (KEY_L)
 extern bool specialmode;
 
-//Alias pour définir un float en virgule fixe
-typedef int32_t f32;
-
 //vecteur 3d en flottant
 typedef struct fvec3{
   float x;
   float y;
   float z;
 } vec3_t;
+
+//vecteur 3d en Q20.12
+typedef struct f32vec3{
+  f32 x;
+  f32 y;
+  f32 z;
+} f32vec3_t;
 
 //vecteur 3d en entier
 typedef struct ivec3{
