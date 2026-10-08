@@ -1,10 +1,7 @@
 # Minecraft DS
 
 Minecraft DS is a Minecraft Demake project for the Nintendo DS, written in C using **BlocksDS libs**.
-
 > **A playable voxel-based technical demo running on Nintendo DS hardware.**
->
-> The project explores how far a Minecraft-inspired game can be pushed on Nintendo DS hardware.
 
 >[!IMPORTANT]
 >MinecraftDS is not affiliated with Mojang or Microsoft.
@@ -23,7 +20,7 @@ The current version focuses on:
 - Block placement and breaking
 - Multiple block types and orientations
 - Texture transparency
-- Basic HUD and performance information
+- Basic HUD
 
 More gameplay systems and technical improvements may be added in future versions.
 
@@ -40,7 +37,7 @@ Currently tested on:
 
 > Compatibility with other Nintendo DS models and emulators may vary.
 
-## Download
+## Download 📥
 
 The latest playable version can be downloaded from the [Releases](../../releases) page.
 
