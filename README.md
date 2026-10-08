@@ -33,7 +33,7 @@ Minecraft DS is designed for Nintendo DS homebrew.
 
 Currently tested on:
 
-- Nintendo DS
+- Nintendo DS, DSi, 3DS
 - [melonDS](https://melonds.kuribo64.net/)
 - [DeSmuMe](https://github.com/TASEmulators/desmume/) (still have bug)
 - [DS Player](https://ds.44670.org) web DS emulator
