@@ -63,7 +63,10 @@ void SubScreenInfos(char *pseudo, blockId_t indexB) {
 void MainScreenInfos(player_t *player) {
   consoleSelect(&hudConsole);
   BG_PALETTE[255] = RGB15(30, 30, 30); // couleur texte
-  printf("\x1b[1;0Hposition x:%3d y:%3d z:%3d", (int)player->Position.x,
-          (int)player->Position.y, (int)player->Position.z);
-  printf("\n%f\n",player->Camera.yaw);  
+  partf32_t x = f32topart(player->Position.x);
+  partf32_t y = f32topart(player->Position.y);
+  partf32_t z = f32topart(player->Position.z);
+  printf("\x1b[1;0H x:%c%4ld y:%c%4ld z:%c%4ld", x.s ? '-' : '+', x.i,
+    y.s ? '-' : '+', y.i,
+    z.s ? '-' : '+', z.i); 
 }

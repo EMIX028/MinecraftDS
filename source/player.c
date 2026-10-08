@@ -6,78 +6,81 @@
 #include <stdint.h>
 
 void setPlayer(player_t *player) {
-  player->Position.x = 0.5f;
-  player->Position.y = 0.0f;
-  player->Position.z = 0.5f;
+  player->Position.x = divf32(F32_ONE,inttof32(2));
+  player->Position.y = 0;
+  player->Position.z = divf32(F32_ONE,inttof32(2));
 
   player->Camera.position.x = player->Position.x;
-  player->Camera.position.y = player->Position.y + 1.62f;
+  player->Camera.position.y = player->Position.y + divf32(inttof32(81),inttof32(50)); // 81/50 = 1.62
   player->Camera.position.z = player->Position.z;
 
-  player->Camera.yaw = 0.0f;
-  player->Camera.pitch = 0.0f;
+  player->Camera.yaw = 0;
+  player->Camera.pitch = 0;
 
   player->hitbox.w = P_hitbox;
   player->hitbox.d = P_hitbox;
-  player->hitbox.h = 1.8f;
+  player->hitbox.h = divf32(inttof32(9),inttof32(5));
 
   player->isfalling = false;
-  player->velocityY = 0.0f;
+  player->velocityY = 0;
   player->index = DIRT;
 }
 
-void movePlayer(player_t *player, vec3_t d) {
+void movePlayer(player_t *player, f32vec3_t d) {
   player->Position.x += d.x;
   player->Position.y += d.y;
   player->Position.z += d.z;
   player->Camera.position.x = player->Position.x;
-  player->Camera.position.y = player->Position.y + 1.62f;
+  player->Camera.position.y = player->Position.y + divf32(inttof32(81),inttof32(50));
   player->Camera.position.z = player->Position.z;
 }
 
-void teleportPlayer(player_t *player, vec3_t d) {
+void teleportPlayer(player_t *player, f32vec3_t d) {
   player->Position = d;
   player->Camera.position = d;
-  player->Camera.position.y += 1.62f;
+  player->Camera.position.y += divf32(inttof32(81),inttof32(50)); // 81/50 = 1.62
 }
 
-vec3_t getDir(camera_t cam) {
-  vec3_t dir;
-  dir.x = sinf(cam.yaw) * cosf(cam.pitch);
-  dir.y = sinf(cam.pitch);
-  dir.z = -cosf(cam.yaw) * cosf(cam.pitch);
+f32vec3_t getDir(camera_t cam) {
+  f32vec3_t dir;
+  dir.x = mulf32(sin_f32(cam.yaw), cos_f32(cam.pitch));
+  dir.y = sin_f32(cam.pitch);
+  dir.z = mulf32(- cos_f32(cam.yaw), cos_f32(cam.pitch));
   return dir;
 }
 
-bool checkCollision(vec3_t apos, hitbox_t a, ivec3_t bpos, hitbox_t b) {
-  float playerMinX = apos.x - a.w / 2.0f;
-  float playerMaxX = apos.x + a.w / 2.0f;
+bool checkCollision(f32vec3_t apos, hitbox_t a, ivec3_t bpos, hitbox_t b) {
+  f32 halfW = divf32(a.w, inttof32(2));
+  f32 halfD = divf32(a.d, inttof32(2));
 
-  float playerMinY = apos.y;
-  float playerMaxY = apos.y + a.h;
+  f32 playerMinX = apos.x - halfW;
+  f32 playerMaxX = apos.x + halfW;
 
-  float playerMinZ = apos.z - a.d / 2.0f;
-  float playerMaxZ = apos.z + a.d / 2.0f;
+  f32 playerMinY = apos.y;
+  f32 playerMaxY = apos.y + a.h;
 
-  float blockMinX = bpos.x;
-  float blockMaxX = bpos.x + b.w;
+  f32 playerMinZ = apos.z - halfD;
+  f32 playerMaxZ = apos.z + halfD;
 
-  float blockMinY = bpos.y;
-  float blockMaxY = bpos.y + b.h;
+  f32 blockMinX = inttof32(bpos.x);
+  f32 blockMaxX = inttof32(bpos.x) + b.w;
 
-  float blockMinZ = bpos.z;
-  float blockMaxZ = bpos.z + b.d;
+  f32 blockMinY = inttof32(bpos.y);
+  f32 blockMaxY = inttof32(bpos.y) + b.h;
+
+  f32 blockMinZ = inttof32(bpos.z);
+  f32 blockMaxZ = inttof32(bpos.z) + b.d;
 
   return (playerMinX < blockMaxX && playerMaxX > blockMinX &&
-
           playerMinY < blockMaxY && playerMaxY > blockMinY &&
-
           playerMinZ < blockMaxZ && playerMaxZ > blockMinZ);
 }
 
-bool canMovePlayer(player_t *player, vec3_t movement, chunk_t chunk[], int n,
+
+
+bool canMovePlayer(player_t *player, f32vec3_t movement, chunk_t chunk[], int n,
                    block_t list[], hitbox_t blocks) {
-  vec3_t futurePosition = {.x = player->Position.x + movement.x,
+  f32vec3_t futurePosition = {.x = player->Position.x + movement.x,
                            .y = player->Position.y + movement.y,
                            .z = player->Position.z + movement.z};
 
@@ -85,14 +88,14 @@ bool canMovePlayer(player_t *player, vec3_t movement, chunk_t chunk[], int n,
     int chunkX = chunk[i].position.x;
     int chunkZ = chunk[i].position.z;
 
-    for (int x = (int)floor(futurePosition.x) - 1;
-         x <= (int)floor(futurePosition.x) + 1; x++) {
+    for (int x = f32toint(floor_f32(futurePosition.x)) - 1;
+         x <= f32toint(floor_f32(futurePosition.x)) + 1; x++) {
 
-      for (int y = (int)floor(futurePosition.y) - 1;
-           y <= (int)floor(futurePosition.y) + 2; y++) {
+      for (int y = f32toint(floor_f32(futurePosition.y)) - 1;
+           y <= f32toint(floor_f32(futurePosition.y)) + 2; y++) {
 
-        for (int z = (int)floor(futurePosition.z) - 1;
-             z <= (int)floor(futurePosition.z) + 1; z++) {
+        for (int z = f32toint(floor_f32(futurePosition.z)) - 1;
+             z <= f32toint(floor_f32(futurePosition.z)) + 1; z++) {
 
           if (y < 0 || y >= H_CHUNK) {
             continue;
@@ -125,9 +128,9 @@ bool canMovePlayer(player_t *player, vec3_t movement, chunk_t chunk[], int n,
 
 void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
                         block_t list[], hitbox_t blocks) {
-  vec3_t m = {.x = 0.0f, .y = 0.0f, .z = 0.0f};
-  float inputX = 0.0f;
-  float inputZ = 0.0f;
+  f32vec3_t m = {.x = 0, .y = 0, .z = 0};
+  f32 inputX = 0;
+  f32 inputZ = 0;
 
   player->Direction = getDir(player->Camera);
 
@@ -139,42 +142,38 @@ void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
   }
 
   if (keysHeld() & KEY_LEFT) {
-    inputX -= 1.0f;
+    inputX -= F32_ONE;
   }
   if (keysHeld() & KEY_RIGHT) {
-    inputX += 1.0f;
+    inputX += F32_ONE;
   }
   if (keysHeld() & KEY_UP) {
-    inputZ += 1.0f;
+    inputZ += F32_ONE;
   }
   if (keysHeld() & KEY_DOWN) {
-    inputZ -= 1.0f;
+    inputZ -= F32_ONE;
   }
 
-  float l = sqrtf(inputX * inputX + inputZ * inputZ);
+  f32 l = sqrtf32(mulf32(inputX, inputX) + mulf32(inputZ, inputZ));
 
-  if (l > 0.0f) {
-    inputX /= l;
-    inputZ /= l;
+  if (l > 0) {
+    inputX = divf32(inputX, l);
+    inputZ = divf32(inputZ, l);
 
-    float cosyaw = cosf(player->Camera.yaw);
-    float sinyaw = sinf(player->Camera.yaw);
+    f32 cosyaw = cos_f32(player->Camera.yaw);
+    f32 sinyaw = sin_f32(player->Camera.yaw);
 
-    m.x = (inputX * cosyaw +
-           inputZ * sinyaw) *
-          P_SPEED;
-    m.z = (inputX * sinyaw -
-           inputZ * cosyaw) *
-          P_SPEED;
+    m.x = mulf32( (mulf32(inputX, cosyaw) + mulf32(inputZ, sinyaw)), P_SPEED );
+    m.z = mulf32( (mulf32(inputX, sinyaw) - mulf32(inputZ, cosyaw)), P_SPEED );
 
-    if (canMovePlayer(player, (vec3_t){.x = m.x, .y = 0.0f, .z = 0.0f}, chunk,
+    if (canMovePlayer(player, (f32vec3_t){.x = m.x, .y = 0, .z = 0}, chunk,
                       n, list, blocks)) {
-      movePlayer(player, (vec3_t){.x = m.x, .y = 0.0f, .z = 0.0f});
+      movePlayer(player, (f32vec3_t){.x = m.x, .y = 0, .z = 0});
     }
 
-    if (canMovePlayer(player, (vec3_t){.x = 0.0f, .y = 0.0f, .z = m.z}, chunk,
+    if (canMovePlayer(player, (f32vec3_t){.x = 0, .y = 0, .z = m.z}, chunk,
                       n, list, blocks)) {
-      movePlayer(player, (vec3_t){.x = 0.0f, .y = 0.0f, .z = m.z});
+      movePlayer(player, (f32vec3_t){.x = 0, .y = 0, .z = m.z});
     }
   }
 
@@ -195,17 +194,16 @@ void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
 
 
 
-
 bool ATTR_FUN_INI raycastBlock(player_t *player, chunk_t chunkL[], int size,
                                        ivec3_t *outTarget, ivec3_t *outPrev,
                                        int *outHitAxis, int *outHitSign,
                                        uint8_t *outBlock) {
-  vec3_t Raydir = getDir(player->Camera);
-  vec3_t origin = player->Camera.position;
+  f32vec3_t Raydir = getDir(player->Camera);
+  f32vec3_t origin = player->Camera.position;
 
-  ivec3_t cur = {.x = (int)floorf(origin.x),
-                 .y = (int)floorf(origin.y),
-                 .z = (int)floorf(origin.z)};
+  ivec3_t cur = {.x = f32toint(floor_f32(origin.x)),
+                 .y = f32toint(floor_f32(origin.y)),
+                 .z = f32toint(floor_f32(origin.z))};
 
   ivec3_t target = cur;
   ivec3_t prev = cur;
@@ -213,35 +211,32 @@ bool ATTR_FUN_INI raycastBlock(player_t *player, chunk_t chunkL[], int size,
   int hitAxis = -1;
   int hitSign = 0;
 
-  ivec3_t step = {.x = (Raydir.x > 0.0f) - (Raydir.x < 0.0f),
-                  .y = (Raydir.y > 0.0f) - (Raydir.y < 0.0f),
-                  .z = (Raydir.z > 0.0f) - (Raydir.z < 0.0f)};
+  ivec3_t step = {.x = (Raydir.x > 0) - (Raydir.x < 0),
+                  .y = (Raydir.y > 0) - (Raydir.y < 0),
+                  .z = (Raydir.z > 0) - (Raydir.z < 0)};
 
-  vec3_t tDelta = {.x = (Raydir.x != 0.0f) ? fabsf(1.0f / Raydir.x) : 1e30f,
-                   .y = (Raydir.y != 0.0f) ? fabsf(1.0f / Raydir.y) : 1e30f,
-                   .z = (Raydir.z != 0.0f) ? fabsf(1.0f / Raydir.z) : 1e30f};
+  f32vec3_t tDelta = {.x = (Raydir.x != 0) ? abs_f32(divf32(F32_ONE, Raydir.x)) : F32_MAX,
+                      .y = (Raydir.y != 0) ? abs_f32(divf32(F32_ONE, Raydir.y)) : F32_MAX,
+                      .z = (Raydir.z != 0) ? abs_f32(divf32(F32_ONE, Raydir.z)) : F32_MAX};
 
-  vec3_t tMax = {.x = (Raydir.x != 0.0f)
-                    ? ((step.x > 0) ? ((float)(cur.x + 1) - origin.x)
-                                    : (origin.x - (float)cur.x)) *
-                          tDelta.x
-                    : 1e30f,
+  f32vec3_t tMax = {.x = (Raydir.x != 0) ? 
+                        mulf32( ((step.x > 0) ? 
+                            (inttof32(cur.x + 1) - origin.x) : (origin.x - inttof32(cur.x))) , tDelta.x )
+                        : F32_MAX,
 
-                 .y = (Raydir.y != 0.0f)
-                    ? ((step.y > 0) ? ((float)(cur.y + 1) - origin.y)
-                                    : (origin.y - (float)cur.y)) *
-                          tDelta.y
-                    : 1e30f,
+                    .y = (Raydir.y != 0) ?
+                        mulf32( ((step.y > 0) ? 
+                            (inttof32(cur.y + 1) - origin.y) : (origin.y - inttof32(cur.y))) , tDelta.y )
+                        : F32_MAX,
 
-                 .z = (Raydir.z != 0.0f)
-                    ? ((step.z > 0) ? ((float)(cur.z + 1) - origin.z)
-                                    : (origin.z - (float)cur.z)) *
-                          tDelta.z
-                    : 1e30f};
+                    .z = (Raydir.z != 0) ?
+                        mulf32( ((step.z > 0) ?
+                            (inttof32(cur.z + 1) - origin.z) : (origin.z - inttof32(cur.z))) , tDelta.z )
+                        : F32_MAX};
 
   bool blockTargeted = false;
-  uint8_t b = AIR;
-  float distance = 0.0f;
+  u8 b = AIR;
+  f32 distance = 0;
 
   //la caméra est dans un bloc
   b = getBlock(chunkL, size, cur.x, cur.y, cur.z);
@@ -306,31 +301,26 @@ bool ATTR_FUN_INI raycastBlock(player_t *player, chunk_t chunkL[], int size,
 static uint8_t computeOrientation(block_t list[], blockId_t indexB, int hitAxis, float yaw) {
   if (list[indexB].isLog) {
     // Buche : orientation dépend uniquement de la face touchée, pas du yaw
-    return (hitAxis == 1) ? front_to_right
-         : (hitAxis == 0) ? front_to_left
-         :                  front_to_front;
+    return (hitAxis == 1) ? front_to_right : 
+              (hitAxis == 0) ? front_to_left : front_to_front;
   }
 
-  int16_t Pdeg = (int16_t)fmodf(yaw * (180.0f / (float)M_PI), 360.0f);
-  if (Pdeg > 180.0f)
-    Pdeg -= 360.0f;
-  else if (Pdeg < -180.0f)
-    Pdeg += 360.0f;
+  int16_t Pdeg = f32toint( mod_f32(mulf32(yaw , divf32(inttof32(180) , F32_PI)), inttof32(360)) );
+  if (Pdeg > 180)
+    Pdeg -= 360;
+  else if (Pdeg < -180)
+    Pdeg += 360;
 
-  return (Pdeg >= -45 && Pdeg < 45)   ? front_to_front
-       : (Pdeg >= 45 && Pdeg < 135)   ? front_to_left
-       : (Pdeg >= -135 && Pdeg < -45) ? front_to_right
-       :                                front_to_back;
+  return (Pdeg >= -45 && Pdeg < 45) ? front_to_front :
+            (Pdeg >= 45 && Pdeg < 135) ? front_to_left :
+              (Pdeg >= -135 && Pdeg < -45) ? front_to_right : front_to_back;
 }
-
 
 
 static inline void notifyBlockChange(bool *majChunk, int *delay) {
   *majChunk = true;
   *delay = DELAY;
 }
-
-
 
 
 void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
@@ -340,7 +330,7 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
   ivec3_t prev;
   int hitAxis;
   int hitSign;
-  uint8_t b;
+  u8 b;
 
   if (!raycastBlock(player, chunkL, size, &target, &prev, &hitAxis, &hitSign, &b)) {
     return;
@@ -348,8 +338,6 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
 
   drawBlockOutline(target.x, target.y, target.z);
 
-  // keysDown()/keysHeld() lisent un état figé pour la frame : on les appelle
-  // une seule fois au lieu de deux (ils ne changeront pas d'ici la fin de la fonction).
   u32 down = keysDown();
   u32 held = keysHeld();
   u32 keys = down | held;
@@ -359,7 +347,7 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
 
   if (wantsPlace && !specialmode && *delay <= 0) {
     if (!checkCollision(player->Position, player->hitbox, prev, HitboxBlocks)) {
-      uint8_t orientation = computeOrientation(list, indexB, hitAxis, player->Camera.yaw);
+      u8 orientation = computeOrientation(list, indexB, hitAxis, player->Camera.yaw);
       setBlock(chunkL, size, prev.x, prev.y, prev.z, indexB, orientation);
       notifyBlockChange(majChunk, delay);
     }
@@ -372,17 +360,15 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
 }
 
 
-
 void setCam(player_t *player) {
   glLight(0, RGB15(31, 31, 31), floattov10(-0.5f), floattov10(-1.0f),
           floattov10(-0.3f));
 
   glMaterialf(GL_AMBIENT, RGB15(15, 15, 15));
   glMaterialf(GL_DIFFUSE, RGB15(31, 31, 31));
-
-  gluLookAt(player->Camera.position.x, player->Camera.position.y,
+  gluLookAtf32(player->Camera.position.x, player->Camera.position.y,
             player->Camera.position.z,
             player->Camera.position.x + player->Direction.x,
             player->Camera.position.y + player->Direction.y,
-            player->Camera.position.z + player->Direction.z, 0.0f, 1.0f, 0.0f);
+            player->Camera.position.z + player->Direction.z, inttof32(0), inttof32(1), inttof32(0));
 }

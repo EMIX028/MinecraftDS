@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <nds/ndstypes.h>
-#define L_CHUNK 15 // chunk minecraft 15
+#define L_CHUNK 14 // chunk minecraft 15
 #define H_CHUNK 20 // hauteur max 256
 
 // macro constante qui gère l'affichage d'un bloc sur un octet
@@ -64,8 +64,6 @@ typedef struct chunk {
   vec2_t position;
   instance_t blocks[L_CHUNK][H_CHUNK][L_CHUNK];
 } chunk_t;
-
-void parcoursChunk(void (*func)(int x, int y, int z));
 
 // initialise tous les blocs du chunk avec une id
 void initChunk(chunk_t *chunk, blockId_t id);

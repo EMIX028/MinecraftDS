@@ -30,29 +30,23 @@ typedef struct partf32 {
 // limite max f32
 #define F32_DEC_MAX 999755859375
 #define F32_INT_MAX 524287
+#define F32_MAX INT32_MAX 
 
 // limite min f32
 #define F32_INT_MIN -524288
 #define F32_DEC_MIN 0
-
-// converti un entier en f32 (Q20.12)
-#define intto_f32(n) ((f32)((n) * F32_ONE))
-// converti un f32 (Q20.12) en entier (tronque la partie décimale)
-#define f32_toint(n) ((n) / F32_ONE)
+#define F32_MIN INT32_MIN
 
 // récupère la partie entière d'un f32
-#define intpart(n) (intto_f32(f32_toint(n)))
+#define intpart(n) (inttof32(f32toint(n)))
 // récupère la partie décimale d'un f32
 #define decpart(n) ((n) - intpart(n))
 
-#define SHOW_F32 "%c%d.%d"
+#define SHOW_F32 "%c%ld.%04d"
 
-// Divise deux valeurs Q20.12 et retourne le résultat en Q20.12
-f32 div_f32(f32 num, f32 den);
+
 // renvoie le modulo entre n et p
 f32 mod_f32(f32 n, f32 p);
-// Multiplie deux valeurs Q20.12 et retourne le résultat en Q20.12
-f32 mul_f32(f32 a, f32 b);
 // Arrondis d'un flottant Q20.12 f32
 f32 round_f32(f32 n);
 // fait un arrondi à l'entier inférieur

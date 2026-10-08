@@ -4,20 +4,20 @@
 #include <stdbool.h>
 #include "utils.h"
 
-#define P_SPEED 0.1
-#define P_SENSI 0.06
-#define P_FLYSPEED 0.25
-#define P_hitbox 0.6f
-#define P_REACH 4.5f
+#define P_SPEED divf32(F32_ONE,inttof32(10)) // 0.1
+#define P_SENSI divf32(inttof32(3),inttof32(50)) // 0.06
+#define P_FLYSPEED divf32(F32_ONE,inttof32(4)) //0.25
+#define P_hitbox divf32(inttof32(3),inttof32(5)) //0.6
+#define P_REACH divf32(inttof32(9),inttof32(2)) //4.5
 #define DELAY 11
-#define MAX_ANGLE 1.4f
+#define MAX_ANGLE divf32(inttof32(7),inttof32(5)) //1.4
 
 //structure camera avec sa position en vecteur 3d
 //sa rotation horizontal yaw et vertical pitch
 typedef struct{
-  vec3_t position;
-  float yaw;
-  float pitch;
+  f32vec3_t position;
+  f32 yaw;
+  f32 pitch;
 } camera_t;
 
 /*Structure player pour définir un joueur
@@ -28,12 +28,12 @@ isfalling booléen de controle
 velocityY pour gérer la gravité appliqué au joueur
 */
 typedef struct player{
-  vec3_t Position;
+  f32vec3_t Position;
   camera_t Camera;
-  vec3_t Direction;
+  f32vec3_t Direction;
   hitbox_t hitbox;
   bool isfalling;
-  float velocityY;
+  f32 velocityY;
   blockId_t index;
 }player_t;
 

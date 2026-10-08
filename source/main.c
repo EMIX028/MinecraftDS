@@ -61,7 +61,7 @@ int main() {
 
   setPlayground();
 
-  movePlayer(&Joueur, (vec3_t){.x = 0.0f, .y = 5.0f, .z = 0.0f});
+  movePlayer(&Joueur, (f32vec3_t){.x = 0, .y = inttof32(5), .z = 0});
 
   while (1) {
     scanKeys();
@@ -114,18 +114,17 @@ char *GetPlayerName(char *pseudo) {
 }
 
 void ApplyGravity() {
-  const vec3_t gravityMove = {.x = 0.0f, .y = Joueur.velocityY, .z = 0.0f};
+  const f32vec3_t gravityMove = {.x = 0, .y = Joueur.velocityY, .z = 0};
 
   if (canMovePlayer(&Joueur, gravityMove, chunkL, SIZE, gBlocks,
                     HitboxBlocks)) {
     movePlayer(&Joueur, gravityMove);
   } else {
-    if (Joueur.velocityY < 0.0f) {
-      Joueur.velocityY = 0.0f;
+    if (Joueur.velocityY < 0) {
+      Joueur.velocityY = 0;
       Joueur.isfalling = false;
-      Joueur.Position.y = floor(Joueur.Position.y);
-    } else if (Joueur.velocityY > 0.0f) {
-      Joueur.velocityY = 0.0f;
+    } else if (Joueur.velocityY > 0) {
+      Joueur.velocityY = 0;
     }
   }
   Joueur.velocityY -= GRAVITY;

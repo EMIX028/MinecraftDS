@@ -4,16 +4,6 @@
 #include "utils.h"
 #include <stdint.h>
 
-void parcoursChunk(void (*func)(int x, int y, int z)) {
-  for (u8 x = 0; x < L_CHUNK; ++x) {
-    for (u8 y = 0; y < H_CHUNK; ++y) {
-      for (u8 z = 0; z < L_CHUNK; ++z) {
-        func(x, y, z);
-      }
-    }
-  }
-}
-
 void initChunk(chunk_t *chunk, blockId_t id) {
   memset(chunk->blocks, id, sizeof chunk->blocks); //blockId_t fait 1 octet pour l'instant
 }
@@ -140,7 +130,7 @@ static void RenderBlock(block_t *block, u8 faces, u8 orientation, int x, int y, 
     drawCubeTop(tex, angle);
   }
 
-  if ((faces & FACE_BOTTOM) && y >= player->Position.y) {
+  if ((faces & FACE_BOTTOM) && y >= f32toint(player->Position.y)) {
     vec2_t tex;
     int angle;
     if (block->isLog) {

@@ -194,20 +194,12 @@ static f32 sin_lut[LUT_SIZE] = {
     -25};
 
 
-f32 div_f32(f32 num, f32 den) {
-  return (f32)(((int64_t)num << F32_FRAC_BITS) / den);
-}
-
 f32 mod_f32(f32 n, f32 p) {
   n %= p;
   if (n < 0) {
     n += p;
   }
   return n;
-}
-
-f32 mul_f32(f32 a, f32 b) {
-  return (f32)(((int64_t)a * b) >> F32_FRAC_BITS);
 }
 
 f32 round_f32(f32 n) {
@@ -240,22 +232,16 @@ f32 abs_f32(f32 n) {
 partf32_t f32topart(f32 n) {
   partf32_t r;
   r.s = n < 0;
-  r.i = f32_toint(n);
+  r.i = f32toint(n);
+  if (r.i < 0) {
+    r.i = -r.i;
+  }
   f32 d = decpart(n);
   if (d < 0) {
     d = -d;
   }
   r.d = (int16_t)(((int64_t)d * 10000) / F32_ONE);
   return r;
-}
-
-f32 parttof32(partf32_t p) {
-  f32 result = intto_f32(p.i);
-  f32 decimal = (f32)(((int64_t)p.d * F32_ONE) / 10000);
-  if (p.s) {
-    return result - decimal;
-  }
-  return result + decimal;
 }
 
 f32 cos_f32(f32 n) {
@@ -267,7 +253,7 @@ f32 cos_f32(f32 n) {
   }
   f32 a = cos_lut[i / period];
   f32 b = cos_lut[(i / period) + 1];
-  return a + mul_f32((b - a), decpart(div_f32(i, period)));
+  return a + mulf32((b - a), decpart(divf32(i, period)));
 }
 
 f32 sin_f32(f32 n) {
@@ -279,5 +265,5 @@ f32 sin_f32(f32 n) {
   }
   f32 a = sin_lut[i / period];
   f32 b = sin_lut[(i / period) + 1];
-  return a + mul_f32((b - a), decpart(div_f32(i, period)));
+  return a + mulf32((b - a), decpart(divf32(i, period)));
 }

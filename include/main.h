@@ -3,7 +3,7 @@
 
 
 #include <stdint.h>
-#define GRAVITY 0.008f
+#define GRAVITY divf32(F32_ONE, inttof32(125)) //0.008
 #define MAIN_TEXT true
 #define MAIN_SPRITE true
 #define SUB_TEXT true

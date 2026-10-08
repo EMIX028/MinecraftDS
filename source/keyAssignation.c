@@ -5,7 +5,7 @@ bool mainLCD = false;
 
 void loadKeyAssignation(player_t *player){
   if((keysHeld() & KEY_L) && (( keysDown() & KEY_B) || (keysHeld() & KEY_B)) && !player->isfalling){
-    player->velocityY = 0.13749f;
+    player->velocityY = divf32(inttof32(13749),inttof32(100000));
     player->isfalling = true;
   }
   if((keysHeld() & KEY_L) && (keysDown() & KEY_A)){

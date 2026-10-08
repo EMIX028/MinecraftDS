@@ -13,13 +13,6 @@
 //booléen utilisé si on appuie sur la touche qui gère les combinaison (KEY_L)
 extern bool specialmode;
 
-//vecteur 3d en flottant
-typedef struct fvec3{
-  float x;
-  float y;
-  float z;
-} vec3_t;
-
 //vecteur 3d en Q20.12
 typedef struct f32vec3{
   f32 x;
@@ -42,9 +35,9 @@ typedef struct vec2{
 
 //définir une hitbox avec largeur, hauteur, profondeur
 typedef struct hitbox{
-  float w;
-  float h;
-  float d;
+  f32 w;
+  f32 h;
+  f32 d;
 }hitbox_t;
 
 //type qui permet de définir tout ce qui est relatif aux id d'un bloc
