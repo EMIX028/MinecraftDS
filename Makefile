@@ -10,8 +10,11 @@ GAME_TITLE		:= Minecraft DS Edition
 GAME_SUBTITLE	:= Made by EMIX
 GAME_AUTHOR     := https://github.com/EMIX028/MinecraftDS
 
-#GAME_ICON       := icon.gif
+GAME_ICON       := icon.png
 
 INCLUDEDIRS := include
+
+CFLAGS  += -O2 -ffunction-sections -fdata-sections -g
+LDFLAGS += -Wl,--gc-sections
 
 include $(BLOCKSDS)/sys/default_makefiles/rom_arm9/Makefile

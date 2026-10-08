@@ -35,7 +35,7 @@ Currently tested on:
 
 - Nintendo DS
 - [melonDS](https://melonds.kuribo64.net/)
-- [DeSmuMe](https://github.com/TASEmulators/desmume/)
+- [DeSmuMe](https://github.com/TASEmulators/desmume/) (still have bug)
 - [DS Player](https://ds.44670.org) web DS emulator
 
 > Compatibility with other Nintendo DS models and emulators may vary.
@@ -77,8 +77,7 @@ Current technical features include:
 | ----------------- | ------------------------- |
 | **D-Pad**         | Move the player           |
 | **A / B / X / Y** | Control the camera        |
-| **START**         | Reset & switch maps       |
-| **SELECT**        | Pause the game            |
+| **START**         | Pause the game            |
 | **R**             | Place a block             |
 | **L**             | Activate Special Mode     |
 | **L + B**         | Jump                      |
@@ -95,27 +94,26 @@ Holding **L** activates the **Special Mode**, allowing additional actions to be 
 
 ### Blocks
 
-There are currently **19 block types** available:
+There are currently **18 block types** available:
 
+- Stone
 - Dirt
 - Grass
-- Sand
-- Stone
 - Cobblestone
-- Bedrock
-- Moss
-- Glass
 - Oak Plank
-- Oak Log
-- Oak Leaves
-- Obsidian
-- Coal Ore
-- Iron Ore
+- Bedrock
+- Sand
 - Gold Ore
-- Redstone Ore
+- Iron Ore
+- Coal Ore
+- Oak Log
+- Oak Leave
+- Glass
+- Obsidian
 - Diamond Ore
 - Crafting Table
 - Furnace
+- Redstone Ore
 
 ### HUD
 
@@ -127,34 +125,9 @@ The bottom screen displays useful gameplay and performance information:
 - Play time
 - FPS
 
-### Music
-
-The music currently played at startup is **Wet Hands**, composed by **C418** for Minecraft.
-
-This music is a third-party asset and is not owned or created by this project. See the [NOTICE](NOTICE) file for attribution and additional information.
-
-## Roadmap
-
-Minecraft DS is still in early development. Future features I'm considering include:
-
-- [ ] Expand the playable world
-- [ ] Dynamic chunk loading
-- [ ] World generation
-- [ ] More blocks
-- [ ] Inventory system
-- [ ] Crafting
-- [ ] Save / load system
-- [ ] Additional gameplay mechanics
-- [ ] Further performance improvements
-- [ ] New HUD and interface
-- [ ] Game icon
-
-Some features listed here are experimental or may change as development progresses.
-
 ## Credits
 
 - **Mojang Studios** — Creator of Minecraft.
-- **C418** — Composer of _Wet Hands_.
 - Third-party textures, music and other assets used by the project are not original assets created by this project.
 
 See the [NOTICE](NOTICE) file for detailed attribution and legal information.

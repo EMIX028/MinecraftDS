@@ -9,12 +9,10 @@ void initChunk(chunk_t *chunk, blockId_t id) {
 }
 
 chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ) {
-  chunk_t *p = chunks;
-  while(p < chunks + size){
+  for(chunk_t *p = chunks; p < chunks + size; ++p){
     if(p->position.x == chunkX && p->position.z == chunkZ){
       return p;
     }
-    ++p;
   }
   return NULL;
 }
@@ -83,18 +81,17 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
 }
 
 void chunkVisibility(chunk_t chunks[], int size, block_t *list) {
-  for (u8 i = 0; i < size; ++i) {
-    chunk_t *chunk = &chunks[i];
+  for (chunk_t *p = chunks; p < chunks + size; ++p) {
 
-    chunk_t *leftChunk  = getChunk(chunks, size, chunk->position.x - 1, chunk->position.z);
-    chunk_t *rightChunk = getChunk(chunks, size, chunk->position.x + 1, chunk->position.z);
-    chunk_t *backChunk  = getChunk(chunks, size, chunk->position.x, chunk->position.z - 1);
-    chunk_t *frontChunk = getChunk(chunks, size, chunk->position.x, chunk->position.z + 1);
+    chunk_t *leftChunk  = getChunk(chunks, size, p->position.x - 1, p->position.z);
+    chunk_t *rightChunk = getChunk(chunks, size, p->position.x + 1, p->position.z);
+    chunk_t *backChunk  = getChunk(chunks, size, p->position.x, p->position.z - 1);
+    chunk_t *frontChunk = getChunk(chunks, size, p->position.x, p->position.z + 1);
 
     for (u8 x = 0; x < L_CHUNK; ++x) {
       for (u8 y = 0; y < H_CHUNK; ++y) {
         for (u8 z = 0; z < L_CHUNK; ++z) {
-          blockVisibility(list, chunk, leftChunk, rightChunk, backChunk, frontChunk, x, y, z);
+          blockVisibility(list, p, leftChunk, rightChunk, backChunk, frontChunk, x, y, z);
         }
       }
     }
@@ -197,14 +194,16 @@ void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int Tex
                  inttof32(chunk->position.z * L_CHUNK));
   startingDraw(cull, TextureID);
   for (u8 x = 0 ; x < L_CHUNK ; ++x) {
+    instance_t (*blockX)[L_CHUNK] = chunk->blocks[x];
     for (u8 y = 0 ; y < H_CHUNK ; ++y) {
       for (u8 z = 0 ; z < L_CHUNK ; ++z) {
-        block_t *block = &list[chunk->blocks[x][y][z].id];
-        u8 faces = chunk->blocks[x][y][z].faces;
-        u8 orientation = GET_ORIENTATION(faces);
+        block_t *block = &list[blockX[y][z].id];
         if (block->transparent >= 2) {
           continue;
         }
+        u8 faces = blockX[y][z].faces;
+        u8 orientation = GET_ORIENTATION(faces);
+        
         glPushMatrix();
         glTranslatef32(inttof32(x), inttof32(y), inttof32(z));
 

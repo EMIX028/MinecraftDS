@@ -12,10 +12,11 @@
 #include "spriteManager.h"
 #include "utils.h"
 
-player_t Joueur;
+player_t DTCM_BSS Joueur;
 int delay = 0; // delay entre chaque bloc posé ou cassé
 bool majChunk = true;
 const u8 RenderDistance = 2;
+u8 GameState = RUNNING;
 
 #define SIZE 4
 chunk_t chunkL[SIZE] = {(chunk_t){.position.x = 0, .position.z = 0},
@@ -65,8 +66,11 @@ int main() {
 
   while (1) {
     scanKeys();
+    loadKeyAssignation(&Joueur, &GameState);
+    if(GameState == PAUSED){
+      continue;
+    }
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
-    loadKeyAssignation(&Joueur);
 
     SubScreenInfos(pseudo, Joueur.index);
     MainScreenInfos(&Joueur);
@@ -79,7 +83,8 @@ int main() {
 
     playerInterract(&Joueur, chunkL, SIZE, Joueur.index, gBlocks,
                     (const bool)specialmode, &majChunk, &delay);
-
+    
+    
     calculRenderView();
 
     for(chunk_t *cp = chunkL ; cp < chunkL + SIZE ; cp++){
@@ -91,11 +96,11 @@ int main() {
     }
 
     glFlush(0);
+    swiWaitForVBlank();
     if (MAIN_SPRITE)
       oamUpdate(&oamMain);
     if (SUB_SPRITE)
       oamUpdate(&oamSub);
-    swiWaitForVBlank();
   }
   
   if(glDeinit() == 0){
@@ -120,10 +125,10 @@ void ApplyGravity() {
                     HitboxBlocks)) {
     movePlayer(&Joueur, gravityMove);
   } else {
-    if (Joueur.velocityY < 0) {
+    if (Joueur.velocityY <= 0) {
       Joueur.velocityY = 0;
       Joueur.isfalling = false;
-    } else if (Joueur.velocityY > 0) {
+    } else {
       Joueur.velocityY = 0;
     }
   }

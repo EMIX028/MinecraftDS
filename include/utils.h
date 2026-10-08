@@ -46,24 +46,24 @@ typedef uint8_t blockId_t;
 //Alias de plusieurs ID de bloc
 typedef enum {
     AIR,
+    STONE,
     DIRT,
     GRASS,
-    SAND,
-    STONE,
     COBBLESTONE,
-    BEDROCK,
-    GLASS,
     OAK_PLANK,
+    BEDROCK,
+    SAND,
+    GOLD_ORE,
+    IRON_ORE,
+    COAL_ORE,
     OAK_LOG,
     OAK_LEAVE,
+    GLASS,
     OBSIDIAN,
-    COAL_ORE,
-    IRON_ORE,
-    GOLD_ORE,
-    REDSTONE_ORE,
     DIAMOND_ORE,
     CRAFTING_TABLE,
     FURNACE,
+    REDSTONE_ORE,
     BLOCK_COUNT
 } Blocks;
 

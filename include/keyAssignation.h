@@ -5,6 +5,6 @@
 #include "PlayerStruct.h"
 
 //gère les inputs en dehors des mouvement du joueur et de la caméra
-void loadKeyAssignation(player_t *player);
+void loadKeyAssignation(player_t *player, u8 *GameState);
 
 #endif
