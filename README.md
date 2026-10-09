@@ -6,7 +6,7 @@ Minecraft DS is a Minecraft Demake project for the Nintendo DS, written in C usi
 >[!IMPORTANT]
 >MinecraftDS is not affiliated with Mojang or Microsoft.
 
-<img width="2558" height="1346" alt="v1.1a new features" src="https://github.com/user-attachments/assets/1689104c-7c6d-4448-9af2-c6fa3c14da59" />
+<img width="2557" height="1347" alt="latest release in game screen, shot on MelonDS" src="https://github.com/user-attachments/assets/880fdf31-798b-4b6c-8969-7af5cc403de6" />
 
 ## Current Status
 
@@ -114,13 +114,11 @@ There are currently **18 block types** available:
 
 ### HUD
 
-The bottom screen displays useful gameplay and performance information:
+Both screens displays useful gameplay and performance information:
 
 - Game version
 - Player position
 - Selected block name
-- Play time
-- FPS
 
 ## Credits
 
