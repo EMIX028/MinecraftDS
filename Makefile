@@ -10,7 +10,7 @@ GAME_TITLE		:= Minecraft DS Edition
 GAME_SUBTITLE	:= Made by EMIX
 GAME_AUTHOR     := https://github.com/EMIX028/MinecraftDS
 
-GAME_ICON       := icon.png
+GAME_ICON       := Icon.gif
 
 INCLUDEDIRS := include
 

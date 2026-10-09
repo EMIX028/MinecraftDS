@@ -8,6 +8,7 @@ compile_commands.json
 *.ogg
 *.wav
 *.bmp
+*.gif
 sound/
 build/
 

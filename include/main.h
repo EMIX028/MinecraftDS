@@ -21,4 +21,6 @@ void setPlayground();
 //récupère le pseudo du joueur qu'il a inscrit dans la DS
 char *GetPlayerName(char *name);
 
+void fin_boucle();
+
 #endif

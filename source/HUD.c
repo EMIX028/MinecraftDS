@@ -37,7 +37,7 @@ void initSubBG(bool WithText, bool WithSprites) {
 
   if (WithText) {
     vramSetBankC(VRAM_C_SUB_BG);
-    consoleInit(&subConsole, 0, BgType_Text4bpp, BgSize_T_256x256, 4, 1, false,
+    consoleInit(&subConsole, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 1, false,
                 true);
   }
   if (WithSprites) {
@@ -49,15 +49,16 @@ void initSubBG(bool WithText, bool WithSprites) {
 // consoleSelect(&subConsole ou &hudConsole); pour choisir l'écran ou afficher
 // le texte
 
-void SubScreenInfos(char *pseudo, blockId_t indexB) {
+void SubScreenInfos(char *pseudo, blockId_t indexB, u8 GameState) {
   consoleSelect(&subConsole);
-  BG_PALETTE_SUB[0] = RGB15(24, 24, 24);   // fond écran sub
-  BG_PALETTE_SUB[255] = RGB15(10, 10, 10); //  couleur texte
+  BG_PALETTE_SUB[0] = RGB15(10, 10, 10);   // fond écran sub
+  BG_PALETTE_SUB[255] = RGB15(24, 24, 24); //  couleur texte
 
-  printf("\x1b[1;3H|Minecraft DS Edition 1.1a|");
+  printf("\x1b[1;3H|Minecraft DS Edition 1.2a|");
   printf("\x1b[2;3H---------------------------");
   printf("\x1b[4;1HHey %s !", pseudo);
   printf("\x1b[6;0H Block: %s                                                     ", getBlockName(indexB));
+  printf("\x1b[15;2H %s", GameState == PAUSED ? "Paused" : "      ");
 }
 
 void MainScreenInfos(player_t *player) {

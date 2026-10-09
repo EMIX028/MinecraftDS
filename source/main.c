@@ -49,6 +49,7 @@ int main() {
   GetPlayerName(pseudo);
 
   setCrosshair();
+  setBackground();
 
   int TextureID;
 
@@ -67,13 +68,16 @@ int main() {
   while (1) {
     scanKeys();
     loadKeyAssignation(&Joueur, &GameState);
+
+    SubScreenInfos(pseudo, Joueur.index, GameState);
+    MainScreenInfos(&Joueur);
+    
     if(GameState == PAUSED){
       continue;
     }
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
 
-    SubScreenInfos(pseudo, Joueur.index);
-    MainScreenInfos(&Joueur);
+    
 
     ApplyGravity();
 
@@ -95,12 +99,7 @@ int main() {
       --delay;
     }
 
-    glFlush(0);
-    swiWaitForVBlank();
-    if (MAIN_SPRITE)
-      oamUpdate(&oamMain);
-    if (SUB_SPRITE)
-      oamUpdate(&oamSub);
+    fin_boucle();
   }
   
   if(glDeinit() == 0){
@@ -154,4 +153,13 @@ void setPlayground() {
   }
   majChunk = true;
   calculRenderView();
+}
+
+void fin_boucle(){
+  glFlush(0);
+    swiWaitForVBlank();
+    if (MAIN_SPRITE)
+      oamUpdate(&oamMain);
+    if (SUB_SPRITE)
+      oamUpdate(&oamSub);
 }
