@@ -75,6 +75,9 @@ chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ);
 // caluls les faces visibles ou non dans une liste de chunk
 void chunkVisibility(chunk_t chunks[], int size, block_t *list);
 
+//vérifie la visibilité des faces des blocks voisin du bloc de coordonnées x,y,z
+int calculNeighborVisibility(block_t list[], chunk_t *chunk, int x, int y, int z, blockId_t block);
+
 // dessine dans le rendu 3d un chunk
 void RenderChunk(chunk_t chunk[], block_t *list, bool cull, int TextureID,
                  player_t *player);
@@ -86,7 +89,7 @@ int localblockXtoglobal(chunk_t chunk[],int x);
 blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z);
 
 // remplace un bloc dans une liste de chunk avec sa position global
-int setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
+chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
              u8 orientation);
 
 #endif

@@ -27,8 +27,8 @@ bool canMovePlayer(player_t *player ,f32vec3_t movement, chunk_t chunk[], int n,
 //gère les inputs de déplacement du joueur
 void loadPlayerMovement(player_t *player , chunk_t chunk[], int n, block_t list[], hitbox_t blocks);
 
-void playerInterract(player_t *player, chunk_t chunkL[], int size, blockId_t indexB,block_t list[],
-                      const bool specialmode, bool *majChunk, int *delay);
+void playerInterract(player_t *player, chunk_t chunkL[], int size,block_t list[],
+                      const bool specialmode, int *delay);
 
 
 //active une lumière pour la caméra ainsi que le transfert d'info

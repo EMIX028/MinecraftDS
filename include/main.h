@@ -12,9 +12,6 @@
 //applique le calcul de la gravité au joueur
 void ApplyGravity();
 
-//recalcul les faces visibles des chunks
-void calculRenderView();
-
 //créer la map temporaire pour le jeu
 void setPlayground();
 

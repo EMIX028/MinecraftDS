@@ -12,9 +12,10 @@
 #include "spriteManager.h"
 #include "utils.h"
 
+#include "mesh.h"
+
 player_t DTCM_BSS Joueur;
 int delay = 0; // delay entre chaque bloc posé ou cassé
-bool majChunk = true;
 const u8 RenderDistance = 2;
 u8 GameState = RUNNING;
 
@@ -76,7 +77,9 @@ int main() {
       continue;
     }
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
-
+    if(Joueur.Position.y <= inttof32(-30) ){
+      Joueur.Position.y = inttof32(20);
+    }
     
 
     ApplyGravity();
@@ -85,11 +88,8 @@ int main() {
     glLoadIdentity();
     setCam(&Joueur);
 
-    playerInterract(&Joueur, chunkL, SIZE, Joueur.index, gBlocks,
-                    (const bool)specialmode, &majChunk, &delay);
-    
-    
-    calculRenderView();
+    playerInterract(&Joueur, chunkL, SIZE, gBlocks,
+                    (const bool)specialmode, &delay);
 
     for(chunk_t *cp = chunkL ; cp < chunkL + SIZE ; cp++){
       RenderChunk(cp, gBlocks, true, TextureID, &Joueur);
@@ -98,7 +98,6 @@ int main() {
     if (delay > 0) {
       --delay;
     }
-
     fin_boucle();
   }
   
@@ -125,19 +124,12 @@ void ApplyGravity() {
     movePlayer(&Joueur, gravityMove);
   } else {
     if (Joueur.velocityY <= 0) {
-      Joueur.velocityY = 0;
       Joueur.isfalling = false;
-    } else {
-      Joueur.velocityY = 0;
     }
+    Joueur.velocityY = 0;
   }
-  Joueur.velocityY -= GRAVITY;
-}
-
-void calculRenderView() {
-  if (majChunk) {
-    chunkVisibility(chunkL, SIZE, gBlocks);
-    majChunk = false;
+  if(Joueur.velocityY > divf32(inttof32(-1307),inttof32(1000))){ //~1.307 bloc par frame car 1.307*60 ~= 78.4 bloc/s (vitesse de chute terminale d'un joueur minecraft)
+    Joueur.velocityY -= GRAVITY;
   }
 }
 
@@ -151,15 +143,14 @@ void setPlayground() {
       }
     }
   }
-  majChunk = true;
-  calculRenderView();
+  chunkVisibility(chunkL, SIZE, gBlocks);
 }
 
 void fin_boucle(){
   glFlush(0);
-    swiWaitForVBlank();
-    if (MAIN_SPRITE)
-      oamUpdate(&oamMain);
-    if (SUB_SPRITE)
-      oamUpdate(&oamSub);
+  swiWaitForVBlank();
+  if (MAIN_SPRITE)
+    oamUpdate(&oamMain);
+  if (SUB_SPRITE)
+    oamUpdate(&oamSub);
 }

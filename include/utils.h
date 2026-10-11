@@ -2,7 +2,19 @@
 #define UTILS_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include "fixed_point.h"
+
+// définition de nullptr pour la norme de compilation de blocksDS
+#if !defined(__nullptr_t_defined) && !defined(_NULLPTR_T) && (__STDC_VERSION__ < 202311L)
+    #if defined(__nullptr) || defined(__GNUC__) && (__GNUC__ >= 13)
+        typedef __typeof__(nullptr) nullptr_t;
+    #else
+        typedef struct { } *nullptr_t;
+        #define nullptr ((nullptr_t)0)
+    #endif
+#endif
+
 #define SCREEN_W 256
 #define SCREEN_H 192
 

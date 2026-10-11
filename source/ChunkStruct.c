@@ -14,7 +14,7 @@ chunk_t *getChunk(chunk_t chunks[], int size, int chunkX, int chunkZ) {
       return p;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 static void blockVisibility(block_t *list, chunk_t *chunk,
@@ -33,7 +33,7 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
     if (list[chunk->blocks[x - 1][y][z].id].transparent != 0) {
       faces |= FACE_LEFT;
     }
-  } else if (leftChunk == NULL || list[leftChunk->blocks[L_CHUNK - 1][y][z].id].transparent != 0) {
+  } else if (leftChunk == nullptr || list[leftChunk->blocks[L_CHUNK - 1][y][z].id].transparent != 0) {
     faces |= FACE_LEFT;
   }
 
@@ -42,7 +42,7 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
     if (list[chunk->blocks[x + 1][y][z].id].transparent != 0) {
       faces |= FACE_RIGHT;
     }
-  } else if (rightChunk == NULL || list[rightChunk->blocks[0][y][z].id].transparent != 0) {
+  } else if (rightChunk == nullptr || list[rightChunk->blocks[0][y][z].id].transparent != 0) {
     faces |= FACE_RIGHT;
   }
 
@@ -51,7 +51,7 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
     if (list[chunk->blocks[x][y][z - 1].id].transparent != 0) {
       faces |= FACE_BACK;
     }
-  } else if (backChunk == NULL || list[backChunk->blocks[x][y][L_CHUNK - 1].id].transparent != 0) {
+  } else if (backChunk == nullptr || list[backChunk->blocks[x][y][L_CHUNK - 1].id].transparent != 0) {
     faces |= FACE_BACK;
   }
 
@@ -60,7 +60,7 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
     if (list[chunk->blocks[x][y][z + 1].id].transparent != 0) {
       faces |= FACE_FRONT;
     }
-  } else if (frontChunk == NULL || list[frontChunk->blocks[x][y][0].id].transparent != 0) {
+  } else if (frontChunk == nullptr || list[frontChunk->blocks[x][y][0].id].transparent != 0) {
     faces |= FACE_FRONT;
   }
 
@@ -242,10 +242,49 @@ blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z) {
   return AIR;
 }
 
-int setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
+static bool updateNeighbor(block_t list[], chunk_t *chunk, int nx, int ny, int nz,
+                           u8 onNeighbor, bool drawing){
+  if(nx < 0 || nx >= L_CHUNK || ny < 0 || ny >= H_CHUNK || nz < 0 || nz >= L_CHUNK){
+    return true;
+  }
+  u8 transparent = list[chunk->blocks[nx][ny][nz].id].transparent;
+
+  if(transparent != 2){
+    if(drawing){
+      chunk->blocks[nx][ny][nz].faces |=  onNeighbor;
+    } else {
+      chunk->blocks[nx][ny][nz].faces &= ~onNeighbor;
+    }
+  }
+  return transparent != 0;
+}
+
+int calculNeighborVisibility(block_t list[], chunk_t *chunk, int x, int y, int z, blockId_t block){
+  if(x < 0 || x >= L_CHUNK || y < 0 || y >= H_CHUNK || z < 0 || z >= L_CHUNK){
+    return -1;
+  }
+  bool drawing = list[block].transparent >= 1;
+  bool solid   = list[block].transparent != 2;
+
+  u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
+
+  // L'appel est évalué AVANT "solid" : les voisins sont mis à jour même pour de l'air
+  if(updateNeighbor(list, chunk, x - 1, y, z, FACE_RIGHT,  drawing) && solid) faces |= FACE_LEFT;
+  if(updateNeighbor(list, chunk, x + 1, y, z, FACE_LEFT,   drawing) && solid) faces |= FACE_RIGHT;
+  if(updateNeighbor(list, chunk, x, y, z - 1, FACE_FRONT,  drawing) && solid) faces |= FACE_BACK;
+  if(updateNeighbor(list, chunk, x, y, z + 1, FACE_BACK,   drawing) && solid) faces |= FACE_FRONT;
+  if(updateNeighbor(list, chunk, x, y - 1, z, FACE_TOP,    drawing) && solid) faces |= FACE_BOTTOM;
+  if(updateNeighbor(list, chunk, x, y + 1, z, FACE_BOTTOM, drawing) && solid) faces |= FACE_TOP;
+
+  chunk->blocks[x][y][z].faces = faces;
+  return 0;
+}
+
+
+chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
              u8 orientation) {
   if (y < 0 || y >= H_CHUNK)
-    return -1;
+    return nullptr;
 
   int chunkX = floorDiv(x, L_CHUNK);
   int chunkZ = floorDiv(z, L_CHUNK);
@@ -258,9 +297,9 @@ int setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
     if (p->position.x == chunkX && p->position.z == chunkZ) {
       p->blocks[localX][y][localZ].id = block;
       SET_ORIENTATION(p->blocks[localX][y][localZ].faces, orientation);
-      return 0;
+      return p;
     }
     p++;
   }
-  return 1;
+  return nullptr;
 }

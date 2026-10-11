@@ -23,7 +23,7 @@ void setPlayer(player_t *player) {
 
   player->isfalling = false;
   player->velocityY = 0;
-  player->index = DIRT;
+  player->index = STONE;
 }
 
 void movePlayer(player_t *player, f32vec3_t d) {
@@ -317,20 +317,14 @@ static uint8_t computeOrientation(block_t list[], blockId_t indexB, int hitAxis,
 }
 
 
-static inline void notifyBlockChange(bool *majChunk, int *delay) {
-  *majChunk = true;
-  *delay = DELAY;
-}
-
-
 void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
-                     blockId_t indexB, block_t list[], const bool specialmode,
-                     bool *majChunk, int *delay) {
+                     block_t list[], const bool specialmode, int *delay) {
   ivec3_t target;
   ivec3_t prev;
   int hitAxis;
   int hitSign;
   u8 b;
+  blockId_t indexB = player->index;
 
   if (!raycastBlock(player, chunkL, size, &target, &prev, &hitAxis, &hitSign, &b)) {
     return;
@@ -348,14 +342,20 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
   if (wantsPlace && !specialmode && *delay <= 0) {
     if (!checkCollision(player->Position, player->hitbox, prev, HitboxBlocks)) {
       u8 orientation = computeOrientation(list, indexB, hitAxis, player->Camera.yaw);
-      setBlock(chunkL, size, prev.x, prev.y, prev.z, indexB, orientation);
-      notifyBlockChange(majChunk, delay);
+      chunk_t *p = setBlock(chunkL, size, prev.x, prev.y, prev.z, indexB, orientation);
+      if(p != nullptr){
+        calculNeighborVisibility(list, p, floorMod(prev.x, L_CHUNK), prev.y, floorMod(prev.z, L_CHUNK), indexB); //face superflue au jonction des chunks
+      }
+      *delay = DELAY;
     }
   }
 
   if (wantsBreak && *delay <= 0 && b != BEDROCK) {
-    setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
-    notifyBlockChange(majChunk, delay);
+    chunk_t *p = setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
+    if(p != nullptr){
+      calculNeighborVisibility(list, p, floorMod(target.x, L_CHUNK), target.y, floorMod(target.z, L_CHUNK), AIR);
+    }
+    *delay = DELAY;
   }
 }
 
