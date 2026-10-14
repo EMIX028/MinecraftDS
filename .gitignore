@@ -9,6 +9,7 @@ compile_commands.json
 *.wav
 *.bmp
 *.gif
+TextureAtlas.*
 sound/
 build/
 
