@@ -12,8 +12,6 @@
 #include "spriteManager.h"
 #include "utils.h"
 
-#include "mesh.h"
-
 player_t DTCM_BSS Joueur;
 int delay = 0; // delay entre chaque bloc posé ou cassé
 const u8 RenderDistance = 2;
@@ -77,9 +75,6 @@ int main() {
       continue;
     }
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
-    if(Joueur.Position.y <= inttof32(-30) ){
-      Joueur.Position.y = inttof32(20);
-    }
     
 
     ApplyGravity();
@@ -117,6 +112,9 @@ char *GetPlayerName(char *pseudo) {
 }
 
 void ApplyGravity() {
+  if(Joueur.Position.y <= inttof32(-30) ){
+      Joueur.Position.y = inttof32(20);
+  }
   const f32vec3_t gravityMove = {.x = 0, .y = Joueur.velocityY, .z = 0};
 
   if (canMovePlayer(&Joueur, gravityMove, chunkL, SIZE, gBlocks,

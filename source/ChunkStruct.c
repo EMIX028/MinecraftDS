@@ -242,45 +242,6 @@ blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z) {
   return AIR;
 }
 
-static bool updateNeighbor(block_t list[], chunk_t *chunk, int nx, int ny, int nz,
-                           u8 onNeighbor, bool drawing){
-  if(nx < 0 || nx >= L_CHUNK || ny < 0 || ny >= H_CHUNK || nz < 0 || nz >= L_CHUNK){
-    return true;
-  }
-  u8 transparent = list[chunk->blocks[nx][ny][nz].id].transparent;
-
-  if(transparent != 2){
-    if(drawing){
-      chunk->blocks[nx][ny][nz].faces |=  onNeighbor;
-    } else {
-      chunk->blocks[nx][ny][nz].faces &= ~onNeighbor;
-    }
-  }
-  return transparent != 0;
-}
-
-int calculNeighborVisibility(block_t list[], chunk_t *chunk, int x, int y, int z, blockId_t block){
-  if(x < 0 || x >= L_CHUNK || y < 0 || y >= H_CHUNK || z < 0 || z >= L_CHUNK){
-    return -1;
-  }
-  bool drawing = list[block].transparent >= 1;
-  bool solid   = list[block].transparent != 2;
-
-  u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
-
-  // L'appel est évalué AVANT "solid" : les voisins sont mis à jour même pour de l'air
-  if(updateNeighbor(list, chunk, x - 1, y, z, FACE_RIGHT,  drawing) && solid) faces |= FACE_LEFT;
-  if(updateNeighbor(list, chunk, x + 1, y, z, FACE_LEFT,   drawing) && solid) faces |= FACE_RIGHT;
-  if(updateNeighbor(list, chunk, x, y, z - 1, FACE_FRONT,  drawing) && solid) faces |= FACE_BACK;
-  if(updateNeighbor(list, chunk, x, y, z + 1, FACE_BACK,   drawing) && solid) faces |= FACE_FRONT;
-  if(updateNeighbor(list, chunk, x, y - 1, z, FACE_TOP,    drawing) && solid) faces |= FACE_BOTTOM;
-  if(updateNeighbor(list, chunk, x, y + 1, z, FACE_BOTTOM, drawing) && solid) faces |= FACE_TOP;
-
-  chunk->blocks[x][y][z].faces = faces;
-  return 0;
-}
-
-
 chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
              u8 orientation) {
   if (y < 0 || y >= H_CHUNK)
@@ -302,4 +263,74 @@ chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t bloc
     p++;
   }
   return nullptr;
+}
+
+
+struct direction { s8 dx, dy, dz; u8 onNeighbor, onSelf; };
+
+static const struct direction NEIGHBORS[6] = {
+  { -1,  0,  0, FACE_RIGHT,  FACE_LEFT   },
+  {  1,  0,  0, FACE_LEFT,   FACE_RIGHT  },
+  {  0,  0, -1, FACE_FRONT,  FACE_BACK   },
+  {  0,  0,  1, FACE_BACK,   FACE_FRONT  },
+  {  0, -1,  0, FACE_TOP,    FACE_BOTTOM },
+  {  0,  1,  0, FACE_BOTTOM, FACE_TOP    },
+};
+
+static chunk_t *findChunk(chunk_t chunkL[], int size, chunk_t *chunk,
+                          int *nx, int ny, int *nz){
+  if(ny < 0 || ny >= H_CHUNK){
+    return nullptr;
+  }
+  if(*nx >= 0 && *nx < L_CHUNK && *nz >= 0 && *nz < L_CHUNK){
+    return chunk;
+  }
+  chunk_t *neighbor = getChunk(chunkL, size,
+                               chunk->position.x + floorDiv(*nx, L_CHUNK),
+                               chunk->position.z + floorDiv(*nz, L_CHUNK));
+  *nx = floorMod(*nx, L_CHUNK);
+  *nz = floorMod(*nz, L_CHUNK);
+  return neighbor;
+}
+
+void updateVisibility(block_t list[], chunk_t chunkL[], int size,
+                      chunk_t *chunk, int wx, int y, int wz, blockId_t block){
+  if(y < 0 || y >= H_CHUNK){
+    return;
+  }
+  int x = floorMod(wx, L_CHUNK);
+  int z = floorMod(wz, L_CHUNK);
+
+  bool drawing = list[block].transparent >= 1;
+   bool solid = list[block].transparent != 2;
+
+  u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
+
+  for(int i = 0; i < 6; i++){
+    int nx = x + NEIGHBORS[i].dx;
+    int ny = y + NEIGHBORS[i].dy;
+    int nz = z + NEIGHBORS[i].dz;
+
+    chunk_t *n = findChunk(chunkL, size, chunk, &nx, ny, &nz);
+    bool visible = true;
+    if(n != nullptr){
+      instance_t *cell = &(n->blocks[nx][ny][nz]);
+      u8 transparent = list[cell->id].transparent;
+
+      if(transparent != 2){
+        if(drawing){
+          cell->faces |=  NEIGHBORS[i].onNeighbor;
+        } else {
+          cell->faces &= ~NEIGHBORS[i].onNeighbor;
+        }
+      }
+      visible = transparent != 0;
+    }
+
+    if(visible && solid){
+      faces |= NEIGHBORS[i].onSelf;
+    }
+  }
+
+  chunk->blocks[x][y][z].faces = faces;
 }

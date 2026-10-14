@@ -22,6 +22,7 @@ void setPlayer(player_t *player) {
   player->hitbox.h = divf32(inttof32(9),inttof32(5));
 
   player->isfalling = false;
+  player->iscrouch = false;
   player->velocityY = 0;
   player->index = STONE;
 }
@@ -344,7 +345,7 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
       u8 orientation = computeOrientation(list, indexB, hitAxis, player->Camera.yaw);
       chunk_t *p = setBlock(chunkL, size, prev.x, prev.y, prev.z, indexB, orientation);
       if(p != nullptr){
-        calculNeighborVisibility(list, p, floorMod(prev.x, L_CHUNK), prev.y, floorMod(prev.z, L_CHUNK), indexB); //face superflue au jonction des chunks
+        updateVisibility(list, chunkL, size, p, prev.x, prev.y, prev.z, indexB);
       }
       *delay = DELAY;
     }
@@ -353,7 +354,7 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
   if (wantsBreak && *delay <= 0 && b != BEDROCK) {
     chunk_t *p = setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
     if(p != nullptr){
-      calculNeighborVisibility(list, p, floorMod(target.x, L_CHUNK), target.y, floorMod(target.z, L_CHUNK), AIR);
+      updateVisibility(list, chunkL, size, p, target.x, target.y, target.z, AIR);
     }
     *delay = DELAY;
   }

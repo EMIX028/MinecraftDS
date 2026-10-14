@@ -33,6 +33,7 @@ typedef struct player{
   f32vec3_t Direction;
   hitbox_t hitbox;
   bool isfalling;
+  bool iscrouch;
   f32 velocityY;
   blockId_t index;
 }player_t;
