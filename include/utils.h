@@ -56,7 +56,7 @@ typedef struct hitbox{
 typedef uint8_t blockId_t;
 
 //Alias de plusieurs ID de bloc
-typedef enum {
+enum Blocks{
     AIR,
     STONE,
     DIRT,
@@ -77,12 +77,12 @@ typedef enum {
     FURNACE,
     REDSTONE_ORE,
     BLOCK_COUNT
-} Blocks;
+};
 
-typedef enum{
+enum GAMESTATE{
   RUNNING,
   PAUSED,
-}GAMESTATE;
+};
 
 //renvoie le quotient d'une division pour un entier <0 ou >0
 int floorDiv(int a, int b);

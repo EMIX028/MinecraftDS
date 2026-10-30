@@ -54,10 +54,9 @@ void SubScreenInfos(char *pseudo, blockId_t indexB, u8 GameState) {
   BG_PALETTE_SUB[0] = RGB15(10, 10, 10);   // fond écran sub
   BG_PALETTE_SUB[255] = RGB15(24, 24, 24); //  couleur texte
 
-  printf("\x1b[1;3H|Minecraft DS Edition 1.2a|");
-  printf("\x1b[2;3H---------------------------");
-  printf("\x1b[4;1HHey %s !", pseudo);
-  printf("\x1b[6;0H Block: %s                                                     ", getBlockName(indexB));
+  printf("\x1b[30;0HV1.2a");
+  printf("\x1b[5;1HHey %s !", pseudo);
+  printf("\x1b[7;0H Block: %s                                                     ", getBlockName(indexB));
   printf("\x1b[15;2H %s", GameState == PAUSED ? "Paused" : "      ");
 }
 
