@@ -6,8 +6,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <nds/ndstypes.h>
-#define L_CHUNK 14 // chunk minecraft 15
+#define L_CHUNK 16 // chunk minecraft 16
 #define H_CHUNK 20 // hauteur max 256
+
+#define L_CHUNK_SHIFT 4
+#define CHUNK_OF(v) ((v) >> L_CHUNK_SHIFT) // =floordiv(v,16)
+#define LOCAL_OF(v) ((v) & (L_CHUNK - 1)) // =floormod(v,16)
 
 // macro constante qui gère l'affichage d'un bloc sur un octet
 //  1 bit par face, soit 6 bits d'utilisé sur 8
@@ -26,6 +30,8 @@ typedef enum {
 }orientation_facetex;
 
 #define ORIENTATION_MASK (3 << 6)
+// pour faire des comparaisons avec les 6 bits de visibilité de face d'un bloc
+#define FACE_MASK 0x3F
 
 #define SET_ORIENTATION(data, orientation)                                     \
   ((data) = ((data) & 0x3F) | ((orientation) << 6))

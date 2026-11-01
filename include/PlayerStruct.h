@@ -5,12 +5,12 @@
 #include "utils.h"
 
 #define P_SPEED divf32(F32_ONE,inttof32(10)) // 0.1
-#define P_SENSI divf32(inttof32(3),inttof32(50)) // 0.06
+#define P_SENSI 624 //divf32(inttof32(3),inttof32(50)) // 0.06
 #define P_FLYSPEED divf32(F32_ONE,inttof32(4)) //0.25
 #define P_hitbox divf32(inttof32(3),inttof32(5)) //0.6
 #define P_REACH divf32(inttof32(9),inttof32(2)) //4.5
 #define DELAY 11
-#define MAX_ANGLE divf32(inttof32(7),inttof32(5)) //1.4
+#define MAX_ANGLE 14602 //divf32(inttof32(7),inttof32(5)) //1.4
 
 //structure camera avec sa position en vecteur 3d
 //sa rotation horizontal yaw et vertical pitch

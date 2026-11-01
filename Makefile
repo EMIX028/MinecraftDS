@@ -14,7 +14,7 @@ GAME_ICON       := Icon.gif
 
 INCLUDEDIRS := include
 
-CFLAGS  += -O2 -ffunction-sections -fdata-sections -g
+CFLAGS  += -save-temps=obj -fverbose-asm -O2 -ffunction-sections -fdata-sections -g
 LDFLAGS += -Wl,--gc-sections
 
 include $(BLOCKSDS)/sys/default_makefiles/rom_arm9/Makefile

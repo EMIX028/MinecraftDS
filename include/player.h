@@ -22,7 +22,7 @@ void teleportPlayer(player_t *player, f32vec3_t d);
 bool checkCollision(f32vec3_t apos , hitbox_t a , ivec3_t bpos , hitbox_t b);
 
 //vérifie si le mouvement du joueur est possible avant de l'exécuter
-bool canMovePlayer(player_t *player ,f32vec3_t movement, chunk_t chunk[], int n, block_t list[], hitbox_t blocks);
+bool canMovePlayer(player_t *p, f32vec3_t m, chunk_t chunk[], int n, block_t list[]);
 
 //gère les inputs de déplacement du joueur
 void loadPlayerMovement(player_t *player , chunk_t chunk[], int n, block_t list[], hitbox_t blocks);

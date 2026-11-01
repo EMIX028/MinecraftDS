@@ -79,52 +79,28 @@ bool checkCollision(f32vec3_t apos, hitbox_t a, ivec3_t bpos, hitbox_t b) {
 
 
 
-bool canMovePlayer(player_t *player, f32vec3_t movement, chunk_t chunk[], int n,
-                   block_t list[], hitbox_t blocks) {
-  f32vec3_t futurePosition = {.x = player->Position.x + movement.x,
-                           .y = player->Position.y + movement.y,
-                           .z = player->Position.z + movement.z};
+bool canMovePlayer(player_t *p, f32vec3_t m, chunk_t chunk[], int n, block_t list[]) {
+    f32 fx = p->Position.x + m.x;
+    f32 fy = p->Position.y + m.y;
+    f32 fz = p->Position.z + m.z;
+    
+    f32 hw = p->hitbox.w >> 1;
+    f32 hd = p->hitbox.d >> 1;
 
-  for (int i = 0; i < n; i++) {
-    int chunkX = chunk[i].position.x;
-    int chunkZ = chunk[i].position.z;
+    int x0 = (fx - hw) >> 12;
+    int x1 = (fx + hw - 1) >> 12;
+    
+    int y0 =  fy >> 12;
+    int y1 = (fy + p->hitbox.h - 1) >> 12;
 
-    for (int x = f32toint(floor_f32(futurePosition.x)) - 1;
-         x <= f32toint(floor_f32(futurePosition.x)) + 1; x++) {
+    int z0 = (fz - hd) >> 12;
+    int z1 = (fz + hd - 1) >> 12;
 
-      for (int y = f32toint(floor_f32(futurePosition.y)) - 1;
-           y <= f32toint(floor_f32(futurePosition.y)) + 2; y++) {
-
-        for (int z = f32toint(floor_f32(futurePosition.z)) - 1;
-             z <= f32toint(floor_f32(futurePosition.z)) + 1; z++) {
-
-          if (y < 0 || y >= H_CHUNK) {
-            continue;
-          }
-          // Coordonnées monde -> coordonnées locales du chunk
-          int localX = x - chunkX * L_CHUNK;
-          int localZ = z - chunkZ * L_CHUNK;
-
-          // Le bloc n'appartient pas à ce chunk
-          if (localX < 0 || localX >= L_CHUNK || localZ < 0 ||
-              localZ >= L_CHUNK) {
-            continue;
-          }
-
-          blockId_t blockID = chunk[i].blocks[localX][y][localZ].id;
-
-          if (list[blockID].solid) {
-
-            if (checkCollision(futurePosition, player->hitbox,
-                               (ivec3_t){.x = x, .y = y, .z = z}, blocks)) {
-              return false;
-            }
-          }
-        }
-      }
-    }
-  }
-  return true;
+    for (int x = x0; x <= x1; ++x)
+      for (int y = y0; y <= y1; ++y)
+        for (int z = z0; z <= z1; ++z)
+          if (list[getBlock(chunk, n, x, y, z)].solid) return false;
+    return true;
 }
 
 void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
@@ -135,59 +111,61 @@ void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
 
   player->Direction = getDir(player->Camera);
 
-  if (keysHeld() & KEY_L) {
+  u32 hold = keysHeld();
+
+  if (hold & KEY_L) {
     specialmode = true;
   }
   if (keysUp() & KEY_L) {
     specialmode = false;
   }
 
-  if (keysHeld() & KEY_LEFT) {
+  if (hold & KEY_LEFT) {
     inputX -= F32_ONE;
   }
-  if (keysHeld() & KEY_RIGHT) {
+  if (hold & KEY_RIGHT) {
     inputX += F32_ONE;
   }
-  if (keysHeld() & KEY_UP) {
+  if (hold & KEY_UP) {
     inputZ += F32_ONE;
   }
-  if (keysHeld() & KEY_DOWN) {
+  if (hold & KEY_DOWN) {
     inputZ -= F32_ONE;
   }
 
-  f32 l = sqrtf32(mulf32(inputX, inputX) + mulf32(inputZ, inputZ));
+  if (inputX != 0 || inputZ != 0) {
+    if (inputX != 0 && inputZ != 0) {          // diagonale : on ramène la longueur à 1
+        inputX = (inputX > 0) ? 2896 : -2896; // 2896 = 1/√2 en f32
+        inputZ = (inputZ > 0) ? 2896 : -2896;
+    }
 
-  if (l > 0) {
-    inputX = divf32(inputX, l);
-    inputZ = divf32(inputZ, l);
+    f32 cosyaw = cos_f32((u16)player->Camera.yaw);
+    f32 sinyaw = sin_f32((u16)player->Camera.yaw);
 
-    f32 cosyaw = cos_f32(player->Camera.yaw);
-    f32 sinyaw = sin_f32(player->Camera.yaw);
-
-    m.x = mulf32( (mulf32(inputX, cosyaw) + mulf32(inputZ, sinyaw)), P_SPEED );
-    m.z = mulf32( (mulf32(inputX, sinyaw) - mulf32(inputZ, cosyaw)), P_SPEED );
+    m.x = mulf32((mulf32(inputX, cosyaw) + mulf32(inputZ, sinyaw)), P_SPEED);
+    m.z = mulf32((mulf32(inputX, sinyaw) - mulf32(inputZ, cosyaw)), P_SPEED);
 
     if (canMovePlayer(player, (f32vec3_t){.x = m.x, .y = 0, .z = 0}, chunk,
-                      n, list, blocks)) {
+                      n, list)) {
       movePlayer(player, (f32vec3_t){.x = m.x, .y = 0, .z = 0});
     }
 
     if (canMovePlayer(player, (f32vec3_t){.x = 0, .y = 0, .z = m.z}, chunk,
-                      n, list, blocks)) {
+                      n, list)) {
       movePlayer(player, (f32vec3_t){.x = 0, .y = 0, .z = m.z});
     }
   }
 
-  if ((keysHeld() & KEY_Y) && !specialmode)
+  if ((hold & KEY_Y) && !specialmode)
     player->Camera.yaw -= P_SENSI;
 
-  if ((keysHeld() & KEY_A) && !specialmode)
+  if ((hold & KEY_A) && !specialmode)
     player->Camera.yaw += P_SENSI;
 
-  if ((keysHeld() & KEY_B) && !specialmode && player->Camera.pitch > -MAX_ANGLE)
+  if ((hold & KEY_B) && !specialmode && player->Camera.pitch > -MAX_ANGLE)
     player->Camera.pitch -= P_SENSI;
 
-  if ((keysHeld() & KEY_X) && !specialmode && player->Camera.pitch < MAX_ANGLE)
+  if ((hold & KEY_X) && !specialmode && player->Camera.pitch < MAX_ANGLE)
     player->Camera.pitch += P_SENSI;
 }
 
@@ -199,7 +177,7 @@ bool ATTR_FUN_INI raycastBlock(player_t *player, chunk_t chunkL[], int size,
                                        ivec3_t *outTarget, ivec3_t *outPrev,
                                        int *outHitAxis, int *outHitSign,
                                        uint8_t *outBlock) {
-  f32vec3_t Raydir = getDir(player->Camera);
+  f32vec3_t Raydir = player->Direction;
   f32vec3_t origin = player->Camera.position;
 
   ivec3_t cur = {.x = f32toint(floor_f32(origin.x)),
@@ -334,11 +312,11 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
   drawBlockOutline(target.x, target.y, target.z);
 
   u32 down = keysDown();
-  u32 held = keysHeld();
-  u32 keys = down | held;
+  u32 hold = keysHeld();
+  u32 keys = down | hold;
 
   bool wantsPlace = keys & KEY_R;
-  bool wantsBreak = (held & KEY_L) && (keys & KEY_R);
+  bool wantsBreak = (hold & KEY_L) && (keys & KEY_R);
 
   if (wantsPlace && !specialmode && *delay <= 0) {
     if (!checkCollision(player->Position, player->hitbox, prev, HitboxBlocks)) {

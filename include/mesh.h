@@ -21,6 +21,8 @@
 // initialise le rendu 3D de Quads
 void startingDraw(bool cullback, int TextureID);
 
+#define endingDraw glPopMatrix(1)
+
 void setFog(int renderDistance);
 
 // dessine un bloc entier

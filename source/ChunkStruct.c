@@ -192,15 +192,15 @@ void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int Tex
   glPushMatrix();
   glTranslatef32(inttof32(chunk->position.x * L_CHUNK), 0,
                  inttof32(chunk->position.z * L_CHUNK));
-  startingDraw(cull, TextureID);
+  
   for (u8 x = 0 ; x < L_CHUNK ; ++x) {
     instance_t (*blockX)[L_CHUNK] = chunk->blocks[x];
     for (u8 y = 0 ; y < H_CHUNK ; ++y) {
       for (u8 z = 0 ; z < L_CHUNK ; ++z) {
-        block_t *block = &list[blockX[y][z].id];
-        if (block->transparent >= 2) {
+        if((blockX[y][z].faces & FACE_MASK) == 0){
           continue;
         }
+        block_t *block = &list[blockX[y][z].id];
         u8 faces = blockX[y][z].faces;
         u8 orientation = GET_ORIENTATION(faces);
         
@@ -213,7 +213,6 @@ void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int Tex
       }
     }
   }
-  glEnd();
   glPopMatrix(1);
 }
 
@@ -225,11 +224,11 @@ blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z) {
   if (y < 0 || y >= H_CHUNK)
     return AIR;
 
-  int chunkX = floorDiv(x, L_CHUNK);
-  int chunkZ = floorDiv(z, L_CHUNK);
+  int chunkX = CHUNK_OF(x);
+  int chunkZ = CHUNK_OF(z);
 
-  int localX = floorMod(x, L_CHUNK);
-  int localZ = floorMod(z, L_CHUNK);
+  int localX = LOCAL_OF(x);
+  int localZ = LOCAL_OF(z);
 
   chunk_t *p = chunk;
   while(p < chunk + size){
@@ -247,11 +246,11 @@ chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t bloc
   if (y < 0 || y >= H_CHUNK)
     return nullptr;
 
-  int chunkX = floorDiv(x, L_CHUNK);
-  int chunkZ = floorDiv(z, L_CHUNK);
+  int chunkX = CHUNK_OF(x);
+  int chunkZ = CHUNK_OF(z);
 
-  int localX = floorMod(x, L_CHUNK);
-  int localZ = floorMod(z, L_CHUNK);
+  int localX = LOCAL_OF(x);
+  int localZ = LOCAL_OF(z);
 
   chunk_t *p = chunk;
   while(p < chunk + size){
@@ -286,10 +285,10 @@ static chunk_t *findChunk(chunk_t chunkL[], int size, chunk_t *chunk,
     return chunk;
   }
   chunk_t *neighbor = getChunk(chunkL, size,
-                               chunk->position.x + floorDiv(*nx, L_CHUNK),
-                               chunk->position.z + floorDiv(*nz, L_CHUNK));
-  *nx = floorMod(*nx, L_CHUNK);
-  *nz = floorMod(*nz, L_CHUNK);
+                               chunk->position.x + CHUNK_OF(*nx),
+                               chunk->position.z + CHUNK_OF(*nz));
+  *nx = LOCAL_OF(*nx);
+  *nz = LOCAL_OF(*nz);
   return neighbor;
 }
 
@@ -298,11 +297,11 @@ void updateVisibility(block_t list[], chunk_t chunkL[], int size,
   if(y < 0 || y >= H_CHUNK){
     return;
   }
-  int x = floorMod(wx, L_CHUNK);
-  int z = floorMod(wz, L_CHUNK);
+  int x = LOCAL_OF(wx);
+  int z = LOCAL_OF(wz);
 
   bool drawing = list[block].transparent >= 1;
-   bool solid = list[block].transparent != 2;
+  bool solid = list[block].transparent != 2;
 
   u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
 

@@ -11,6 +11,7 @@
 #include "player.h"
 #include "spriteManager.h"
 #include "utils.h"
+#include "mesh.h"
 
 player_t DTCM_BSS Joueur;
 int delay = 0; // delay entre chaque bloc posé ou cassé
@@ -72,7 +73,7 @@ int main() {
     MainScreenInfos(&Joueur);
     
     if(GameState == PAUSED){
-      continue;
+      goto Fin_de_Boucle;
     }
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
     
@@ -85,14 +86,18 @@ int main() {
 
     playerInterract(&Joueur, chunkL, SIZE, gBlocks,
                     (const bool)specialmode, &delay);
-
+    
+    //rendu 3D
+    startingDraw(true, TextureID);
     for(chunk_t *cp = chunkL ; cp < chunkL + SIZE ; cp++){
       RenderChunk(cp, gBlocks, true, TextureID, &Joueur);
     }
+    endingDraw;
 
     if (delay > 0) {
       --delay;
     }
+Fin_de_Boucle:
     fin_boucle();
   }
   
@@ -117,8 +122,7 @@ void ApplyGravity() {
   }
   const f32vec3_t gravityMove = {.x = 0, .y = Joueur.velocityY, .z = 0};
 
-  if (canMovePlayer(&Joueur, gravityMove, chunkL, SIZE, gBlocks,
-                    HitboxBlocks)) {
+  if (canMovePlayer(&Joueur, gravityMove, chunkL, SIZE, gBlocks)) {
     movePlayer(&Joueur, gravityMove);
   } else {
     if (Joueur.velocityY <= 0) {
@@ -126,7 +130,8 @@ void ApplyGravity() {
     }
     Joueur.velocityY = 0;
   }
-  if(Joueur.velocityY > divf32(inttof32(-1307),inttof32(1000))){ //~1.307 bloc par frame car 1.307*60 ~= 78.4 bloc/s (vitesse de chute terminale d'un joueur minecraft)
+  //~1.307 bloc par frame car 1.307*60 ~= 78.4 bloc/s (vitesse de chute terminale d'un joueur minecraft)
+  if(Joueur.velocityY > divf32(inttof32(-1307),inttof32(1000))){
     Joueur.velocityY -= GRAVITY;
   }
 }

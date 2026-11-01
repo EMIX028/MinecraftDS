@@ -42,8 +42,8 @@ typedef struct partf32 {
 // récupère la partie décimale d'un f32
 #define decpart(n) ((n) - intpart(n))
 
+//affichage d'un f32 en format de nombre décimal pour printf
 #define SHOW_F32 "%c%ld.%04d"
-
 
 // renvoie le modulo entre n et p
 f32 mod_f32(f32 n, f32 p);
@@ -60,8 +60,8 @@ partf32_t f32topart(f32 n);
 f32 parttof32(partf32_t p);
 
 // Renvoie le cosinus d'un angle n exprimé en radians Q20.12
-f32 cos_f32(f32 n);
+f32 cos_f32(u16 a);
 // Renvoie le sinus d'un angle n exprimé en radians Q20.12
-f32 sin_f32(f32 n);
+f32 sin_f32(u16 a);
 
 #endif
