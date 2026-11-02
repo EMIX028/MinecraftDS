@@ -4,12 +4,12 @@
 #include "utils.h"
 #include <nds.h>
 
-#include "sprites/Crosshair.h"
-#include "sprites/background.h"
-#include "sprites/Title32P0.h"
-#include "sprites/Title32P1.h"
-#include "sprites/Title32P2.h"
-#include "sprites/Title32P3.h"
+#include "Crosshair.h"
+#include "background.h"
+#include "Title32P0.h"
+#include "Title32P1.h"
+#include "Title32P2.h"
+#include "Title32P3.h"
 
 void setCrosshair();
 

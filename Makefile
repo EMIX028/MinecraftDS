@@ -13,6 +13,7 @@ GAME_AUTHOR     := https://github.com/EMIX028/MinecraftDS
 GAME_ICON       := Icon.gif
 
 INCLUDEDIRS := include
+GFXDIRS := graphics
 
 CFLAGS  += -save-temps=obj -fverbose-asm -O2 -ffunction-sections -fdata-sections -g
 LDFLAGS += -Wl,--gc-sections
