@@ -2,12 +2,11 @@
 #define CHUNKSTRUCT_H
 
 #include "PlayerStruct.h"
+#include "config.h"
 #include "utils.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <nds/ndstypes.h>
-#define L_CHUNK 16 // chunk minecraft 16
-#define H_CHUNK 20 // hauteur max 256
 
 #define L_CHUNK_SHIFT 4
 #define CHUNK_OF(v) ((v) >> L_CHUNK_SHIFT) // =floordiv(v,16)
@@ -15,18 +14,18 @@
 
 // macro constante qui gère l'affichage d'un bloc sur un octet
 //  1 bit par face, soit 6 bits d'utilisé sur 8
-#define FACE_LEFT (1 << 0)
-#define FACE_RIGHT (1 << 1)
+#define FACE_WEST (1 << 0)
+#define FACE_EST (1 << 1)
 #define FACE_TOP (1 << 2)
 #define FACE_BOTTOM (1 << 3)
-#define FACE_FRONT (1 << 4)
-#define FACE_BACK (1 << 5)
+#define FACE_SOUTH (1 << 4)
+#define FACE_NORTH (1 << 5)
 
 typedef enum {
-  front_to_front, // même valeur que si un block isLog a sa face du dessus orienté sur Z
-  front_to_left, // même valeur que si un block isLog a sa face du dessus orienté sur X
-  front_to_back, // même valeur que si un block isLog a sa face du dessus orienté sur Y
-  front_to_right
+  front_to_south, // même valeur que si un block isLog a sa face du dessus orienté sur Z
+  front_to_west, // même valeur que si un block isLog a sa face du dessus orienté sur X
+  front_to_north, // même valeur que si un block isLog a sa face du dessus orienté sur Y
+  front_to_est
 }orientation_facetex;
 
 #define ORIENTATION_MASK (3 << 6)
@@ -37,7 +36,7 @@ typedef enum {
   ((data) = ((data) & 0x3F) | ((orientation) << 6))
 #define GET_ORIENTATION(data) (((data) >> 6) & 0x03)
 
-typedef enum { top, bottom, side, front } faces;
+typedef enum { top, bottom, side, front } faces; //sert pour l'affichage des face de textures
 
 /*structure d'un type de bloc avec son ID
 solid qui est un booléen si on peut traverser ou non le bloc
@@ -45,7 +44,7 @@ transparent qui sert de valeur de 0 à 2 de transparence
 0 : opaque, 1 : bloc contenant de la transparence, 2 : totalement transparent
 texture est la coordonné de la texture dans l'atlas
 */
-typedef struct block_s {
+typedef struct {
   blockId_t id;
 
   bool solid;
@@ -57,7 +56,7 @@ typedef struct block_s {
 
 // structure présente dans les tableaux de chunk
 //  1 octet pour l'id, 1 octet faces pour les faces à afficher ou non
-typedef struct instance {
+typedef struct {
   blockId_t id;
   u8 faces;
   // dans le futur ajouté luminosité des blocs
@@ -66,7 +65,7 @@ typedef struct instance {
 // chunk est un regroupement de bloc avec
 // sa position dans le monde
 // et les blocs qui le compose
-typedef struct chunk {
+typedef struct {
   vec2_t position;
   instance_t blocks[L_CHUNK][H_CHUNK][L_CHUNK];
 } chunk_t;

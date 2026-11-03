@@ -3,50 +3,34 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "config.h"
 #include "fixed_point.h"
-
-// définition de nullptr pour la norme de compilation de blocksDS
-#if !defined(__nullptr_t_defined) && !defined(_NULLPTR_T) && (__STDC_VERSION__ < 202311L)
-    #if defined(__nullptr) || defined(__GNUC__) && (__GNUC__ >= 13)
-        typedef __typeof__(nullptr) nullptr_t;
-    #else
-        typedef struct { } *nullptr_t;
-        #define nullptr ((nullptr_t)0)
-    #endif
-#endif
-
-#define SCREEN_W 256
-#define SCREEN_H 192
-
-#define DEBUG_MODE 0
-
-#define ATTR_FUN_INI __attribute__((section(".itcm")))
 
 //booléen utilisé si on appuie sur la touche qui gère les combinaison (KEY_L)
 extern bool specialmode;
 
 //vecteur 3d en Q20.12
-typedef struct f32vec3{
+typedef struct {
   f32 x;
   f32 y;
   f32 z;
 } f32vec3_t;
 
 //vecteur 3d en entier
-typedef struct ivec3{
+typedef struct {
   int8_t x;
   int8_t y;
   int8_t z;
 } ivec3_t;
 
 //vecteur 2d en entier
-typedef struct vec2{
+typedef struct {
   int8_t x;
   int8_t z;
 } vec2_t;
 
 //définir une hitbox avec largeur, hauteur, profondeur
-typedef struct hitbox{
+typedef struct {
   f32 w;
   f32 h;
   f32 d;
@@ -55,33 +39,16 @@ typedef struct hitbox{
 //type qui permet de définir tout ce qui est relatif aux id d'un bloc
 typedef uint8_t blockId_t;
 
-//Alias de plusieurs ID de bloc
-enum Blocks{
-    AIR,
-    STONE,
-    DIRT,
-    GRASS,
-    COBBLESTONE,
-    OAK_PLANK,
-    BEDROCK,
-    SAND,
-    GOLD_ORE,
-    IRON_ORE,
-    COAL_ORE,
-    OAK_LOG,
-    OAK_LEAVE,
-    GLASS,
-    OBSIDIAN,
-    DIAMOND_ORE,
-    CRAFTING_TABLE,
-    FURNACE,
-    REDSTONE_ORE,
-    BLOCK_COUNT
-};
-
 enum GAMESTATE{
   RUNNING,
   PAUSED,
+};
+
+enum {
+  south,
+  west,
+  north,
+  est
 };
 
 //renvoie le quotient d'une division pour un entier <0 ou >0
@@ -90,6 +57,5 @@ int floorDiv(int a, int b);
 //renvoie le reste d'une division pour un entier <0 ou >0
 int floorMod(int a, int b);
 
-bool flipflop(bool a);
 
 #endif

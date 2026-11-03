@@ -37,8 +37,8 @@ void setBackground(){
     dmaCopy(backgroundPal, VRAM_I_EXT_SPR_PALETTE[0], backgroundPalLen);
     
     int i = 0; // (SCREEN_W/32)*(SCREEN_H/32) = 48 id utilisé
-    for(int x = 0; x < SCREEN_W/32; ++x){
-        for(int y = 0; y < SCREEN_H/32; ++y){
+    for(int x = 0; x < SCREEN_W / 32; ++x){
+        for(int y = 0; y < SCREEN_H / 32; ++y){
             oamSet(&oamSub, i,                        // slot sprite
                 x*32, y*32, // x, y
                 -1,                                  // priorité (0 = devant)

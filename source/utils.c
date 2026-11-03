@@ -18,7 +18,3 @@ int floorMod(int a, int b){
   }
   return r;
 }
-
-bool flipflop(bool a){
-  return !a;
-}

@@ -11,7 +11,7 @@ void setPlayer(player_t *player) {
   player->Position.z = divf32(F32_ONE,inttof32(2));
 
   player->Camera.position.x = player->Position.x;
-  player->Camera.position.y = player->Position.y + divf32(inttof32(81),inttof32(50)); // 81/50 = 1.62
+  player->Camera.position.y = player->Position.y + P_HEIGHT;
   player->Camera.position.z = player->Position.z;
 
   player->Camera.yaw = 0;
@@ -24,7 +24,7 @@ void setPlayer(player_t *player) {
   player->isfalling = false;
   player->iscrouch = false;
   player->velocityY = 0;
-  player->index = STONE;
+  player->index = 1;
 }
 
 void movePlayer(player_t *player, f32vec3_t d) {
@@ -32,14 +32,14 @@ void movePlayer(player_t *player, f32vec3_t d) {
   player->Position.y += d.y;
   player->Position.z += d.z;
   player->Camera.position.x = player->Position.x;
-  player->Camera.position.y = player->Position.y + divf32(inttof32(81),inttof32(50));
+  player->Camera.position.y = player->Position.y + P_HEIGHT;
   player->Camera.position.z = player->Position.z;
 }
 
 void teleportPlayer(player_t *player, f32vec3_t d) {
   player->Position = d;
   player->Camera.position = d;
-  player->Camera.position.y += divf32(inttof32(81),inttof32(50)); // 81/50 = 1.62
+  player->Camera.position.y += P_HEIGHT;
 }
 
 f32vec3_t getDir(camera_t cam) {
@@ -132,6 +132,10 @@ void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
   if (hold & KEY_DOWN) {
     inputZ -= F32_ONE;
   }
+  if((hold & KEY_L) && (( keysDown() & KEY_B) || (hold & KEY_B)) && !player->isfalling){
+    player->velocityY = 563; //divf32(inttof32(13749),inttof32(100000))
+    player->isfalling = true;
+  }
 
   if (inputX != 0 || inputZ != 0) {
     if (inputX != 0 && inputZ != 0) {          // diagonale : on ramène la longueur à 1
@@ -169,6 +173,26 @@ void ATTR_FUN_INI loadPlayerMovement(player_t *player, chunk_t chunk[], int n,
     player->Camera.pitch += P_SENSI;
 }
 
+
+void applyGravity(player_t *p, chunk_t c[], int n) {
+  if(p->Position.y <= inttof32(-30) ){
+      p->Position.y = inttof32(20);
+  }
+  const f32vec3_t gravityMove = {.x = 0, .y = p->velocityY, .z = 0};
+
+  if (canMovePlayer(p, gravityMove, c, n, gBlocks)) {
+    p->isfalling = true;
+    movePlayer(p, gravityMove);
+  } else {
+    if (p->velocityY <= 0) {
+      p->isfalling = false;
+    }
+    p->velocityY = 0;
+  }
+  if(p->velocityY > TERMINAL_SPEED ){
+    p->velocityY -= GRAVITY;
+  }
+}
 
 
 
@@ -277,22 +301,19 @@ bool ATTR_FUN_INI raycastBlock(player_t *player, chunk_t chunkL[], int size,
 
 
 
-static uint8_t computeOrientation(block_t list[], blockId_t indexB, int hitAxis, float yaw) {
-  if (list[indexB].isLog) {
-    // Buche : orientation dépend uniquement de la face touchée, pas du yaw
-    return (hitAxis == 1) ? front_to_right : 
-              (hitAxis == 0) ? front_to_left : front_to_front;
-  }
+static uint8_t computeOrientation(block_t list[], blockId_t indexB, int hitAxis, f32 yaw) {
+    if (list[indexB].isLog) {
+        // Buche : orientation dépend uniquement de la face touchée
+        return (hitAxis == 1) ? front_to_est :
+               (hitAxis == 0) ? front_to_west : front_to_south;
+    }
 
-  int16_t Pdeg = f32toint( mod_f32(mulf32(yaw , divf32(inttof32(180) , F32_PI)), inttof32(360)) );
-  if (Pdeg > 180)
-    Pdeg -= 360;
-  else if (Pdeg < -180)
-    Pdeg += 360;
+    uint8_t orientation = ((u16)(yaw + 8192) >> 14) & 3;
 
-  return (Pdeg >= -45 && Pdeg < 45) ? front_to_front :
-            (Pdeg >= 45 && Pdeg < 135) ? front_to_left :
-              (Pdeg >= -135 && Pdeg < -45) ? front_to_right : front_to_back;
+    return (orientation == 0) ? front_to_south :
+           (orientation == 1) ? front_to_west :
+           (orientation == 2) ? front_to_north :
+                                front_to_est;
 }
 
 
@@ -330,7 +351,7 @@ void ATTR_FUN_INI playerInterract(player_t *player, chunk_t chunkL[], int size,
   }
 
   if (wantsBreak && *delay <= 0 && b != BEDROCK) {
-    chunk_t *p = setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_front);
+    chunk_t *p = setBlock(chunkL, size, target.x, target.y, target.z, AIR, front_to_south);
     if(p != nullptr){
       updateVisibility(list, chunkL, size, p, target.x, target.y, target.z, AIR);
     }
@@ -349,5 +370,5 @@ void setCam(player_t *player) {
             player->Camera.position.z,
             player->Camera.position.x + player->Direction.x,
             player->Camera.position.y + player->Direction.y,
-            player->Camera.position.z + player->Direction.z, inttof32(0), inttof32(1), inttof32(0));
+            player->Camera.position.z + player->Direction.z, 0, F32_ONE, 0);
 }

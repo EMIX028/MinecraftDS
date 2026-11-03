@@ -38,7 +38,6 @@ int main() {
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_ANTIALIAS);
   glEnable(GL_BLEND);
-  glEnable(GL_FOG);
 
   glViewport(0, 0, SCREEN_W - 1, SCREEN_H - 1);
   glMatrixMode(GL_PROJECTION);
@@ -78,7 +77,7 @@ int main() {
     loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
     
 
-    ApplyGravity();
+    applyGravity(&Joueur, chunkL, SIZE);
 
     glMatrixMode(GL_MODELVIEW); // reset complet chaque frame
     glLoadIdentity();
@@ -88,7 +87,7 @@ int main() {
                     (const bool)specialmode, &delay);
     
     //rendu 3D
-    startingDraw(true, TextureID);
+    startingDraw(CULLBACK, TextureID);
     for(chunk_t *cp = chunkL ; cp < chunkL + SIZE ; cp++){
       RenderChunk(cp, gBlocks, true, TextureID, &Joueur);
     }
@@ -98,7 +97,7 @@ int main() {
       --delay;
     }
 Fin_de_Boucle:
-    fin_boucle();
+    fin_boucle;
   }
   
   if(glDeinit() == 0){
@@ -116,26 +115,6 @@ char *GetPlayerName(char *pseudo) {
   return pseudo;
 }
 
-void ApplyGravity() {
-  if(Joueur.Position.y <= inttof32(-30) ){
-      Joueur.Position.y = inttof32(20);
-  }
-  const f32vec3_t gravityMove = {.x = 0, .y = Joueur.velocityY, .z = 0};
-
-  if (canMovePlayer(&Joueur, gravityMove, chunkL, SIZE, gBlocks)) {
-    movePlayer(&Joueur, gravityMove);
-  } else {
-    if (Joueur.velocityY <= 0) {
-      Joueur.isfalling = false;
-    }
-    Joueur.velocityY = 0;
-  }
-  //~1.307 bloc par frame car 1.307*60 ~= 78.4 bloc/s (vitesse de chute terminale d'un joueur minecraft)
-  if(Joueur.velocityY > divf32(inttof32(-1307),inttof32(1000))){
-    Joueur.velocityY -= GRAVITY;
-  }
-}
-
 void setPlayground() {
   for (int i = 0; i < SIZE; ++i) {
     initChunk(&chunkL[i], AIR);
@@ -147,13 +126,4 @@ void setPlayground() {
     }
   }
   chunkVisibility(chunkL, SIZE, gBlocks);
-}
-
-void fin_boucle(){
-  glFlush(0);
-  swiWaitForVBlank();
-  if (MAIN_SPRITE)
-    oamUpdate(&oamMain);
-  if (SUB_SPRITE)
-    oamUpdate(&oamSub);
 }

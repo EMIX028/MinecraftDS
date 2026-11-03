@@ -27,6 +27,9 @@ bool canMovePlayer(player_t *p, f32vec3_t m, chunk_t chunk[], int n, block_t lis
 //gère les inputs de déplacement du joueur
 void loadPlayerMovement(player_t *player , chunk_t chunk[], int n, block_t list[], hitbox_t blocks);
 
+//applique le calcul de la gravité au joueur
+void applyGravity(player_t *p, chunk_t c[], int n);
+
 void playerInterract(player_t *player, chunk_t chunkL[], int size,block_t list[],
                       const bool specialmode, int *delay);
 

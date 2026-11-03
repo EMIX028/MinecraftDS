@@ -197,27 +197,12 @@ void InitBlocks(void){
     };
 }
 
-const char *getBlockName(uint8_t block){
-    switch (block) {
-        case AIR:   return "Air";
-        case STONE: return "Stone";
-        case DIRT:  return "Dirt";
-        case GRASS: return "Grass block";
-        case COBBLESTONE: return "Cobblestone";
-        case OAK_PLANK: return "Oak Plank";
-        case BEDROCK: return "Bedrock";
-        case SAND: return "Sand";
-        case GOLD_ORE: return "Gold Ore";
-        case IRON_ORE: return "Iron Ore";
-        case COAL_ORE: return "Coal Ore";
-        case OAK_LOG: return "Oak Log";
-        case OAK_LEAVE: return "Oak Leave";
-        case GLASS: return "Glass";
-        case OBSIDIAN: return "Obsidian";
-        case DIAMOND_ORE: return "Diamond Ore";
-        case CRAFTING_TABLE: return "Crafting table";
-        case FURNACE: return "Furnace";
-        case REDSTONE_ORE: return "Redstone Ore";
-        default:          return "UNKNOWN";
-    }
+static const char *const BLOCK_NAMES[BLOCK_COUNT] = {
+#define X(id, name) [id] = name,
+  BLOCK_LIST(X)
+#undef X
+};
+
+const char *getBlockName(uint8_t block) {
+  return block < BLOCK_COUNT ? BLOCK_NAMES[block] : "UNKNOWN";
 }

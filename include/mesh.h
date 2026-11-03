@@ -21,20 +21,18 @@
 // initialise le rendu 3D de Quads
 void startingDraw(bool cullback, int TextureID);
 
-#define endingDraw glPopMatrix(1)
-
-void setFog(int renderDistance);
+#define endingDraw glEnd()
 
 // dessine un bloc entier
 void drawCube(bool cullback, vec2_t t, int TextureID);
 
 // dessine sur le rendu 3D une face
-void drawCubeTop(vec2_t t, uint8_t angle);
-void drawCubeBottom(vec2_t t, uint8_t angle);
-void drawCubeLeft(vec2_t t, uint8_t angle);
-void drawCubeRight(vec2_t t, uint8_t angle);
-void drawCubeFront(vec2_t t, uint8_t angle);
-void drawCubeBack(vec2_t t, uint8_t angle);
+void drawTopFace(vec2_t t, uint8_t angle);
+void drawBotFace(vec2_t t, uint8_t angle);
+void drawWestFace(vec2_t t, uint8_t angle);
+void drawEstFace(vec2_t t, uint8_t angle);
+void drawSouthFace(vec2_t t, uint8_t angle);
+void drawNorthFace(vec2_t t, uint8_t angle);
 
 // dessine un contour noir autour du bloc que l'on regarde
 // si il est dans notre rayon d'action

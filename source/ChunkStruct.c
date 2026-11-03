@@ -31,37 +31,37 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
   // LEFT
   if (x > 0) {
     if (list[chunk->blocks[x - 1][y][z].id].transparent != 0) {
-      faces |= FACE_LEFT;
+      faces |= FACE_WEST;
     }
   } else if (leftChunk == nullptr || list[leftChunk->blocks[L_CHUNK - 1][y][z].id].transparent != 0) {
-    faces |= FACE_LEFT;
+    faces |= FACE_WEST;
   }
 
   // RIGHT
   if (x < L_CHUNK - 1) {
     if (list[chunk->blocks[x + 1][y][z].id].transparent != 0) {
-      faces |= FACE_RIGHT;
+      faces |= FACE_EST;
     }
   } else if (rightChunk == nullptr || list[rightChunk->blocks[0][y][z].id].transparent != 0) {
-    faces |= FACE_RIGHT;
+    faces |= FACE_EST;
   }
 
   // BACK
   if (z > 0) {
     if (list[chunk->blocks[x][y][z - 1].id].transparent != 0) {
-      faces |= FACE_BACK;
+      faces |= FACE_NORTH;
     }
   } else if (backChunk == nullptr || list[backChunk->blocks[x][y][L_CHUNK - 1].id].transparent != 0) {
-    faces |= FACE_BACK;
+    faces |= FACE_NORTH;
   }
 
   // FRONT
   if (z < L_CHUNK - 1) {
     if (list[chunk->blocks[x][y][z + 1].id].transparent != 0) {
-      faces |= FACE_FRONT;
+      faces |= FACE_SOUTH;
     }
   } else if (frontChunk == nullptr || list[frontChunk->blocks[x][y][0].id].transparent != 0) {
-    faces |= FACE_FRONT;
+    faces |= FACE_SOUTH;
   }
 
   // BOTTOM
@@ -119,72 +119,72 @@ static void RenderBlock(block_t *block, u8 faces, u8 orientation, int x, int y, 
     vec2_t tex;
     int angle;
     if (block->isLog) {
-      logFaceTexAngle(block, orientation, front_to_right, front_to_front, &tex, &angle);
+      logFaceTexAngle(block, orientation, front_to_est, front_to_south, &tex, &angle);
     } else {
       tex = block->texture[top];
       angle = 0;
     }
-    drawCubeTop(tex, angle);
+    drawTopFace(tex, angle);
   }
 
   if ((faces & FACE_BOTTOM) && y >= f32toint(player->Position.y)) {
     vec2_t tex;
     int angle;
     if (block->isLog) {
-      logFaceTexAngle(block, orientation, front_to_right, front_to_front, &tex, &angle);
+      logFaceTexAngle(block, orientation, front_to_est, front_to_south, &tex, &angle);
     } else {
       tex = block->texture[bottom];
       angle = 0;
     }
-    drawCubeBottom(tex, angle);
+    drawBotFace(tex, angle);
   }
 
-  if (faces & FACE_LEFT) {
+  if (faces & FACE_WEST) {
     vec2_t tex;
     int angle;
     if (block->isLog) {
-      logFaceTexAngle(block, orientation, front_to_left, front_to_front, &tex, &angle);
+      logFaceTexAngle(block, orientation, front_to_west, front_to_south, &tex, &angle);
     } else {
-      tex = sideOrFrontTex(block, orientation, front_to_left);
+      tex = sideOrFrontTex(block, orientation, front_to_west);
       angle = 0;
     }
-    drawCubeLeft(tex, angle);
+    drawWestFace(tex, angle);
   }
 
-  if (faces & FACE_RIGHT) {
+  if (faces & FACE_EST) {
     vec2_t tex;
     int angle;
     if (block->isLog) {
-      logFaceTexAngle(block, orientation, front_to_left, front_to_front, &tex, &angle);
+      logFaceTexAngle(block, orientation, front_to_west, front_to_south, &tex, &angle);
     } else {
-      tex = sideOrFrontTex(block, orientation, front_to_right);
+      tex = sideOrFrontTex(block, orientation, front_to_est);
       angle = 0;
     }
-    drawCubeRight(tex, angle);
+    drawEstFace(tex, angle);
   }
 
-  if (faces & FACE_FRONT) {
+  if (faces & FACE_SOUTH) {
     vec2_t tex;
     int angle;
     if (block->isLog) {
-      logFaceTexAngle(block, orientation, front_to_front, front_to_left, &tex, &angle);
+      logFaceTexAngle(block, orientation, front_to_south, front_to_west, &tex, &angle);
     } else {
-      tex = sideOrFrontTex(block, orientation, front_to_front);
+      tex = sideOrFrontTex(block, orientation, front_to_south);
       angle = 0;
     }
-    drawCubeFront(tex, angle);
+    drawSouthFace(tex, angle);
   }
 
-  if (faces & FACE_BACK) {
+  if (faces & FACE_NORTH) {
     vec2_t tex;
     int angle;
     if (block->isLog) {
-      logFaceTexAngle(block, orientation, front_to_front, front_to_left, &tex, &angle);
+      logFaceTexAngle(block, orientation, front_to_south, front_to_west, &tex, &angle);
     } else {
-      tex = sideOrFrontTex(block, orientation, front_to_back);
+      tex = sideOrFrontTex(block, orientation, front_to_north);
       angle = 0;
     }
-    drawCubeBack(tex, angle);
+    drawNorthFace(tex, angle);
   }
 }
 
@@ -243,8 +243,9 @@ blockId_t getBlock(chunk_t chunk[], int size, int x, int y, int z) {
 
 chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t block,
              u8 orientation) {
-  if (y < 0 || y >= H_CHUNK)
+  if (y < 0 || y >= H_CHUNK){
     return nullptr;
+  }
 
   int chunkX = CHUNK_OF(x);
   int chunkZ = CHUNK_OF(z);
@@ -268,10 +269,10 @@ chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t bloc
 struct direction { s8 dx, dy, dz; u8 onNeighbor, onSelf; };
 
 static const struct direction NEIGHBORS[6] = {
-  { -1,  0,  0, FACE_RIGHT,  FACE_LEFT   },
-  {  1,  0,  0, FACE_LEFT,   FACE_RIGHT  },
-  {  0,  0, -1, FACE_FRONT,  FACE_BACK   },
-  {  0,  0,  1, FACE_BACK,   FACE_FRONT  },
+  { -1,  0,  0, FACE_EST,    FACE_WEST   },
+  {  1,  0,  0, FACE_WEST,   FACE_EST  },
+  {  0,  0, -1, FACE_SOUTH,  FACE_NORTH   },
+  {  0,  0,  1, FACE_NORTH,  FACE_SOUTH  },
   {  0, -1,  0, FACE_TOP,    FACE_BOTTOM },
   {  0,  1,  0, FACE_BOTTOM, FACE_TOP    },
 };

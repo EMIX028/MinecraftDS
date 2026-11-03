@@ -3,14 +3,6 @@
 
 
 #include <stdint.h>
-#define GRAVITY divf32(F32_ONE, inttof32(125)) //0.008
-#define MAIN_TEXT true
-#define MAIN_SPRITE true
-#define SUB_TEXT true
-#define SUB_SPRITE true
-
-//applique le calcul de la gravité au joueur
-void ApplyGravity();
 
 //créer la map temporaire pour le jeu
 void setPlayground();
@@ -18,6 +10,14 @@ void setPlayground();
 //récupère le pseudo du joueur qu'il a inscrit dans la DS
 char *GetPlayerName(char *name);
 
-void fin_boucle();
+#define fin_boucle                  \
+    {                               \
+        glFlush(0);                 \
+        swiWaitForVBlank();         \
+        if (MAIN_SPRITE)            \
+            oamUpdate(&oamMain);    \
+        if (SUB_SPRITE)             \
+            oamUpdate(&oamSub);     \
+    }
 
 #endif

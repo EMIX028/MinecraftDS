@@ -12,7 +12,7 @@ typedef int32_t f32;
 // i : partie entière
 // d : partie décimale
 // s : signe true si <0 false sinon
-typedef struct partf32 {
+typedef struct {
   int32_t i;
   int16_t d;
   bool s;
@@ -22,7 +22,7 @@ typedef struct partf32 {
 
 // Représentation de 1.0 en Q20.12 (4096)
 #define F32_ONE (1 << F32_FRAC_BITS)
-// valeur de π/2 en f32
+// valeur de 1/2 en f32
 #define F32_HALF (F32_ONE / 2)
 // valeur de π en f32
 #define F32_PI 12868

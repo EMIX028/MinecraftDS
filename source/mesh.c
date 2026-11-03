@@ -2,19 +2,6 @@
 #include <stdint.h>
 #define ARR 5
 
-void SetupFog(int renderDistance) {
-  glFogColor(31, 31, 31, 31);
-  glFogShift(2);
-  glFogOffset(27800);
-
-  for (int i = 0; i < 32; i++) {
-    float t = (float)i / 31.0f;
-    float f = t * t * t * t;
-
-    glFogDensity(i, (int)(127.0f * f));
-  }
-}
-
 void startingDraw(bool cullback, int TextureID) {
   glBindTexture(0, TextureID);
   glPolyFmt(POLY_ALPHA(31) | (cullback ? POLY_CULL_BACK : POLY_CULL_NONE) |
@@ -26,7 +13,7 @@ void startingDraw(bool cullback, int TextureID) {
   glBegin(GL_QUADS);
 }
 
-void drawCubeTop(vec2_t t, u8 angle) {
+void drawTopFace(vec2_t t, u8 angle) {
   glNormal(NORMAL_PACK(0, floattov10(1.0), 0));
 
   int u0 = 1 + 18 * t.z;
@@ -81,7 +68,7 @@ void drawCubeTop(vec2_t t, u8 angle) {
   }
 }
 
-void drawCubeBottom(vec2_t t, uint8_t angle) {
+void drawBotFace(vec2_t t, uint8_t angle) {
   glNormal(NORMAL_PACK(0, floattov10(-1.0), 0));
 
   int u0 = 1 + 18 * t.z;
@@ -136,172 +123,7 @@ void drawCubeBottom(vec2_t t, uint8_t angle) {
   }
 }
 
-void drawCubeBack(vec2_t t, uint8_t angle) {
-  glNormal(NORMAL_PACK(0, 0, floattov10(-1.0)));
-
-  int u0 = 1 + 18 * t.z;
-  int u1 = 17 + 18 * t.z;
-
-  int v0 = 1 + 18 * t.x;
-  int v1 = 17 + 18 * t.x;
-
-  switch (angle) {
-  case 0:
-  default:
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(0, 0, 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(0, inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(inttov16(1), inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(inttov16(1), 0, 0);
-    break;
-
-  case 90:
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(0, 0, 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(0, inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(inttov16(1), inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(inttov16(1), 0, 0);
-    break;
-
-  case 180:
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(0, 0, 0);
-
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(0, inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(inttov16(1), inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(inttov16(1), 0, 0);
-    break;
-  }
-}
-
-void drawCubeRight(vec2_t t, uint8_t angle) {
-  glNormal(NORMAL_PACK(floattov10(1.0), 0, 0));
-
-  int u0 = 1 + 18 * t.z;
-  int u1 = 17 + 18 * t.z;
-
-  int v0 = 1 + 18 * t.x;
-  int v1 = 17 + 18 * t.x;
-
-  switch (angle) {
-  case 0:
-  default:
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(inttov16(1), 0, 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(inttov16(1), inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(inttov16(1), 0, inttov16(1));
-    break;
-
-  case 90:
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(inttov16(1), 0, 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(inttov16(1), inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(inttov16(1), 0, inttov16(1));
-    break;
-
-  case 180:
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(inttov16(1), 0, 0);
-
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(inttov16(1), inttov16(1), 0);
-
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(inttov16(1), 0, inttov16(1));
-    break;
-  }
-}
-
-void drawCubeFront(vec2_t t, uint8_t angle) {
-  glNormal(NORMAL_PACK(0, 0, floattov10(1.0)));
-
-  int u0 = 1 + 18 * t.z;
-  int u1 = 17 + 18 * t.z;
-
-  int v0 = 1 + 18 * t.x;
-  int v1 = 17 + 18 * t.x;
-
-  switch (angle) {
-  case 0:
-  default:
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(inttov16(1), 0, inttov16(1));
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(0, inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(0, 0, inttov16(1));
-    break;
-
-  case 90:
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(inttov16(1), 0, inttov16(1));
-
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(0, inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(0, 0, inttov16(1));
-    break;
-
-  case 180:
-    glTexCoord2t16(inttot16(u0), inttot16(v0));
-    glVertex3v16(inttov16(1), 0, inttov16(1));
-
-    glTexCoord2t16(inttot16(u0), inttot16(v1));
-    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u1), inttot16(v1));
-    glVertex3v16(0, inttov16(1), inttov16(1));
-
-    glTexCoord2t16(inttot16(u1), inttot16(v0));
-    glVertex3v16(0, 0, inttov16(1));
-    break;
-  }
-}
-
-void drawCubeLeft(vec2_t t, uint8_t angle) {
+void drawWestFace(vec2_t t, uint8_t angle) {
   glNormal(NORMAL_PACK(floattov10(-1.0), 0, 0));
 
   int u0 = 1 + 18 * t.z;
@@ -356,15 +178,180 @@ void drawCubeLeft(vec2_t t, uint8_t angle) {
   }
 }
 
+void drawEstFace(vec2_t t, uint8_t angle) {
+  glNormal(NORMAL_PACK(floattov10(1.0), 0, 0));
+
+  int u0 = 1 + 18 * t.z;
+  int u1 = 17 + 18 * t.z;
+
+  int v0 = 1 + 18 * t.x;
+  int v1 = 17 + 18 * t.x;
+
+  switch (angle) {
+  case 0:
+  default:
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(inttov16(1), 0, 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(inttov16(1), inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(inttov16(1), 0, inttov16(1));
+    break;
+
+  case 90:
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(inttov16(1), 0, 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(inttov16(1), inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(inttov16(1), 0, inttov16(1));
+    break;
+
+  case 180:
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(inttov16(1), 0, 0);
+
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(inttov16(1), inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(inttov16(1), 0, inttov16(1));
+    break;
+  }
+}
+
+void drawSouthFace(vec2_t t, uint8_t angle) {
+  glNormal(NORMAL_PACK(0, 0, floattov10(1.0)));
+
+  int u0 = 1 + 18 * t.z;
+  int u1 = 17 + 18 * t.z;
+
+  int v0 = 1 + 18 * t.x;
+  int v1 = 17 + 18 * t.x;
+
+  switch (angle) {
+  case 0:
+  default:
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(inttov16(1), 0, inttov16(1));
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(0, inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(0, 0, inttov16(1));
+    break;
+
+  case 90:
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(inttov16(1), 0, inttov16(1));
+
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(0, inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(0, 0, inttov16(1));
+    break;
+
+  case 180:
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(inttov16(1), 0, inttov16(1));
+
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(inttov16(1), inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(0, inttov16(1), inttov16(1));
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(0, 0, inttov16(1));
+    break;
+  }
+}
+
+void drawNorthFace(vec2_t t, uint8_t angle) {
+  glNormal(NORMAL_PACK(0, 0, floattov10(-1.0)));
+
+  int u0 = 1 + 18 * t.z;
+  int u1 = 17 + 18 * t.z;
+
+  int v0 = 1 + 18 * t.x;
+  int v1 = 17 + 18 * t.x;
+
+  switch (angle) {
+  case 0:
+  default:
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(0, 0, 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(0, inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(inttov16(1), inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(inttov16(1), 0, 0);
+    break;
+
+  case 90:
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(0, 0, 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(0, inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(inttov16(1), inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(inttov16(1), 0, 0);
+    break;
+
+  case 180:
+    glTexCoord2t16(inttot16(u0), inttot16(v0));
+    glVertex3v16(0, 0, 0);
+
+    glTexCoord2t16(inttot16(u0), inttot16(v1));
+    glVertex3v16(0, inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v1));
+    glVertex3v16(inttov16(1), inttov16(1), 0);
+
+    glTexCoord2t16(inttot16(u1), inttot16(v0));
+    glVertex3v16(inttov16(1), 0, 0);
+    break;
+  }
+}
+
 void drawCube(bool cullback, vec2_t t, int TextureID) {
   startingDraw(cullback, TextureID);
-  drawCubeLeft(t, 0);
-  drawCubeFront(t, 0);
-  drawCubeBack(t, 0);
-  drawCubeRight(t, 0);
-  drawCubeTop(t, 0);
-  drawCubeBottom(t, 0);
-  glEnd();
+  drawTopFace(t, 0);
+  drawBotFace(t, 0);
+  drawWestFace(t, 0);
+  drawEstFace(t, 0);
+  drawNorthFace(t, 0);
+  drawSouthFace(t, 0);
+  endingDraw;
 }
 
 // glMaterialf(

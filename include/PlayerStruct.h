@@ -4,17 +4,9 @@
 #include <stdbool.h>
 #include "utils.h"
 
-#define P_SPEED divf32(F32_ONE,inttof32(10)) // 0.1
-#define P_SENSI 624 //divf32(inttof32(3),inttof32(50)) // 0.06
-#define P_FLYSPEED divf32(F32_ONE,inttof32(4)) //0.25
-#define P_hitbox divf32(inttof32(3),inttof32(5)) //0.6
-#define P_REACH divf32(inttof32(9),inttof32(2)) //4.5
-#define DELAY 11
-#define MAX_ANGLE 14602 //divf32(inttof32(7),inttof32(5)) //1.4
-
 //structure camera avec sa position en vecteur 3d
 //sa rotation horizontal yaw et vertical pitch
-typedef struct{
+typedef struct {
   f32vec3_t position;
   f32 yaw;
   f32 pitch;
@@ -27,7 +19,7 @@ hitbox du joueur qui est dirigé par la macro constante P_hitbox & 1.8 de hauteu
 isfalling booléen de controle
 velocityY pour gérer la gravité appliqué au joueur
 */
-typedef struct player{
+typedef struct {
   f32vec3_t Position;
   camera_t Camera;
   f32vec3_t Direction;
@@ -36,6 +28,7 @@ typedef struct player{
   bool iscrouch;
   f32 velocityY;
   blockId_t index;
+  unsigned int facing : 2; //utilise 2 bits (0 à 3) pour si on regarde au nord, sud, est ou ouest
 }player_t;
 
 #endif
