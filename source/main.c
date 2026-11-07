@@ -74,7 +74,10 @@ int main() {
     if(GameState == PAUSED){
       goto Fin_de_Boucle;
     }
-    loadPlayerMovement(&Joueur, chunkL, SIZE, gBlocks, HitboxBlocks);
+    if(GameState == CLOSE){
+      break;
+    }
+    loadPlayerMovement(&Joueur, chunkL, SIZE, MC_Blocks_list, HitboxBlocks);
     
 
     applyGravity(&Joueur, chunkL, SIZE);
@@ -83,19 +86,47 @@ int main() {
     glLoadIdentity();
     setCam(&Joueur);
 
-    playerInterract(&Joueur, chunkL, SIZE, gBlocks,
+    #if DEBUG_MODE
+      cpuStartTiming(0);
+    #endif
+
+    playerInterract(&Joueur, chunkL, SIZE, MC_Blocks_list,
                     (const bool)specialmode, &delay);
+    #if DEBUG_MODE
+      u32 tickInt = cpuEndTiming();
+      u32 tempInt = timerTicks2usec(tickInt);
+      consoleSelect(&subConsole);
+      printf("\n\ttemps int : %ld\n", tempInt);
     
+    
+      cpuStartTiming(0);
+    #endif
+
     //rendu 3D
     startingDraw(CULLBACK, TextureID);
     for(chunk_t *cp = chunkL ; cp < chunkL + SIZE ; cp++){
-      RenderChunk(cp, gBlocks, true, TextureID, &Joueur);
+      RenderChunk(cp, MC_Blocks_list, true, TextureID, &Joueur);
     }
     endingDraw;
+
+    #if DEBUG_MODE
+      u32 ticks = cpuEndTiming();
+      u32 tempsRendu = timerTicks2usec(ticks);
+      printf("\ttemps CPU : %ld\n", tempsRendu);
+    #endif
 
     if (delay > 0) {
       --delay;
     }
+
+    #if DEBUG_MODE
+      int polys = 0;
+      int verts = 0;
+      glGetInt(GL_GET_POLYGON_RAM_COUNT, &polys);
+      glGetInt(GL_GET_VERTEX_RAM_COUNT, &verts);
+      printf("\tpolys : %d\n\tverts : %d\n", polys, verts);
+    #endif
+
 Fin_de_Boucle:
     fin_boucle;
   }
@@ -116,14 +147,10 @@ char *GetPlayerName(char *pseudo) {
 }
 
 void setPlayground() {
-  for (int i = 0; i < SIZE; ++i) {
-    initChunk(&chunkL[i], AIR);
-    for (int x = 0; x < L_CHUNK; ++x) {
-      for (int z = 0; z < L_CHUNK; ++z) {
-        chunkL[i].blocks[x][0][z].id = BEDROCK;
-        chunkL[i].blocks[x][1][z].id = GRASS;
-      }
-    }
-  }
-  chunkVisibility(chunkL, SIZE, gBlocks);
+  parcours_lin(SIZE, L_CHUNK, L_CHUNK,
+    initChunk(&chunkL[x], AIR),
+    NONE,
+    chunkL[x].blocks[y][0][z].id = BEDROCK;
+    chunkL[x].blocks[y][1][z].id = GRASS;);
+  chunkVisibility(chunkL, SIZE, MC_Blocks_list);
 }

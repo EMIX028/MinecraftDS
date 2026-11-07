@@ -52,7 +52,7 @@ void initSubBG(bool WithText, bool WithSprites) {
 void SubScreenInfos(char *pseudo, blockId_t indexB, u8 GameState) {
   consoleSelect(&subConsole);
   BG_PALETTE_SUB[0] = RGB15(10, 10, 10);   // fond écran sub
-  BG_PALETTE_SUB[255] = RGB15(24, 24, 24); //  couleur texte
+  consoleSetColor(&subConsole, CONSOLE_LIGHT_GRAY); //  couleur texte
 
   printf("\x1b[30;0HV1.2a");
   printf("\x1b[5;1HHey %s !", pseudo);
@@ -62,7 +62,7 @@ void SubScreenInfos(char *pseudo, blockId_t indexB, u8 GameState) {
 
 void MainScreenInfos(player_t *player) {
   consoleSelect(&hudConsole);
-  BG_PALETTE[255] = RGB15(30, 30, 30); // couleur texte
+  consoleSetColor(&hudConsole, CONSOLE_WHITE); // couleur texte
   partf32_t x = f32topart(player->Position.x);
   partf32_t y = f32topart(player->Position.y);
   partf32_t z = f32topart(player->Position.z);

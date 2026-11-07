@@ -15,7 +15,13 @@ GAME_ICON       := Icon.gif
 INCLUDEDIRS := include
 GFXDIRS := graphics
 
-CFLAGS  += -save-temps=obj -fverbose-asm -O2 -ffunction-sections -fdata-sections -g
+CFLAGS  += -fverbose-asm -O2 -ffunction-sections -fdata-sections -g
 LDFLAGS += -Wl,--gc-sections
 
 include $(BLOCKSDS)/sys/default_makefiles/rom_arm9/Makefile
+
+
+.PHONY: disassemble
+
+disassemble: build/MinecraftDS.elf
+	/opt/wonderful/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-objdump.exe -d -S $< > build/MinecraftDS.s

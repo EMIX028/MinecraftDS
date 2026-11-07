@@ -4,7 +4,7 @@
 #include "ChunkStruct.h"
 
 //listes des blocs du jeu avec leur caractéristiques
-extern block_t gBlocks[BLOCK_COUNT];
+extern block_t MC_Blocks_list[BLOCK_COUNT];
 
 //hitbox d'un bloc classique 
 extern const hitbox_t HitboxBlocks;

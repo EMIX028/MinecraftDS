@@ -180,7 +180,7 @@ void applyGravity(player_t *p, chunk_t c[], int n) {
   }
   const f32vec3_t gravityMove = {.x = 0, .y = p->velocityY, .z = 0};
 
-  if (canMovePlayer(p, gravityMove, c, n, gBlocks)) {
+  if (canMovePlayer(p, gravityMove, c, n, MC_Blocks_list)) {
     p->isfalling = true;
     movePlayer(p, gravityMove);
   } else {

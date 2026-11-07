@@ -28,14 +28,6 @@ typedef enum {
   front_to_est
 }orientation_facetex;
 
-#define ORIENTATION_MASK (3 << 6)
-// pour faire des comparaisons avec les 6 bits de visibilité de face d'un bloc
-#define FACE_MASK 0x3F
-
-#define SET_ORIENTATION(data, orientation)                                     \
-  ((data) = ((data) & 0x3F) | ((orientation) << 6))
-#define GET_ORIENTATION(data) (((data) >> 6) & 0x03)
-
 typedef enum { top, bottom, side, front } faces; //sert pour l'affichage des face de textures
 
 /*structure d'un type de bloc avec son ID
@@ -58,7 +50,8 @@ typedef struct {
 //  1 octet pour l'id, 1 octet faces pour les faces à afficher ou non
 typedef struct {
   blockId_t id;
-  u8 faces;
+  u8 orientation : 2;
+  u8 faces : 6;
   // dans le futur ajouté luminosité des blocs
 } instance_t;
 
@@ -69,6 +62,20 @@ typedef struct {
   vec2_t position;
   instance_t blocks[L_CHUNK][H_CHUNK][L_CHUNK];
 } chunk_t;
+
+//macro fonction de parcours linéaire en triple boucle
+#define parcours_lin(bx, by, bz, exprX, exprXY, exprXYZ)      \
+  do {                                                        \
+    for (u8 x = 0; x < (bx); ++x){                            \
+      exprX;                                                  \
+      for (u8 y = 0; y < (by); ++y){                          \
+        exprXY;                                               \
+        for (u8 z = 0; z < (bz); ++z){                        \
+          exprXYZ;                                            \
+        }                                                     \
+      }                                                       \
+    }                                                         \
+  } while(0)
 
 // initialise tous les blocs du chunk avec une id
 void initChunk(chunk_t *chunk, blockId_t id);

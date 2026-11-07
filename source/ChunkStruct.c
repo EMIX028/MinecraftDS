@@ -21,10 +21,10 @@ static void blockVisibility(block_t *list, chunk_t *chunk,
                              chunk_t *leftChunk, chunk_t *rightChunk,
                              chunk_t *backChunk, chunk_t *frontChunk,
                              u8 x, u8 y, u8 z) {
-  u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
+  u8 faces = chunk->blocks[x][y][z].faces;
 
   if (list[chunk->blocks[x][y][z].id].transparent == 2) {
-    chunk->blocks[x][y][z].faces = faces;
+    chunk->blocks[x][y][z].faces = 0;
     return;
   }
 
@@ -192,27 +192,41 @@ void ATTR_FUN_INI RenderChunk(chunk_t chunk[], block_t *list, bool cull, int Tex
   glPushMatrix();
   glTranslatef32(inttof32(chunk->position.x * L_CHUNK), 0,
                  inttof32(chunk->position.z * L_CHUNK));
-  
+  /*
   for (u8 x = 0 ; x < L_CHUNK ; ++x) {
     instance_t (*blockX)[L_CHUNK] = chunk->blocks[x];
     for (u8 y = 0 ; y < H_CHUNK ; ++y) {
       for (u8 z = 0 ; z < L_CHUNK ; ++z) {
-        if((blockX[y][z].faces & FACE_MASK) == 0){
+        if(blockX[y][z].faces == 0 || blockX[y][z].id == AIR){
           continue;
         }
         block_t *block = &list[blockX[y][z].id];
-        u8 faces = blockX[y][z].faces;
-        u8 orientation = GET_ORIENTATION(faces);
         
         glPushMatrix();
         glTranslatef32(inttof32(x), inttof32(y), inttof32(z));
 
-        RenderBlock(block, faces, orientation, x, y, z, player);
+        RenderBlock(block, blockX[y][z].faces, blockX[y][z].orientation, x, y, z, player);
 
         glPopMatrix(1);
       }
     }
-  }
+  }*/
+  parcours_lin(L_CHUNK, H_CHUNK, L_CHUNK,
+    instance_t (*blockX)[L_CHUNK] = chunk->blocks[x],
+      NONE,
+        {
+          if(blockX[y][z].faces == 0 || blockX[y][z].id == AIR){
+            continue;
+          }
+          block_t *block = &list[blockX[y][z].id];
+        
+          glPushMatrix();
+          glTranslatef32(inttof32(x), inttof32(y), inttof32(z));
+
+          RenderBlock(block, blockX[y][z].faces, blockX[y][z].orientation, x, y, z, player);
+
+          glPopMatrix(1);
+        });
   glPopMatrix(1);
 }
 
@@ -257,7 +271,8 @@ chunk_t *setBlock(chunk_t chunk[], int size, int x, int y, int z, blockId_t bloc
   while(p < chunk + size){
     if (p->position.x == chunkX && p->position.z == chunkZ) {
       p->blocks[localX][y][localZ].id = block;
-      SET_ORIENTATION(p->blocks[localX][y][localZ].faces, orientation);
+      p->blocks[localX][y][localZ].orientation = orientation;
+      p->blocks[localX][y][localZ].faces = 0;
       return p;
     }
     p++;
@@ -304,7 +319,7 @@ void updateVisibility(block_t list[], chunk_t chunkL[], int size,
   bool drawing = list[block].transparent >= 1;
   bool solid = list[block].transparent != 2;
 
-  u8 faces = chunk->blocks[x][y][z].faces & ORIENTATION_MASK;
+  u8 faces = 0;
 
   for(int i = 0; i < 6; i++){
     int nx = x + NEIGHBORS[i].dx;

@@ -39,9 +39,12 @@ typedef struct {
 //type qui permet de définir tout ce qui est relatif aux id d'un bloc
 typedef uint8_t blockId_t;
 
+#define NONE ((void)0)
+
 enum GAMESTATE{
   RUNNING,
   PAUSED,
+  CLOSE
 };
 
 enum {

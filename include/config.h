@@ -3,7 +3,7 @@
 #define CONFIG_H
 
 //activer ou non le debug mode
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 
 // définition de nullptr pour la norme de compilation de blocksDS

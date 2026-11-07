@@ -8,6 +8,9 @@ void loadKeyAssignation(player_t *player, u8 *GameState){
   if(Kdown & KEY_START){
     *GameState = (*GameState == PAUSED) ? RUNNING : PAUSED;
   }
+  if(Kdown & KEY_SELECT){
+    *GameState = CLOSE;
+  }
 
   if((hold & KEY_L) && (Kdown & KEY_A)){
     if(player->index < BLOCK_COUNT-1){
